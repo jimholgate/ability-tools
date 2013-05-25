@@ -1,0 +1,52 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+    <meta>
+        <topic id="aplusschooltools/ca.bc.vancouver.holgate.james.schooltools/install.xhp" indexer="include" status="PUBLISH">
+            <title id="install" xml-lang="en-US">
+                Install</title>
+            <filename>/ca.bc.vancouver.holgate.james.schooltools/install.xhp</filename>
+        </topic>
+        <history>
+            <created date="2012-04-25T00:00:00">
+                James Holgate</created>
+            <lastedited date="2012-08-29T10:40:00">
+            </lastedited>
+        </history>
+    </meta>
+    <body>
+        <paragraph role="heading" id="install1" xml-lang="en-US" level="1">
+            Setting up Ability Tools</paragraph>
+        <paragraph role="heading" id="install1.1" xml-lang="en-US" level="2">
+            Install</paragraph>
+        <list>
+            <listitem>
+                This extension makes it easy to export and publish presentations and electronic books. Use the Impress notes screen to add text to the presentation. The extension can read your notes aloud while you present. The extension can export your presentation as an ePub document, HTML, or as uncompressed Braille text. Applications like iBooks and Overdrive for iOS or fbReader for Android can read your electronic documents aloud.
+            </listitem>
+            <listitem>
+                If you have a new computer, check your computer's email setup by sending a test email message. If you are planning to publish electronic books, you can install a electronic book manager like
+                <link href="http://calibre-ebook.com/" name="http://calibre-ebook.com/">
+                    calibre</link>.
+            </listitem>
+            <listitem>
+                You can use the Readium extension for Chrome and Chromium to preview and read your ePub electronic books. You can find out more at the 
+                <link href="http://www.readium.org/" name="http://www.readium.org/">
+                    Readium</link> site.
+            </listitem>
+            <listitem>
+                Check that the %PRODUCTNAME application is up to date.  
+            </listitem>
+            <listitem>
+                Get the most recent version of the extension at the extensions web site. 
+            </listitem>
+            <listitem>
+                Open the extension with the %PRODUCTNAME application. Approve the license.
+            </listitem>
+            <listitem>
+                Restart the %PRODUCTNAME application.
+            </listitem>
+        </list>
+<section id="relatedtopics">
+<embed href="text/shared/guide/accessibility.xhp#accessibility"/>
+</section>
+    </body>
+</helpdocument>

@@ -1,0 +1,589 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="userpreview" script:language="StarBasic">REM  *****  BASIC  *****
+option explicit 
+sub previewNoteAsAudibleBraille
+	dim sA as string
+	if ThisComponent.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) then
+		&apos;viewNormal &apos; We want to unselect the text of the note and show the slide very large.
+		ThisComponent.Presentation.Start
+		sA = fsGetSlideNote
+		if len(sA) = 0 then
+			simpleSpeech (getBrailleL10N(16))
+			ShowDialog (getBrailleL10N(16)) &apos; The note is blank.
+		else
+			sA = fsstripXMLTags (sA)
+			sA = fsSuperTrim (sA)
+			AudibleBraille (sA,100)
+		endif
+		ThisComponent.Presentation.End
+	endif
+end sub
+
+
+function AudibleBraille (optional byval cText, optional byval iMode)
+	dim sA as string
+	if ismissing (cText) then
+		cText = getBrailleL10N (12) &apos; Sentence with all letters
+	endif
+	if ismissing (iMode) then
+		iMode = 100
+	endif
+	cText = fsReplaceText (cText, &quot;©&quot;, getBrailleL10N(17))
+	cText = fsReplaceText (cText, &quot;™&quot;, getBrailleL10N(18))
+	cText = fsSuperTrim (cText)
+	sA = fsToGradeOneBraille (cText, 0)
+	sA = fsAsciiToBrailleTypeWriter (sA)
+	sA = fsReplaceText (sA, &quot;1&quot;, &quot;1 &quot;)
+	sA = fsReplaceText (sA, &quot;2&quot;, &quot;2 &quot;)
+	sA = fsReplaceText (sA, &quot;3&quot;, &quot;3 &quot;)
+	sA = fsReplaceText (sA, &quot;4&quot;, &quot;4 &quot;)
+	sA = fsReplaceText (sA, &quot;5&quot;, &quot;5 &quot;)
+	sA = fsReplaceText (sA, &quot;6&quot;, &quot;6 &quot;)
+	select case iMode
+	case 7 
+		simpleSpeech (cText &amp; chr$(10) &amp; sA )
+		ShowDialog (cText &amp; chr$(10) &amp; fsToGradeOneBraille (cText, 105) &amp; chr$(10) &amp; sA)
+	case 6
+		simpleSpeech (cText &amp; chr$(10) &amp; sA )
+		ShowDialog (cText &amp; chr$(10) &amp; fsToGradeOneBraille (cText, 105))
+	case 5
+		ShowDialog ( cText &amp; chr$(10) &amp; fsToGradeOneBraille (cText, 105) &amp; chr$(10) &amp; sA)
+	case 4
+		ShowDialog (cText &amp; chr$(10) &amp; fsToGradeOneBraille (cText, 105))
+	case 3
+		simpleSpeech ( sA )
+		ShowDialog (sA)
+	case 2
+		simpleSpeech ( sA )
+	case 1
+		ShowDialog (sA)
+	case 0
+		&apos; invisible, inaudible
+	case else 
+		&apos; This is the default. We only show the typewriter codes, because we
+		&apos; don&apos;t know if the fonts on your computer support Unicode Braille.
+		simpleSpeech ( cText )
+		ShowDialog (cText &amp; chr$(10) &amp; chr$(10) &amp; sA)
+	end select
+	AudibleBraille = sA
+end function
+
+sub ReadImpressVeryVerbose (optional iMultiLingual as boolean)
+	&apos; This gives a preview of the presentation roughly as an ePub will sound
+	&apos; on iBooks for iOS with VoiceOver. It plays all the text fields as audio.
+	&apos; The screen does _not_ update as you click through the slides. 
+	&apos; Use &quot;Read notes aloud with the system voice (Recommended!)&quot; if 
+	&apos; you need the screen to update as your computer reads.
+	&apos; The order that the extension reads text fields corresponds to the 
+	&apos; order of the text field in the presentation. Normally, this means
+	&apos; that the text fields you added first get read first, followed by 
+	&apos; the various text fields in the order you added them.
+	&apos; To change the order a text field is read, right click or control click the
+	&apos; text object, then choose, Arrange - Bring forward or Send backward.
+	if ismissing (iMultiLingual) then
+		iMultiLingual = false
+	endif
+	&apos;Listen to the text of the slides in a Impress presentation.
+	&apos;Adapted from code by Danny Brewer at http://www.oooforum.org/forum/viewtopic.phtml?t=10795 
+	dim oDoc, oDrawPages,oDrawPage,oShape,oElem
+	dim nNumShapes,nShape,nPage,nNumPages,nThisPage, iNo
+	dim cTitle,cDialogTitle
+	dim n1
+	oDoc=ThisComponent 
+	if oDoc.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) then
+		ThisComponent.Presentation.Start
+		oDrawPages=oDoc.getDrawPages() 
+		nNumPages=oDrawPages.getCount()
+		oElem=oDoc.getDrawPages().getElementNames() 
+		nThisPage=oDoc.getCurrentController.getCurrentPage().Number-1
+		for nPage=nThisPage To nNumPages - 1 
+			oDrawPage=oDrawPages.getByIndex( nPage ) 
+			nNumShapes=oDrawPage.getCount() 
+			for nShape=0 To nNumShapes - 1 
+				oShape=oDrawPage.getByIndex( nShape ) 
+				if HasUnoInterfaces( oShape, &quot;com.sun.star.lang.XServiceInfo&quot;) then 
+					if oDrawPage.getName &lt;&gt; &quot;&quot; then
+						cDialogTitle=nPage + 1 &amp; &quot;.&quot; &amp; nShape + 1 &amp; &quot; - &quot; _
+						&amp; oDrawPage.getName
+					else
+						cDialogTitle=nPage + 1 &amp; &quot;.&quot; &amp; nShape + 1 &amp; &quot; - &quot; _
+						&amp; getBranding ( bI_SPOKEN_BRANDING )
+					endif
+					cTitle=&quot;&quot;
+					on error resume next
+					cTitle=oShape.getText().getString()
+					if len(cTitle) &lt;&gt; 0 then
+						cTitle = fsReplaceText (cTitle,&quot;&lt;li&quot;, fs_BULLET(fs_cL) &amp; &quot;. &lt;li&quot;)
+						cTitle = fsReplaceText (cTitle,&quot;&lt;h&quot;, fs_HEADING(fs_cL) &amp; &quot;. &lt;h&quot;)
+						cTitle = fsReplaceText (cTitle,&quot;&lt;a&quot;, fs_LINK(fs_cL) &amp; &quot;. &lt;a&quot;)
+						cTitle = fsReplaceText (cTitle,&quot;&lt;img&quot;, fs_IMAGE(fs_cL) &amp; &quot;. &lt;img&quot;)
+						cTitle = fsReplaceText (cTitle,&quot;&lt;blockquote&quot;, fs_BLOCKQUOTE(fs_cL) &amp; &quot;. &lt;blockquote&quot;)
+						cTitle = fsReplaceText (cTitle,&quot;&amp;nbsp;&quot;,&quot; &quot;)
+						cTitle = fsstripXMLTags (cTitle)
+						if iMultilingual = false then
+							simpleSpeech (fsReplaceText(cTitle,chr(10),&quot;. &quot;)
+						else
+							synthesizeSpeech (fsReplaceText(cTitle,chr(10),&quot;. &quot;)
+						endif 
+					n1= msgBox (cTitle,1,cDialogTitle)
+					endif
+					if n1=2 then
+						ThisComponent.Presentation.End
+						exit sub 
+					endif
+				endif 
+			next
+			if oDrawPage.getName &lt;&gt; &quot;&quot; then
+				cDialogTitle=nPage + 1 &amp; &quot;.&quot; &amp; nNumShapes + 1 &amp; &quot; - &quot; _
+				&amp; oDrawPage.getName
+				else
+				cDialogTitle=nPage + 1 &amp; &quot;.&quot; &amp; nNumShapes + 1 &amp; &quot; - &quot; _
+				&amp; getBranding ( bI_SPOKEN_BRANDING )
+			endif
+			iNo = fiGetSlideNoteIndex
+			cTitle=oDrawPage.getNotesPage.getByIndex(iNo).getText().getString()
+			if len(cTitle) &lt;&gt; 0 then
+				cTitle = fsReplaceText (cTitle,&quot;&lt;li&quot;, fs_BULLET(fs_cL) &amp; &quot;. &lt;li&quot;)
+				cTitle = fsReplaceText (cTitle,&quot;&lt;h&quot;, fs_HEADING(fs_cL) &amp; &quot;. &lt;h&quot;)
+				cTitle = fsReplaceText (cTitle,&quot;&lt;/a&gt;&quot;, &quot;&lt;/a&gt;. &quot; &amp; fs_LINK(fs_cL) &amp; &quot;.&quot;)
+				cTitle = fsReplaceText (cTitle,&quot;&lt;/img&gt;&quot;, &quot;&lt;/img&gt;. &quot; &amp; fs_IMAGE(fs_cL) &amp; &quot;.&quot;)
+				cTitle = fsReplaceText (cTitle,&quot;&lt;blockquote&quot;, fs_BLOCKQUOTE(fs_cL) &amp; &quot;. &lt;blockquote&quot;)
+				cTitle = fsReplaceText (cTitle,&quot;&amp;nbsp;&quot;,&quot; &quot;)
+				cTitle = fsstripXMLTags (cTitle)
+				if iMultilingual = false then
+					simpleSpeech (fsReplaceText(cTitle,chr(10),&quot;. &quot;)
+				else
+					synthesizeSpeech (fsReplaceText(cTitle,chr(10),&quot;. &quot;)
+				endif 
+				n1= msgBox (cTitle,1,cDialogTitle)
+				if n1=2 then
+					ThisComponent.Presentation.End
+					exit sub 
+				endif
+			endif
+		next
+	endif
+	if iMultilingual = false then
+		simpleSpeech (fs_END_OF_SLIDESHOW(&quot;en&quot;))
+	else
+		synthesizeSpeech (fs_END_OF_SLIDESHOW(fs_cL))
+	endif 
+	ThisComponent.Presentation.End
+	ShowDialog(fs_END_OF_SLIDESHOW(fs_cL))
+end sub
+
+function fnCurrentCard
+	on Error goto fiGetCurrentCarderror 
+	fnCurrentCard = ThisComponent.Presentation.Controller.getCurrentSlideIndex()
+	exit function
+	fiGetCurrentCarderror:
+	&apos;The presentation is not playing. Return current editing page 
+	if ThisComponent.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) then
+		fnCurrentCard = ThisComponent.getCurrentController.getCurrentPage().Number-1
+	else
+		fnCurrentCard = -1
+	endif
+end function
+
+function fiCurrentSlideIndex
+	on Error goto fiGetCurrentSlideIndexerror 
+	fiCurrentSlideIndex = ThisComponent.Presentation.Controller.getCurrentSlideIndex()
+	exit function
+	fiGetCurrentSlideIndexerror:
+	&apos; The presentation is not playing. 
+	fiCurrentSlideIndex = -1
+end function
+
+function fnCountCards 
+	fnCountCards=ThisComponent.getDrawPages.getCount()
+end function
+
+sub readSlideShowNote (Optional nSpeechResources)
+	&apos;The notes objects are only available when using odp presentations. 
+	&apos;Using a PowerPoint presentation raises an error.
+	dim nPage as integer
+	dim sA as string
+	dim cAttachmentURL as string
+	if ismissing (nSpeechResources) then
+		nSpeechResources = ENABLE_SYSTEM_SPEECH_ONLY
+	endif
+	cAttachmentURL = ThisComponent.getURL()
+	if fBextensionOK (&quot;odp&quot;, cAttachmentURL) then 
+		nPage = fiCurrentSlideIndex
+		if nPage &lt;&gt; -1 then
+			sA = ThisComponent.getDrawPages().getByIndex( nPage ).getNotesPage.getByIndex(fiGetSlideNoteIndex).getText().getString()
+			sA = fsreplaceText (sA ,&quot;&amp;lt;&quot;, getBrailleL10N(20)) &apos; not defined in SML
+			sA = fsreplaceText (sA ,&quot;&amp;gt;&quot;, getBrailleL10N(19)) &apos; not defined in SML
+			readTheNotesScript(sA, nSpeechResources, nPage)
+		endif
+	else 
+		ShowDialog(fs_SAVE_BEFORE_SENDING(fs_cL))
+	endif
+end sub 
+
+function fBextensionOK (optional sExt, optional sFileName)
+	if NOT GlobalScope.BasicLibraries.isLibraryLoaded(&quot;Tools&quot;) then 
+		GlobalScope.BasicLibraries.loadLibrary(&quot;Tools&quot;)
+	endif
+	if ismissing ( sExt ) then 
+		sExt = &quot;odp&quot;
+	endif
+	if ismissing ( sFileName ) then
+		sFileName = ThisComponent.getURL()
+	endif
+	select case len(sFileName)
+	case 0
+		fBextensionOK = false
+	case else 
+		select case GetFileNameExtension (sFileName)
+		case sExt
+			fBextensionOK = true
+		case else 
+			fBextensionOK = false
+		end select
+	end select
+end function
+
+sub tellTheTime
+	readTheNotesScript (Time)
+end sub
+
+function fbIsAnURL(sA)
+	dim sB as string
+	sB=fsreplaceText(sA,&quot;+&quot;,&quot;%2B&quot;)
+	sB=fsreplaceText(sB,&quot;&amp;&quot;,&quot;%26&quot;)
+	select case LCase(Left(ConvertToURL(sA),Instr(ConvertToURL(sB),&quot;:&quot;)))
+	case &quot;file:&quot;, &quot;&quot;
+		fbIsAnURL = false
+	case else 
+		fbIsAnURL = true
+	end select
+end function
+
+function fbIsAPlayableSoundURL(sA)
+	select case LCase(Right(ConvertToURL(sA),4))
+	case &quot;.mp3&quot;
+		fbIsAPlayableSoundURL = true
+	case else 
+		fbIsAPlayableSoundURL = false
+	end select
+end function
+
+sub readTheNotesScript(optional sA, optional nSpeechResources, optional nPage)
+	dim cHeading as string
+	&apos; cHeading = getBranding (bI_SPOKEN_BRANDING ) &amp; &quot; &quot; &amp; (fnCurrentCard + 1) &amp; &quot; [&quot; &amp; fsLanguageOfNote1 &amp; &quot;]&quot;
+	cHeading = fsShortFileName() &amp; &quot; &quot; &amp; (fnCurrentCard + 1) &amp; &quot; [&quot; &amp; fsLanguageOfNote1 &amp; &quot;]&quot; 
+	if ismissing (nSpeechResources) then
+		nSpeechResources = ENABLE_SYSTEM_SPEECH_ONLY
+	endif
+	
+	if ismissing (nPage) then
+		nPage = 0
+	endif
+	if ismissing (sA) then
+		sA = fsAskForNote (fs_WHAT_DO_YOU_SAY(fs_cL), cHeading )
+	endif
+	select case fbIsAnURL(sA)
+	case false
+		&apos;Read the stringsA aloud
+		if sA = &quot;&quot; then
+			&apos; lets ask for a string
+			sA = fsAskForNote (fs_WHAT_DO_YOU_SAY(fs_cL), cHeading)
+			&apos; lets put the stringin the note
+			UpdateSlideNote (sA)
+		endif 
+		sA = fsSuperTrim (sA)
+		if instr (sA,&quot;&lt;ask&gt;&quot;) = 1 and right(sA, 6 ) = &quot;&lt;/ask&gt;&quot; then
+		&apos; Ask
+			sA = fsAskForNote (sA, cHeading)
+			UpdateSlideNote (sA)
+			&apos; let&apos;s not say the ask code with synthesizeSpeech.
+			sA = fsReplaceText ( sA , &quot;&lt;ask&gt;&quot; , &quot;&quot;) 
+			sA = fsReplaceText ( sA , &quot;&lt;/ask&gt;&quot; , &quot;&quot;)
+		endif
+		
+		if fbIsJson (sA) = false then
+			sA = fsstripXMLTags (sA)
+			&apos; synthesizeSpeech(sA, fsLanguageOfNote1(fiCurrentSlideIndex), nSpeechResources)
+			synthesizeSpeech(sA, fsLanguageOfNote1(fnCurrentCard), nSpeechResources)
+		else
+			&apos;Deal with Json. for now, show it in a dialog field.
+			ShowDialog ( sA )
+		endif
+	case else  &apos;true
+		if nSpeechResources = ENABLE_ONLINE_RESOURCES or ShowDialog ( sA , true ) then
+			&apos; The notes have a URL in them, so we go to the URL using the system default 
+			&apos; application for the given file protocol.
+			if fbIsAPlayableSoundURL (sA) then
+				&apos; Attempt to play the sound in the background, if a background player is available.
+				&apos; for example:
+				&apos; http://www.sounddogs.com/previews/31/mp3/272650_SOUNDDOGS__ch.mp3
+				&apos; if you have an audio blog, you can make the presentation play your current mp3 entry
+				&apos; playASoundFile(cURL as string,Optional bVisible as boolean)
+				playASoundFile(sA,false)
+			else
+				webExecute (sA)
+			endif
+		endif
+	end select
+end sub 
+
+sub webExecute (sA as string, optional istate)
+	if ismissing (istate) then
+		istate = 0 
+	endif
+	dim oSvc As object
+	oSvc=createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
+	oSvc.execute(sA,&quot;&quot;,istate)
+end sub 
+
+
+function ENABLE_SYSTEM_SPEECH_ONLY
+	ENABLE_SYSTEM_SPEECH_ONLY = 1
+end function
+
+function ENABLE_SYSTEM_LANGUAGES
+	ENABLE_SYSTEM_LANGUAGES = 2
+end function
+
+function ENABLE_ONLINE_RESOURCES
+	ENABLE_ONLINE_RESOURCES = 3
+end function
+
+function ENABLE_ONLINE_VOICES_ONLY
+	ENABLE_ONLINE_VOICES_ONLY = 4
+end function
+&apos;------------
+
+sub readSlideShowNotes (Optional nSpeechResources)
+&apos; Start the slideshow with the system voice narrating
+&apos; The script for the speech is taken from the presentation
+&apos; notes.
+	if ismissing (nSpeechResources) then
+		nSpeechResources = ENABLE_SYSTEM_SPEECH_ONLY
+	endif
+	on error goto  readSlideShowNotesError
+	dim l1 as long
+	dim lCurrent as Long
+	lCurrent = fnCurrentCard - 1
+	ThisComponent.Presentation.Start
+	Wait 500 &apos; half second
+	Do
+		if fnCurrentCard &lt;&gt; lCurrent then
+			readSlideShowNote (nSpeechResources)
+			lCurrent = fnCurrentCard + 0
+			Wait 250 &apos; quarter second
+		endif
+		if lCurrent = fnCountCards then
+			exit Do
+		endif
+		&apos;Raise an error if user exits slideshow prematurely
+		l1 = ThisComponent.Presentation.Controller.getCurrentSlideIndex()
+	Loop
+	readSlideShowNotesError:
+	&apos;Premature exit
+	&apos;
+end sub 
+
+sub ShowInfoAboutCurrentDisplaySlide
+	&apos;Returns first slide info if slide show is not running.
+	msgBox &quot;Index: &quot;  &amp; fnCurrentCard &amp; Chr$(25) &amp; &quot; Language: &quot; &amp; fsLanguageOfNote1 (fnCurrentCard)
+end sub
+
+function fsLanguageOfNote1 (nPage, optional cAsiaComplexWest)
+	if ismissing (cAsiaComplexWest) then 
+		cAsiaComplexWest = &quot;&quot;
+	endif
+	&apos; Format - Character - Font - Language 
+	&apos;Adapted from code by Danny Brewer at http://www.oooforum.org/forum/viewtopic.phtml?t=10795 
+	dim oDoc, oDrawPages,oDrawPage,oShape,oElem
+	dim nNumShapes,nShape,nPage,nNumPages,nThisPage as integer
+	dim cTitle,cLocale,cAsianLanguage,cComplexLanguage, cWesternLanguage as string
+	dim n1, iNO as integer
+	dim longI as Long
+	dim CR as string
+	dim sA as string
+	CR = chr$(13)
+	oDoc=ThisComponent 
+	oDrawPages=oDoc.getDrawPages() 
+	nNumPages=oDrawPages.getCount()
+	oElem=oDoc.getDrawPages().getElementNames() 
+	oDrawPage=oDrawPages.getByIndex( fnCurrentCard )  
+	if oDrawPage.getNotesPage.getCount &lt; 2 then &apos; User deleted the notes object
+		cTitle=&quot;&quot;
+		cAsianLanguage=&quot;zxx-&quot; &apos;if missing note field, use code for unknown language and locale
+		cComplexLanguage=&quot;zxx-&quot;
+		cWesternLanguage=&quot;zxx-&quot;
+	else 
+		iNo = fiGetSlideNoteIndex
+		cTitle=oDrawPage.getNotesPage.getByIndex(iNo).getText().getString()
+		cAsianLanguage=oDrawPage.getNotesPage.getByIndex(iNo).CharLocaleAsian.Language &amp; &quot;-&quot; &amp; oDrawPage.getNotesPage.getByIndex(iNo).CharLocaleAsian.Country
+		cComplexLanguage=oDrawPage.getNotesPage.getByIndex(iNo).CharLocaleComplex.Language &amp; &quot;-&quot; &amp; oDrawPage.getNotesPage.getByIndex(iNo).CharLocaleComplex.Country
+		cWesternLanguage=oDrawPage.getNotesPage.getByIndex(iNo).CharLocale.Language() &amp; &quot;-&quot; &amp; oDrawPage.getNotesPage.getByIndex(iNo).CharLocale.Country()
+	endif
+	if cAsiaComplexWest &lt;&gt; &quot;&quot; then
+		sA = cAsiaComplexWest
+	else
+		sA = fsComplexAsiaOrWest( cTitle )
+	end if
+	select case sA
+	case &quot;WEST&quot;
+		cLocale=cWesternLanguage
+	case &quot;ASIA&quot;
+		cLocale=cAsianLanguage
+	case &quot;UNDEFINED&quot; &apos;We would prefer that the client not read this aloud
+		cLocale=&quot;zxx-&quot;
+	case else  &apos;COMPLEX
+		cLocale=cComplexLanguage
+	end select
+	fsLanguageOfNote1 = cLocale
+	exit function
+	fsLanguageOfNote1Error:
+	fsLanguageOfNote1=&quot;zxx-&quot; &apos;undefined. Keep quiet!
+end function
+
+function fsQuickSubtitleDoc
+	&apos; Use this for quickly modifying your notes.
+	&apos; for example, you could translate them, then
+	&apos; import the translation.
+	dim oDoc, oDrawPages,oDrawPage
+	dim nPage,nNumPages as integer
+	dim cBody,cTimeCode as string
+	dim n1, iNo as integer
+	dim CR as string
+	CR = chr$(13)
+	oDoc=ThisComponent 
+	oDrawPages=oDoc.getDrawPages() 
+	nNumPages=oDrawPages.getCount()
+	fsQuickSubtitleDoc=&quot;&quot;
+	on error goto fsQuickSubtitleDocError
+	for nPage=0 To nNumPages - 1 step 1
+		oDrawPage=oDrawPages.getByIndex( nPage ) 
+		if oDrawPage.getNotesPage.getCount &lt; 2 then &apos; User deleted the notes object
+			cBody=&quot;[...]&quot;
+		else 
+			iNo = fiGetSlideNoteIndex
+			cBody=oDrawPage.getNotesPage.getByIndex(iNo).getText().getString()
+			if cBody = &quot;&quot; then 
+				cBody=&quot;[?????]&quot;
+			elseif fbIsAPlayableSoundURL(cBody) then
+				cBody=&quot;[--♫--]&quot;
+			endif
+		endif
+		fsQuickSubtitleDoc=fsQuickSubtitleDoc &amp; fsMakeQuickTimeCode(nPage,10) &amp; CR &apos; Ten seconds per slide
+		fsQuickSubtitleDoc=fsQuickSubtitleDoc &amp; cBody &amp; CR &amp; CR
+	next
+	fsQuickSubtitleDoc=fsSuperTrim(fsQuickSubtitleDoc)
+	exit function
+	fsQuickSubtitleDocError:
+	fsQuickSubtitleDoc=&quot;&quot;
+end function
+
+function fsMakeQuickTimeCode(nSlideNo as long,nInterval as long)
+	dim nStartTime as long
+	dim nEndTime as long
+	nStartTime=nSlideNo * nInterval
+	nEndTime=(nSlideNo + 1) * nInterval
+	fsMakeQuickTimeCode=SecondsToSubTitleTime(nStartTime) &amp; &quot;.500,&quot; &amp; SecondsToSubTitleTime(nEndTime)&amp; &quot;.000&quot;
+end function
+
+function SecondsToSubTitleTime (b2 as long)
+	dim daDT as Date
+	dim a2 , c2 as string
+	c2 = trim(Str(b2))
+	c2 = &quot;0:00:&quot; &amp; c2
+	a2 = &quot;0:00&quot;
+	daDT = TimeValue(c2) - TimeValue(a2)
+	SecondsToSubTitleTime = trim(Str(Hour(daDT))) &amp; &quot;:&quot; &amp; fsPrefixZeroes(trim(Str(Minute(daDT))),2) &amp; _
+		&quot;:&quot; &amp; fsPrefixZeroes(trim(Str(Second(daDT))),2) &apos; &amp; &quot;.0000&quot;	
+end function
+
+&apos;Preview Transcript 
+&apos;ShowDialog (fsNotesTranscript)
+
+function fsNotesTranscript
+	dim oDoc, oDrawPages,oDrawPage
+	dim nPage,nNumPages as integer
+	dim cBody as string
+	dim n1, iNo as integer
+	dim CR as string
+	CR = chr$(13)
+	oDoc=ThisComponent 
+	oDrawPages=oDoc.getDrawPages() 
+	nNumPages=oDrawPages.getCount()
+	fsNotesTranscript=&quot;&quot;
+	on error goto fsNotesTranscriptError
+	for nPage=0 To nNumPages - 1 step 1
+		oDrawPage=oDrawPages.getByIndex( nPage ) 
+		if oDrawPage.getNotesPage.getCount &lt; 2 then &apos; User deleted the notes object
+			cBody=&quot;&quot;
+		else 
+			iNo = fiGetSlideNoteIndex
+			cBody=oDrawPage.getNotesPage.getByIndex(iNo).getText().getString()
+		endif
+		fsNotesTranscript=fsNotesTranscript &amp; cBody &amp; CR
+	next
+	exit function
+	fsNotesTranscriptError:
+	fsNotesTranscript=&quot;&quot;
+end function
+
+&apos;Start recording desktop (shell to app) is incomplete. Replace it.
+&apos;ScreenCaptureMovie
+
+sub ScreenCaptureMovie
+	dim errorCode as Long
+	dim sArg as string
+	dim bWait as boolean
+	dim sApp as string
+	dim sApp2 as string
+	select case fsGetOS()
+	case &quot;WINDOWS&quot;
+		&apos; Be sure to get the most recent Microsoft Expression Encoder with screen capture. The free
+		&apos; version can record up to ten minutes but can&apos;t produce as many formats as the paid version.
+		sArg=&quot;&quot;
+		bWait=false
+		sApp = convertToURL( fsProgramDirectory) &amp; &quot;Microsoft%20Expression/Encoder%204/EEScreen.exe&quot;
+		sApp2 = convertToURL ( fsProgramDirectoryx86 ) &amp; &quot;Microsoft%20Expression/Encoder%204/EEScreen.exe&quot;
+		if fileExists (sApp) then
+			errorCode=Shell (sApp, 0, sArg, bWait)
+		elseif fileExists (sApp2) then
+			errorCode=Shell (sApp2, 0, sArg, bWait)
+		else 
+			ShowDialog(fs_NO_ACTION(fs_cL) &amp; chr$(13) &amp; chr$(13) &amp; convertFromURL(sApp) )
+		endif
+	case &quot;MAC&quot;,&quot;OSX&quot;
+		&apos; Quicktime screen capture records screen activity but does not directly record the 
+		&apos; sound playing. You can set it up to use a microphone, or record it on another computer.
+		&apos; Sound Flower (http://code.google.com/soundflower) is an auxillary program for OSX 
+		&apos; that acts as a virtual device that can send system or outside device sound
+		&apos; output to programs running in OSX. http://www.youtube.com/watch?v=wFYQqI-6Luc
+		sApp=&quot;file:///Applications/QuickTime%20Player.app/Contents/MacOS/QuickTime%20Player&quot;
+		sArg=&quot;&quot;
+		bWait=false
+		if FileExists (sApp) then
+			errorCode=Shell (sApp, 0, sArg, bWait)
+		else 
+			ShowDialog(fs_NO_ACTION(fs_cL) &amp; chr$(13) &amp; chr$(13) &amp; convertFromURL(sApp) )
+		endif
+	case else  &apos;Linux
+		if fileExists (&quot;file:///usr/bin/kazam&quot;) then
+			&apos; Kazam outputs to Firefox &amp; Webkit compatible Video (webm) by default.
+			&apos; Kazam can also output to MP4 format - suitable for editing on OSX
+			sApp=&quot;file:///usr/bin/kazam&quot;
+			errorCode=Shell (sApp, 2)
+		elseif fileExists (&quot;file:///usr/bin/recorditnow&quot;) then
+			&apos; KDE screen recorder
+			sApp=&quot;file:///usr/bin/recorditnow&quot;
+			errorCode=Shell (sApp, 2)
+		elseif fileExists (&quot;file:///usr/bin/gtk-recordmydesktop&quot;) then
+			&apos; Outputs to ogv, an open standard
+			sApp=&quot;file:///usr/bin/gtk-recordmydesktop&quot;
+			errorCode=Shell (sApp, 2)
+		else
+			ShowDialog(fs_NO_ACTION(fs_cL) &amp; chr$(13) &amp; chr$(13) &amp; convertFromURL(&quot;file:///usr/bin/kazam&quot;) )
+		endif
+	end select
+end sub 
+</script:module>

@@ -1,0 +1,58 @@
+<?xml version='1.0' encoding='utf-8'?>
+<svg width='400' height='565' xmlns='http://www.w3.org/2000/svg'>
+<metadata id='metadata7'>image/svg+xml</metadata>
+<!-- Printed 2012-09-14. Images (c) 2012 JAMES HOLGATE. CC CANADA ATTRIBUTION, NON-COMMERCIAL, MODIFICATION PERMITTED
+This is a Vector graphics file. The image is made up of curves and line segments. When you
+view a SVG file in a modern browser, the titles show up as tool tips. 
+Notice the comments. They don't show up in the image, but they help tell how the format works./--> 
+<filter id='dropshadow' height='130%'> 
+<feGaussianBlur in='SourceAlpha' stdDeviation='3'/> 
+<!-- stdDeviation is how much to blur --> 
+<feOffset dx='0' dy='3' result='offsetblur'/>  
+<!-- how much to offset --> 
+<feMerge>  
+<feMergeNode/>  
+<feMergeNode in='SourceGraphic'/> 
+<!-- this contains the element that the filter is applied to --> 
+</feMerge> 
+</filter> 
+<filter id='inner-shadow'>
+<!-- Shadow Offset -->
+<feOffset dx='0' dy='5'/>
+<!-- Shadow Blur -->
+<feGaussianBlur stdDeviation='3' result='offset-blur'/>
+<!-- Invert the drop shadow to create an inner shadow -->
+<feComposite operator='out' in='SourceGraphic' in2='offset-blur' result='inverse'/>
+<!-- Color & Opacity -->
+<feFlood flood-color='black' flood-opacity='0.75' result='color'/>
+<!-- Clip color inside shadow -->
+<feComposite operator='in' in='color' in2='inverse' result='shadow'/>
+<!-- Put shadow over original object -->
+<feComposite operator='over' in='shadow' in2='SourceGraphic'/>
+</filter>
+<!--This is the image of the square in the background. We work towards the foreground /-->
+<g>
+<title>(TITLE)</title>
+<g id='layer1'>
+<rect fill='greY' y='65' x='50' height='300' width='300' id='rect3618' style='filter:url(#inner-shadow)' />
+</g>
+</g>
+<!-- This is the image of a Inuksuk. It appears in front of the square. /-->
+<g>
+<title>(AUTHOR)</title>
+<g id='inuksuk1'>
+<path fill='white' stroke='white' stroke-width='1px' id='path3050-1'
+d='m 100.39992,355.54462 c 15.68941,-10.72705 38.16391,-10.48841 38.16391,-10.48841 l 12.20288,-2.06295 6.97305,-17.32825 0.43582,-10.31451 1.30745,-7.42643 4.79399,-7.42642 2.17908,-0.41258 1.30745,-5.36353 -7.40889,0 0,-3.71322 12.20288,-11.5522 11.33125,-2.47548 -2.17907,-7.42645 0,-7.0138 4.35817,-9.90193 -9.588,-0.82513 -4.79398,-2.06292 2.17909,-9.07673 0,-4.53839 1.74324,-1.6503 9.15217,-0.41257 3.92239,-1.23776 -2.17911,-11.13962 -0.87167,-9.48932 -1.30744,-2.06289 -1.30746,-4.5384 2.6149,-2.47544 7.84474,-1.65032 8.71632,0.82515 2.17908,1.23776 3.92236,4.53835 -0.87164,25.16734 8.28052,1.23772 5.6656,2.47545 2.17908,9.48936 -15.68939,3.71323 5.6656,11.55217 0,10.3145 8.28055,-0.82517 3.92233,0.41258 3.05074,2.0629 0,7.01384 -3.05074,0 0.87166,4.12579 -1.74326,5.36351 2.17908,2.88808 -1.74327,2.0629 3.92235,2.88803 0,3.71323 -0.87163,1.23774 3.92233,3.30062 1.74329,3.30065 -0.87164,6.60126 0,5.77612 -2.6149,0 0,7.0138 0,0 -30.07138,1.23776 2.61491,-5.77612 -3.92236,-6.18869 3.05073,-7.01386 -2.17909,-7.83899 3.92238,-6.60127 -8.71635,1.6503 -4.79396,0 -0.43586,4.95097 4.35819,8.25159 0.87163,7.42639 -0.87163,5.36356 1.30743,4.53836 5.0483,1.28537 31.56031,-1.28537 14.81778,0.82519 11.767,1.65033 19.63094,9.53426 38.95682,15.35541 -39.84755,-0.54753 -176.97912,0' style='filter:url(#dropshadow)' />
+</g>
+</g>
+<!-- This is the moon /-->
+<g>
+<title>(DATE)</title>
+<g id='layer3'>
+<path fill='lightgreY' d='m292.85883,150.52319c0,12.82889 10.21637,23.22879 22.81891,23.22879c12.60254,
+0 22.81891,-10.3999 22.81891,-23.22879c0,-12.82895 -10.21637,-23.22885 -22.81891,-23.22885c-12.60254,0
+ -22.81891,10.3999 -22.81891,23.22885z' id='path2825' style='filter:url(#dropshadow)' />
+</g>
+</g>
+<!-- This is the text below /-->
+</svg>

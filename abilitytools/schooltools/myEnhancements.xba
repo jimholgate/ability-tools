@@ -1,0 +1,2712 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="myEnhancements" script:language="StarBasic">REM  *****  BASIC  *****
+option explicit
+&apos; Variable holding the input box dialog.
+private f_dlgImpressAsk As Variant
+private f_dlgImpressAddress As Variant
+private f_dlgImpressEvent As Variant 
+
+function fsSchoolToolsAddressBox (optional cType, optional i )
+	dim corg, cgivenname, csurname, cstreet, cpostalcode, ctown, cprovince, ccountryregion, ctitle , cposition, chomephone as string
+	dim ctelephonenumber, cfacsimiletelephonenumber, cmail, cimagepath, sFullname, ccleanedcimagepath , sA, sB as string
+	dim cSummary, cDocTitle, cDate, cTime, cDateTime, cL as string
+	dim oSlides
+	dim oAlbum
+	oAlbum = ThisComponent
+	oSlides = oAlbum.getDrawPages
+	if isMissing (cType) then
+		cType = &quot;AddressCard&quot;
+	endif
+	if isMissing (i) then
+		&apos;Usually, we want to add info to the slide at the end of the presentation
+		i = oSlides.Count - 1
+	endif
+	DialogLibraries.LoadLibrary(&quot;schooltools&quot;)
+	f_dlgImpressAddress=CreateUnoDialog( DialogLibraries.schooltools.schooltools4 )
+
+	if fbHelpIsInstalled then
+		f_dlgImpressAddress.model.HelpURL=fsMyID &amp; &quot;/assistant.xhp&quot;
+	else 
+		f_dlgImpressAddress.model.HelpURL=&quot;&quot;
+	endif
+	&apos; ---------------- load the dialog with presets ----------------
+	&apos; Why not just use the dialog language editor?
+	&apos; The dialog language editor is buggy. The strings do not always get saved.
+	&apos; We have more control over the strings in code. We can compare strings and
+	&apos; how they have been translated. We can change a label on demand as needed.
+	cL = fs_cL()
+	f_dlgImpressAddress.GetControl(&quot;Label1&quot;).Model.Label = fs_COMPANY (cL)
+	f_dlgImpressAddress.GetControl(&quot;Label2&quot;).Model.Label = fs_FIRSTNAMELASTNAME (cL)
+	f_dlgImpressAddress.GetControl(&quot;Label3&quot;).Model.Label = fs_POSTALCODECITY (cL)
+	f_dlgImpressAddress.GetControl(&quot;Label4&quot;).Model.Label = fs_COUNTRYREGION (cL)
+	f_dlgImpressAddress.GetControl(&quot;Label5&quot;).Model.Label = fs_TITLEPOSITION (cL)
+	f_dlgImpressAddress.GetControl(&quot;Label6&quot;).Model.Label = fs_PHONEHOMEOFFICE (cL)
+	f_dlgImpressAddress.GetControl(&quot;Label7&quot;).Model.Label = fs_FAXEMAIL (cL)
+	f_dlgImpressAddress.GetControl(&quot;Label8&quot;).Model.Label = fs_STREET (cL)
+	f_dlgImpressAddress.GetControl(&quot;Label9&quot;).Model.Label = fs_DATEHEURE (cL)
+	f_dlgImpressAddress.GetControl(&quot;Label10&quot;).Model.Label = fs_TITLE (cL)
+	f_dlgImpressAddress.GetControl(&quot;CommandButton2&quot;).Label = fs_DIALOG_CANCEL(cL)
+	f_dlgImpressAddress.GetControl(&quot;CommandButton1&quot;).Label = fs_DIALOG_OK(cL)
+	f_dlgImpressAddress.GetControl(&quot;FrameControl1&quot;).Model.Label = fs_ADDRESS (cL)
+	f_dlgImpressAddress.GetControl(&quot;FrameControl2&quot;).Model.Label = fs_DESCRIPTION (cL)
+	select case cType
+	case &quot;Cover&quot;
+		f_dlgImpressAddress.Title = fs_BOOK_COVER (fsDocLanguage)
+	case &quot;Imprint&quot;
+		f_dlgImpressAddress.Title = fs_IMPRINT (fsDocLanguage)
+	case &quot;Mecard&quot;
+		f_dlgImpressAddress.Title = fs_MECARD (fsDocLanguage)
+	case &quot;Photo&quot;, &quot;Image&quot;
+		f_dlgImpressAddress.Title = fs_IMAGE (fsDocLanguage)
+	case &quot;Event&quot;
+		f_dlgImpressAddress.Title = fs_EVENT (fsDocLanguage)
+	case &quot;Test&quot;
+		f_dlgImpressAddress.Title = &quot;Test - Not implemented for product release yet&quot;
+	case else 
+		f_dlgImpressAddress.Title = fs_ADDRESS (fsDocLanguage)
+	end select
+	f_dlgImpressAddress.GetControl(&quot;TextField1&quot;).Model.Text = fsEditorInfo (&quot;o&quot;, false)
+	f_dlgImpressAddress.GetControl(&quot;TextField2&quot;).Model.Text = fsEditorInfo (&quot;givenname&quot;, false)
+	f_dlgImpressAddress.GetControl(&quot;TextField3&quot;).Model.Text = fsEditorInfo (&quot;sn&quot;, false)
+	f_dlgImpressAddress.GetControl(&quot;TextField4&quot;).Model.Text = fsEditorInfo (&quot;street&quot;, false)
+	f_dlgImpressAddress.GetControl(&quot;TextField5&quot;).Model.Text = fsEditorInfo (&quot;postalcode&quot;, false)
+	f_dlgImpressAddress.GetControl(&quot;TextField6&quot;).Model.Text = fsEditorInfo (&quot;l&quot;, false)
+	f_dlgImpressAddress.GetControl(&quot;TextField7&quot;).Model.Text = fsEditorInfo (&quot;c&quot;, false)
+	f_dlgImpressAddress.GetControl(&quot;TextField8&quot;).Model.Text = fsEditorInfo (&quot;title&quot;, false)
+	f_dlgImpressAddress.GetControl(&quot;TextField9&quot;).Model.Text = fsEditorInfo (&quot;position&quot;, false)
+	f_dlgImpressAddress.GetControl(&quot;TextField10&quot;).Model.Text = fsEditorInfo (&quot;homephone&quot;, false)
+	f_dlgImpressAddress.GetControl(&quot;TextField11&quot;).Model.Text = fsEditorInfo (&quot;telephonenumber&quot;, false)
+	f_dlgImpressAddress.GetControl(&quot;TextField12&quot;).Model.Text = fsEditorInfo (&quot;facsimiletelephonenumber&quot;, false)
+	f_dlgImpressAddress.GetControl(&quot;TextField13&quot;).Model.Text = fsEditorInfo (&quot;mail&quot;, false)
+	f_dlgImpressAddress.GetControl(&quot;TextField15&quot;).Model.Text = fsEditorInfo (&quot;st&quot;, false)
+	&apos;TextField14 is a summary - a title for the image. We will default to the last title used.
+	if fileExists (fsLastPageTitle) then
+		csummary = fsSuperTrim (getTextFromFile(fsLastPageTitle, &quot;UTF-8&quot;))
+	else
+		csummary = getBranding (bI_SPOKEN_BRANDING)
+	endif
+	f_dlgImpressAddress.GetControl(&quot;TextField14&quot;).Model.Text = csummary
+	if fileExists (fsLastImageInsertedRecord) then
+		cimagepath = fsSuperTrim (getTextFromFile(fsLastImageInsertedRecord, &quot;UTF-8&quot;))
+		if instr (cimagepath, &quot;http&quot;) &lt;&gt; 1 and fileExists(cimagepath) = false then
+			cimagepath = ConvertFromURL(fsMyURL &amp; &quot;/images/googl-code-ability-tools.png&quot;)
+		endif
+	else
+		cimagepath = ConvertFromURL(fsMyURL &amp; &quot;/images/googl-code-ability-tools.png&quot;)
+	endif
+
+	f_dlgImpressAddress.GetControl(&quot;myurl&quot;).Model.Text = cimagepath
+	f_dlgImpressAddress.GetControl(&quot;DateField1&quot;).Model.Text = left(fsNow(),instr(fsNow(),&quot;T&quot;) - 1)
+	f_dlgImpressAddress.GetControl(&quot;TimeField1&quot;).Model.Text = mid(fsNow(),instr(fsNow(),&quot;T&quot;) + 1)
+	&apos; Hide or disable unused fields
+	select case cType
+	case &quot;Mecard&quot;
+		&apos; hide gadgets for choosing an image - we download a 2D code from Google Charts.
+		sB = trim (fsConverttoFullName (f_dlgImpressAddress.GetControl(&quot;TextField3&quot;).Model.Text, f_dlgImpressAddress.GetControl(&quot;TextField2&quot;).Model.Text ))
+		if len (sB) = 0 then 
+			sB = trim (fsEditorInfo (&quot;o&quot;, false))
+		endif
+		if len (sB) = 0 then 
+			sB = csummary
+		endif
+		f_dlgImpressAddress.GetControl(&quot;TextField14&quot;).Model.Text = sB
+			 
+		f_dlgImpressAddress.GetControl(&quot;TextField8&quot;).Visible =false
+		f_dlgImpressAddress.GetControl(&quot;TextField11&quot;).Visible =false
+		f_dlgImpressAddress.GetControl(&quot;TextField12&quot;).Visible =false 
+		f_dlgImpressAddress.GetControl(&quot;ImageControl1&quot;).model.ImageURL = fsMyURL &amp; &quot;/images/googl-code-ability-tools_50.png&quot;
+		f_dlgImpressAddress.GetControl(&quot;ImageControl1&quot;).model.Enabled = false
+		f_dlgImpressAddress.GetControl(&quot;ImageControl1&quot;).model.helpText = &quot;&quot;
+		f_dlgImpressAddress.GetControl(&quot;myurl&quot;).Visible = false
+		f_dlgImpressAddress.GetControl(&quot;ImageControl2&quot;).Visible = false
+	case &quot;Photo&quot;, &quot;Image&quot;
+		&apos; hide the contact information - show a picture
+		f_dlgImpressAddress.GetControl(&quot;TextField1&quot;).Visible =false
+		f_dlgImpressAddress.GetControl(&quot;TextField2&quot;).Visible =false
+		f_dlgImpressAddress.GetControl(&quot;TextField3&quot;).Visible =false
+		f_dlgImpressAddress.GetControl(&quot;TextField4&quot;).Visible =false
+		f_dlgImpressAddress.GetControl(&quot;TextField5&quot;).Visible =false
+		f_dlgImpressAddress.GetControl(&quot;TextField6&quot;).Visible =false
+		f_dlgImpressAddress.GetControl(&quot;TextField7&quot;).Visible =false
+		f_dlgImpressAddress.GetControl(&quot;TextField8&quot;).Visible =false
+		f_dlgImpressAddress.GetControl(&quot;TextField9&quot;).Visible =false
+		f_dlgImpressAddress.GetControl(&quot;TextField10&quot;).Visible =false 
+		f_dlgImpressAddress.GetControl(&quot;TextField11&quot;).Visible =false
+		f_dlgImpressAddress.GetControl(&quot;TextField12&quot;).Visible =false 
+		f_dlgImpressAddress.GetControl(&quot;TextField13&quot;).Visible =false
+		f_dlgImpressAddress.GetControl(&quot;TextField15&quot;).Visible =false
+		f_dlgImpressAddress.GetControl(&quot;Label1&quot;).Visible =false
+		f_dlgImpressAddress.GetControl(&quot;Label2&quot;).Visible =false
+		f_dlgImpressAddress.GetControl(&quot;Label3&quot;).Visible =false
+		f_dlgImpressAddress.GetControl(&quot;Label4&quot;).Visible =false
+		f_dlgImpressAddress.GetControl(&quot;Label5&quot;).Visible =false
+		f_dlgImpressAddress.GetControl(&quot;Label6&quot;).Visible =false
+		f_dlgImpressAddress.GetControl(&quot;Label7&quot;).Visible =false
+		f_dlgImpressAddress.GetControl(&quot;Label8&quot;).Visible =false
+		f_dlgImpressAddress.GetControl(&quot;FrameControl1&quot;).Visible =false
+		f_dlgImpressAddress.GetControl(&quot;ImageControl2&quot;).Visible =true
+		writePhotoLogoSvg ()
+		f_dlgImpressAddress.GetControl(&quot;ImageControl2&quot;).model.ImageURL = fsStagingDirectoryURL &amp; &quot;/OEBPS/images/cover.svg&quot;
+		f_dlgImpressAddress.GetControl(&quot;ImageControl1&quot;).model.ImageURL = fsMyURL &amp; &quot;/images/camera-photo.png&quot;
+	case else &apos; &quot;AddressCard&quot;, &quot;Mecard&quot;, &quot;Contact&quot;, &quot;Event&quot;
+		f_dlgImpressAddress.GetControl(&quot;ImageControl1&quot;).model.ImageURL = fsMyURL &amp; &quot;/images/camera-photo.png&quot;
+		&apos;f_dlgImpressAddress.GetControl(&quot;myurl&quot;).Model.Text = ConvertFromURL(fsMyURL &amp; &quot;/images/googl-code-ability-tools.png&quot;)
+		f_dlgImpressAddress.GetControl(&quot;ImageControl2&quot;).Visible = false
+	end select
+	if f_dlgImpressAddress.Execute() &lt;&gt; 0 then
+		corg = fsCleanForXtml(f_dlgImpressAddress.GetControl(&quot;TextField1&quot;).Model.Text)
+		cgivenname = fsCleanForXtml(f_dlgImpressAddress.GetControl(&quot;TextField2&quot;).Model.Text)
+		csurname =  fsCleanForXtml(f_dlgImpressAddress.GetControl(&quot;TextField3&quot;).Model.Text)
+		cstreet =  fsCleanForXtml(f_dlgImpressAddress.GetControl(&quot;TextField4&quot;).Model.Text)
+		cpostalcode =  fsCleanForXtml(f_dlgImpressAddress.GetControl(&quot;TextField5&quot;).Model.Text)
+		ctown =  fsCleanForXtml(f_dlgImpressAddress.GetControl(&quot;TextField6&quot;).Model.Text)
+		cprovince = fsCleanForXtml(f_dlgImpressAddress.GetControl(&quot;TextField15&quot;).Model.Text)
+		ccountryregion =  fsCleanForXtml(f_dlgImpressAddress.GetControl(&quot;TextField7&quot;).Model.Text)
+		ctitle =  fsCleanForXtml(f_dlgImpressAddress.GetControl(&quot;TextField8&quot;).Model.Text)
+		cposition =  fsCleanForXtml(f_dlgImpressAddress.GetControl(&quot;TextField9&quot;).Model.Text)
+		chomephone = f_dlgImpressAddress.GetControl(&quot;TextField10&quot;).Model.Text
+		ctelephonenumber = f_dlgImpressAddress.GetControl(&quot;TextField11&quot;).Model.Text
+		cfacsimiletelephonenumber = f_dlgImpressAddress.GetControl(&quot;TextField12&quot;).Model.Text 
+		cmail =  fsCleanForXtml(f_dlgImpressAddress.GetControl(&quot;TextField13&quot;).Model.Text)
+		&apos; We can&apos;t escape cimagepath for xhtml yet because we use it to generate a 2D code
+		cimagepath = convertToURL(f_dlgImpressAddress.GetControl(&quot;myurl&quot;).Model.Text)
+
+		ccleanedcimagepath = fsCleanForXtml(cimagepath)
+		sFullname =  fsConverttoFullName (csurname, cgivenname)
+		
+		csummary =  fsCleanForXtml(f_dlgImpressAddress.GetControl(&quot;TextField14&quot;).Model.Text)
+		cdoctitle = f_dlgImpressAddress.GetControl(&quot;TextField14&quot;).Model.Text
+		if len(csummary) = 0 then
+			csummary = getBranding (bI_SPOKEN_BRANDING)
+		endif
+		if cType &lt;&gt; &quot;Mecard&quot; and cType &lt;&gt; &quot;Webcam&quot; then 
+			&apos; Mecard and Webcam use on-line resources that may not always be available.
+			&apos; Therefore we don&apos;t use them as a default file path
+			if fileExists (fsLastImageInsertedRecord) then
+				kill fsLastImageInsertedRecord
+			endif
+			if len(f_dlgImpressAddress.GetControl(&quot;myurl&quot;).Model.Text) &lt;&gt; 0 and rppIsGraphicFile (cimagepath, 2) then
+				CreateFile(fsLastImageInsertedRecord,f_dlgImpressAddress.GetControl(&quot;myurl&quot;).Model.Text,&quot;UTF-8&quot;)
+			endif
+			if fileExists (fsLastPageTitle) then
+				kill fsLastPageTitle
+			endif
+			CreateFile(fsLastPageTitle,cdoctitle,&quot;UTF-8&quot;)
+			&apos; I tell you if your chapter name is a duplicate. You can choose to keep or discard the suggestion.
+			select case fbSlideNameIsUnique (csummary)
+			case false
+				csummary = InputBox ( fs_TITLE_NOT_UNIQUE(fs_cL), fs_TITLE(fs_cL), csummary)
+				if len (csummary) = 0 then
+					fsSchoolToolsAddressBox = &quot;&quot;
+					exit function
+				endif
+			case else
+			end select
+		endif
+
+		cDateTime = f_dlgImpressAddress.GetControl(&quot;DateField1&quot;).Model.Text &amp; &quot;T&quot; &amp; f_dlgImpressAddress.GetControl(&quot;TimeField1&quot;).Model.Text
+		select case cType
+		case &quot;Mecard&quot;
+			&apos; An electronic contact card for 2D code readers like zXing for Android or Google Goggles for iOS.
+			sA = fsMeCard (f_dlgImpressAddress.GetControl(&quot;TextField3&quot;).Model.Text, _
+			f_dlgImpressAddress.GetControl(&quot;TextField2&quot;).Model.Text, _
+			f_dlgImpressAddress.GetControl(&quot;TextField1&quot;).Model.Text, _
+			f_dlgImpressAddress.GetControl(&quot;TextField10&quot;).Model.Text, _
+			f_dlgImpressAddress.GetControl(&quot;TextField13&quot;).Model.Text, _
+			f_dlgImpressAddress.GetControl(&quot;TextField4&quot;).Model.Text, _
+			f_dlgImpressAddress.GetControl(&quot;TextField6&quot;).Model.Text, _
+			f_dlgImpressAddress.GetControl(&quot;TextField15&quot;).Model.Text, _
+			f_dlgImpressAddress.GetControl(&quot;TextField7&quot;).Model.Text, _
+			f_dlgImpressAddress.GetControl(&quot;TextField5&quot;).Model.Text, _
+			f_dlgImpressAddress.GetControl(&quot;TextField9&quot;).Model.Text, _
+			true)
+			&apos;
+			sA = &quot;http://chart.apis.google.com/chart?chs=350x350&amp;cht=qr&amp;chl=&quot; &amp; _
+				fsReplaceText (fsEscapeStr(sA), &quot;?&quot;,&quot;%3F&quot;) &amp; &quot;&amp;type=.png&quot;
+			&apos; ---- Warning -- The string may contain personal information in clear text!
+			if fb_Online_Resource_CarteBlanche() or showdialog (fs_POWERBYGOGLE (cL) &amp; chr$(10) &amp; _
+				chr$(10) &amp; _
+				fs_ONLINE_WARNING (cL) &amp; chr$(10) &amp; _
+				sA, true) then
+				&apos; carry on
+			else
+				fsSchoolToolsAddressBox = &quot;&quot;
+				exit function
+			endif
+			ccleanedcimagepath = fsCleanForXtml(sA)
+			&apos; ------		
+			&apos;on error goto fsSchoolToolsAddressBoxErr
+			fsSchoolToolsAddressBox = fsOrgMicroformatsVeventXhtml (csummary, cDateTime, 2 , ccleanedcimagepath) &amp; chr$(10) &amp; _
+			chr$(10) &amp; chr$(10) &amp; &quot;&lt;hr /&gt;&quot; &amp; chr$(10) &amp; _
+			 fsOrgMicroformatsVcardXhtml (sFullName, _
+				corg, _
+				cstreet, _
+				cpostalcode, _
+				ccountryregion, _
+				ctown, _
+				cprovince, _
+				chomephone, _
+				&quot;&quot;, _
+				&quot;&quot;, _
+				cmail, _
+				&quot;&quot;, _
+				2, _
+				&quot;&quot;)
+			if ThisComponent.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) then
+				oSlides.getByIndex(i).setName(sFullname)
+				if rppIsGraphicFile ( sA, 2) then
+					&apos;this doc, imageurl, slide object, breaklink, onclickurl
+					if AddGraphic (oAlbum, sA, oSlides.getByIndex(i), true, &quot;&quot; ) = false then
+						showdialog ( fs_URL404ERROR (cL) &amp; &quot;: &quot; &amp; chr$(10) &amp; sA )
+						exit function
+					endif
+				endif
+			endif
+		case &quot;Imprint&quot;, &quot;Cover&quot;	
+			&apos; Copyright statement with  date, horizontal line, contact information.
+			if len (cimagepath) = 0 then
+				cimagepath = fsMyURL &amp; &quot;/images/googl-code-ability-tools.png&quot;
+			endif			
+			sA = &quot;&quot;
+			if len (cimagepath) &lt;&gt; 0 and instr(cimagepath, &quot;http&quot;) = 1 then 
+				if fb_Online_Resource_CarteBlanche() or showdialog (fs_ONLINE_WARNING (cL) &amp; chr$(10) &amp; cimagepath, true) then
+					sA = ccleanedcimagepath
+				else
+					exit function
+				endif
+			endif
+			if csummary = &quot;&quot; then
+				csummary = sFullname
+				cDocTitle = getBranding (bI_SPOKEN_BRANDING)
+			endif
+			fsSchoolToolsAddressBox = fsFixCommonXhtmlProblems( fsOrgMicroformatsVeventCopyrightInfoXhtml (csummary, sA) &amp; chr$(10) &amp; _
+			chr$(10) &amp; chr$(10) &amp; &quot;&lt;hr /&gt;&quot; &amp; chr$(10) &amp; _
+			fsOrgMicroformatsVcardXhtml (sFullName, _
+				corg, _
+				cstreet, _
+				cpostalcode, _
+				ccountryregion, _
+				ctown, _
+				cprovince, _
+				chomephone, _
+				ctelephonenumber, _
+				cfacsimiletelephonenumber, _
+				cmail, _
+				&quot;&quot;) )
+			&apos;on error goto fsSchoolToolsAddressBoxErr
+			if ThisComponent.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) then
+				oSlides.getByIndex(i).setName(f_dlgImpressAddress.Title)
+				ThisComponent.DocumentProperties.Title = cDocTitle
+				UpdateSlideTitle (cDocTitle)
+				if rppIsGraphicFile (cimagepath, 2) then
+					if AddGraphic (oAlbum, cimagepath, oSlides.getByIndex(i), true, &quot;&quot;) = false then
+						exit function
+					endif
+				endif
+			endif
+		case &quot;AddressCard&quot;, &quot;Contact&quot;, &quot;Event&quot;
+			&apos; Includes date, contact information, image, summary.
+			&apos;select case sFullname
+			&apos;case &quot;&quot;
+			&apos;	sFullname = corg
+			&apos;end select
+			&apos;if len(sFullname) = 0 then
+				&apos; This shouldn&apos;t happen, but we need to include something for the title if it does.
+			&apos;	sFullname = fsNow
+			&apos;endif
+			if len (cimagepath) &lt;&gt; 0 and instr(cimagepath, &quot;http&quot;) = 1 then 
+				if fb_Online_Resource_CarteBlanche() or showdialog (fs_ONLINE_WARNING (cL) &amp; chr$(10) &amp; cimagepath, true) then
+					fsSchoolToolsAddressBox = fsOrgMicroformatsVeventXhtml (csummary, cDateTime, 2, cCleanedcimagepath)
+				else
+					exit function
+				endif
+			else
+				fsSchoolToolsAddressBox = fsOrgMicroformatsVeventXhtml (csummary, cDateTime, 1)
+			endif
+			if cType = &quot;Event&quot; then 
+				&apos; Don&apos;t include the photo as part of the contact&apos;s profile.
+				sA = &quot;&quot;
+			else
+				sA = cCleanedcimagepath
+			endif
+			fsSchoolToolsAddressBox = fsSchoolToolsAddressBox &amp; _
+			chr$(10) &amp; chr$(10) &amp; &quot;&lt;hr /&gt;&quot; &amp; chr$(10) &amp; _
+			fsOrgMicroformatsVcardXhtml (sFullname, _
+				corg, _
+				cstreet, _
+				cpostalcode, _
+				ccountryregion, _
+				ctown, _
+				cprovince, _
+				chomephone, _
+				ctelephonenumber, _
+				cfacsimiletelephonenumber, _
+				cmail, _
+				sA)
+			&apos;on error goto fsSchoolToolsAddressBoxErr
+			if ThisComponent.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) then
+				oSlides.getByIndex(i).setName(csummary)
+				if rppIsGraphicFile (cimagepath, 2) then
+					if AddGraphic (oAlbum, cimagepath, oSlides.getByIndex(i), true, &quot;&quot;) = false then
+						exit function
+					endif
+				endif
+			endif
+		case &quot;Photo&quot;, &quot;Image&quot;
+				&apos; Title of picture with date and image. No contact info.
+			if len(cimagepath) = 0 then
+				cimagepath = fsMyURL &amp; &quot;/images/googl-code-ability-tools.png&quot;
+			endif
+			if instr(cimagepath, &quot;http&quot;) = 1 then 
+				fsSchoolToolsAddressBox = fsOrgMicroformatsVeventXhtml (csummary, cDateTime, 2)
+			else
+				fsSchoolToolsAddressBox = fsOrgMicroformatsVeventXhtml (csummary, cDateTime, 1)
+			endif
+			&apos;on error goto fsSchoolToolsAddressBoxErr
+			if ThisComponent.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) then
+				oSlides.getByIndex(i).setName(csummary)
+				if rppIsGraphicFile (cimagepath, 2) then
+					if AddGraphic (oAlbum, cimagepath, oSlides.getByIndex(i), true, &quot;&quot;) = false then
+						exit function
+					endif
+				endif
+			endif
+		case else
+			ShowDialog(fs_NO_ACTION(fs_cL))
+			fsSchoolToolsAddressBox = &quot;&quot;
+		end select
+	endif
+	exit function
+	fsSchoolToolsAddressBoxErr:
+	ShowDialog(fs_NO_ACTION(fs_cL) &amp; chr$(10) &amp; fsSchoolToolsAddressBox) 
+	&apos; What&apos;s the problem? Probably you wanted to retrieve an image from the Internet, but you aren&apos;t connected.
+	fsSchoolToolsAddressBox = &quot;&quot;
+end function
+
+function fsConverttoFullName (csurname, cgivenname)
+	select case fsDefaultLocale (&quot;UILocale&quot;)
+	case &quot;zh&quot;, &quot;jp&quot;, &quot;ja&quot;, &quot;yu&quot;, &quot;ko&quot; &apos;Asian
+		fsConverttoFullName = trim(csurname &amp; cgivenname)
+	case else
+		fsConverttoFullName = trim(cgivenname &amp; &quot; &quot; &amp; csurname)
+	end select
+end function
+
+sub insertImagePathToSchoolToolsAddressDialog
+	&apos; activates when clicking the camera icon in the dialog
+	dim sA as string
+	sA =  fsOpenMyFileDialogURI(2)
+	if len (sA) &lt;&gt; 0 then
+		f_dlgImpressAddress.GetControl(&quot;myurl&quot;).Model.Text = ConvertFromURL (sA)
+	endif
+end sub
+
+sub insertAddressCardInfo
+	&apos;Ask for location or person information. Add slide to the end of the presentation.
+	&apos;Use for restaurant reviews, travel journals, or address books
+	insertImageInfo (&quot;AddressCard&quot;)
+end sub
+
+sub insertMecardInfo
+	&apos;Ask for location or person information. Add 2D code to the end of the presentation.
+	&apos;Use for sharing address with a mobile address book
+	insertImageInfo (&quot;Mecard&quot;)
+end sub
+
+sub insertImageInfo (optional cType)
+	&apos; Ask you for some information, then insert a picture at the end of the presentation. 
+	&apos; By default,we only include basic information like the picture title and the date and time.
+	if ismissing (cType) then 
+		cType = &quot;Image&quot;
+	endif
+	dim sA as string
+	dim oAlbum, oSlides, oDrawpage
+	dim nNumShapes
+	&apos; Please use the Ability Tools notepad instead of the normal impress note editor.
+	&apos; It advises you of bad xhtml and lets you preview the what the text looks like in a browser.
+	viewNormal()
+	oAlbum = ThisComponent
+	oSlides = oAlbum.getDrawPages
+	oSlides.InsertNewByIndex (oSlides.Count)
+	oAlbum.getcurrentcontroller().setCurrentPage(oAlbum.drawpages(oSlides.Count -1))
+	sA = fsSchoolToolsAddressBox (cType, oSlides.Count - 1 )	
+	oDrawPage=oSlides.getByIndex( oSlides.Count - 1 ) 
+	nNumShapes=oDrawPage.getCount()	
+	if len (sA) = 0 and nNumShapes = 0 and oSlides.Count &gt; 1 then &apos; you hit cancel button on a blank page
+		oSlides.Remove (oSlides (oSlides.Count -1))
+	else
+		UpdateSlideNote (sA, oSlides.Count -1 )
+	endif
+end sub
+
+sub insertEventInfo
+	&apos; Ask for some information, then insert a picture with event information at the end of the presentation.
+	&apos; todo: we plan on inserting more complete event info using microformats.org vevent markup.
+	&apos; for now, we use the insert imageinfo routine, which includes basic vevent markup.
+	insertImageInfo(&quot;Event&quot;)
+end sub
+
+sub writeTranscriptToDoc
+	if NOT GlobalScope.BasicLibraries.isLibraryLoaded(&quot;Tools&quot;) then 
+		GlobalScope.BasicLibraries.loadLibrary(&quot;Tools&quot;)
+	endif
+	WriteDbgString (fsNotesTranscript())
+end sub
+
+function fsOrgMicroformatsVeventCopyrightInfoXhtml (fullname , optional sURL)
+	&apos;This returns a minimal copyright date phrase with year showing and precise date as title overlay
+	if isMissing (sURL) then
+		sURL = &quot;&quot;
+	endif
+	dim cNow as string
+	cNow = fsNow()
+	fsOrgMicroformatsVeventCopyrightInfoXhtml = fsOrgMicroformatsVeventXhtml (fullname, left(cNow,instr(cNow,&quot;T&quot;) - 1), 300, sURL )
+end function
+
+function fsOrgMicroformatsVeventXhtml (csummary, optional cNow, optional iVerbose, optional cURL )
+	&apos;This returns a title and date in xhtml with year and precise date as title overlay
+	dim cNow2 as string
+	dim sA as string
+	if ismissing (cNow) then
+		cNow = fsNow()
+	elseif len (cNow) = 0 or instr(cNow,&quot;T&quot;) = 0 then
+		cNow = fsNow()
+	endif
+	if ismissing (cURL) then
+		cURL = &quot;&quot;
+	endif
+	if ismissing (iVerbose) then
+		iVerbose = 1
+	endif
+	cNow2 = left(cNow,instr(cNow,&quot;T&quot;) - 1)
+	if len(csummary) = 0 then
+		&apos;You didn&apos;t enter a title for the picture
+		csummary = fs_IMAGE (fs_cL)
+	endif
+	select case iVerbose
+	case 0 &apos; plain xhtml
+		sA = &quot;&lt;div id=&quot;&quot;x-no.org.microformats.vevent-&quot; &amp; cNow &amp; &quot;&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; _
+		&quot;&lt;div&gt;&quot; &amp; chr$(10) &amp; _
+		&quot;&lt;h2&gt;&quot; &amp; csummary &amp; &quot;&lt;/h2&gt; &quot; &amp; chr$(10) &amp; _
+	 	&quot;&lt;span&gt;&quot; &amp; cNow2 &amp; &quot;&lt;/span&gt;&quot; &amp; chr$(10) &amp; _
+		&quot;&lt;/div&gt;&quot; &amp; chr$(10) &amp; _
+		&quot;&lt;/div&gt;&quot;
+	case 1 &apos; minimum microformat vevent
+		sA = &quot;&lt;div id=&quot;&quot;x-small.org.microformats.vevent-&quot; &amp; cNow &amp; &quot;&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; _
+		&quot;&lt;div class=&quot;&quot;vevent&quot;&quot; title=&quot;&quot;&quot; &amp; fs_EVENT (fsDocLanguage) &amp; &quot;&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; _
+		&quot;&lt;h2 class=&quot;&quot;summary&quot;&quot;&gt;&quot; &amp; csummary &amp; &quot;&lt;/h2&gt; &quot; &amp; chr$(10) &amp; _
+	 	&quot;&lt;span class=&quot;&quot;dtstart&quot;&quot; title=&quot;&quot;&quot; &amp; cNow &amp; &quot;&quot;&quot;&gt;&quot; &amp; cNow2 &amp; &quot;&lt;/span&gt;&quot; &amp; chr$(10) &amp; _
+		&quot;&lt;/div&gt;&quot; &amp; chr$(10) &amp; _
+		&quot;&lt;/div&gt;&quot;
+	case 2 &apos; verbose microformat vevent - best practice for annotating a web resource
+		sA = &quot;&lt;div id=&quot;&quot;x-big.org.microformats.vevent-&quot; &amp; cNow &amp; &quot;&quot;&quot;&gt;&quot; &amp; _
+		&quot;&lt;div class=&quot;&quot;vevent&quot;&quot; title=&quot;&quot;&quot; &amp; fs_EVENT (fsDocLanguage) &amp; &quot;&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; _
+		&quot;&lt;h2 class=&quot;&quot;summary&quot;&quot;&gt;&quot; &amp; csummary &amp; &quot;&lt;/h2&gt; &quot; &amp; chr$(10) &amp; _
+	 	&quot;&lt;span class=&quot;&quot;dtstart&quot;&quot; title=&quot;&quot;&quot; &amp; cNow &amp; &quot;&quot;&quot;&gt;&quot; &amp; cNow2 &amp; &quot;&lt;/span&gt;&quot; &amp; chr$(10) &amp; _
+	 	&quot;&lt;span class=&quot;&quot;description ccache1&quot;&quot;&gt;&quot; &amp; &quot; &quot; &amp; fsCleanForXtml(fsEditorInfo(&quot;fullname&quot;, false)) &amp; _
+		&quot;; &quot; &amp; fsCleanForXtml(fsShortFileName) &amp; _
+		&quot;; &quot; &amp; fsCleanForXtml(fsEditorInfo(&quot;o&quot;, false)) &amp; _
+		&quot;;&lt;/span&gt;&quot; &amp; chr$(10)
+		if len(cURL) &lt;&gt; 0 then 
+			sA = sA &amp; &quot;&lt;a class=&quot;&quot;url&quot;&quot; href=&quot;&quot;&quot; &amp; cURL &amp; &quot;&quot;&quot;&gt;&quot; &amp; fs_IMAGE_CREDITS (fs_cL) &amp; &quot;&lt;/a&gt;&quot;
+		endif
+		sA = sA &amp; &quot;&lt;/div&gt;&quot; &amp; chr$(10) &amp; _
+		&quot;&lt;/div&gt;&quot;		
+	case 300 &apos; format for imprint or cover page.
+		sA = &quot;&lt;div  id=&quot;&quot;x-imprint.org.microformats.vevent-&quot; &amp; cNow &amp; &quot;&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; _
+		&quot;&lt;div class=&quot;&quot;vevent&quot;&quot; title=&quot;&quot;&quot; &amp; fs_EVENT (fsDocLanguage) &amp; &quot;&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; _
+		&quot;&lt;h2 class=&quot;&quot;summary&quot;&quot;&gt;&quot; &amp; csummary &amp; &quot;&lt;/h2&gt; &quot; &amp; chr$(10) &amp; _
+		&quot;&lt;span class=&quot;&quot;description&quot;&quot;&gt;© &quot; &amp; fsCleanForXtml(fsEditorInfo(&quot;fullname&quot;, false)) &amp; &quot;&lt;/span&gt; &quot; &amp; chr$(10) &amp; _
+	 	&quot;&lt;span class=&quot;&quot;dtstart&quot;&quot; title=&quot;&quot;&quot; &amp; cNow &amp; &quot;&quot;&quot;&gt;&quot; &amp; year(now) &amp; &quot;&lt;/span&gt;&quot;  &amp; chr$(10)
+		if len(cURL) &lt;&gt; 0 then 
+			sA = sA &amp; &quot;&lt;span class=&quot;&quot;url ccache1&quot;&quot;&gt;&quot; &amp; cURL &amp; &quot;&lt;/span&gt;&quot;
+		endif
+		sA = sA &amp; &quot;&lt;/div&gt;&quot; &amp; chr$(10) &amp; _
+		&quot;&lt;/div&gt;&quot;
+	case else &apos; verbose microformat vevent - best practice for annotating a web resource
+		sA = &quot;&lt;div id=&quot;&quot;x-big.org.microformats.vevent-&quot; &amp; cNow &amp; &quot;&quot;&quot;&gt;&quot; &amp; _
+		&quot;&lt;div class=&quot;&quot;vevent&quot;&quot; title=&quot;&quot;&quot; &amp; fs_EVENT (fsDocLanguage) &amp; &quot;&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; _
+		&quot;&lt;h2 class=&quot;&quot;summary&quot;&quot;&gt;&quot; &amp; csummary &amp; &quot;&lt;/h2&gt; &quot; &amp; chr$(10) &amp; _
+	 	&quot;&lt;span class=&quot;&quot;dtstart&quot;&quot; title=&quot;&quot;&quot; &amp; cNow &amp; &quot;&quot;&quot;&gt;&quot; &amp; cNow2 &amp; &quot;&lt;/span&gt;&quot; &amp; chr$(10) &amp; _
+	 	&quot;&lt;span class=&quot;&quot;description ccache1&quot;&quot;&gt;&quot; &amp; &quot;AUTHOR=&quot; &amp; fsCleanForXtml(fsEditorInfo(&quot;fullname&quot;, false)) &amp; _
+		&quot;;TITLE=&quot; &amp; fsCleanForXtml(fsShortFileName) &amp; _
+		&quot;;ORG=&quot; &amp; fsCleanForXtml(fsEditorInfo(&quot;o&quot;, false)) &amp; _
+		&quot;;&lt;/span&gt;&quot; &amp; chr$(10)
+		if len(cURL) &lt;&gt; 0 then 
+			sA = sA &amp; &quot;&lt;span class=&quot;&quot;url ccache1&quot;&quot;&gt;&quot; &amp; cURL &amp; &quot;&lt;/span&gt;&quot;
+		endif
+		sA = sA &amp; &quot;&lt;/div&gt;&quot; &amp; chr$(10) &amp; _
+		&quot;&lt;/div&gt;&quot;
+	end select
+	&apos; final check - did you include some evil xhtml?
+	fsOrgMicroformatsVeventXhtml = fsFixCommonXhtmlProblems(sA, false)
+end function
+
+function fsOrgMicroformatsVcardXhtml (sFullName, _
+	corg, _
+	cstreet, _
+	cpostalcode, _
+	ccountryregion, _
+	ctown, _
+	cprovince, _
+	chomephone, _
+	ctelephonenumber, _
+	cfacsimiletelephonenumber, _
+	cmail, _
+	cimagepath, _
+	optional iverbose, _
+	optional curl)
+	
+	&apos; This returns xhtml code that includes intelligent markup for speech synthesis and automated data extraction.
+	&apos; See https://addons.mozilla.org/en-US/firefox/addon/operator/
+	dim sA, sB as string
+	
+	sB = fsReplaceText (trim(sFullname), &quot; &quot;, &quot;-&quot;)
+	if len(sB) = 0 then
+		sB = fsReplaceText(trim(corg), &quot; &quot;, &quot;-&quot;)
+	endif
+	if len(sB) = 0 then
+		sB = fsNow()
+	endif
+	
+	if ismissing (iVerbose) then 
+		iVerbose = 1 
+	endif
+	if ismissing (curl) then
+		curl = &quot;&quot;
+	endif
+	
+	
+	select case iverbose
+	case 1
+	&apos; Addressing mostly follows Canadian and US or German and French local mail conventions. 
+	&apos; Non-US versions of LibreOffice present addresses differently. You can change the order, as long as the
+	&apos; semantic tags correctly identify the meaning of each field.
+	&apos; Changing the order of an address does not change the meaning of the microformats semantic tags.
+	&apos; Therefore, a client program like Operator plug-in for Firefox should correctly parse 
+	&apos; the mail address as a vcard. Your localized contacts program then uses the vcard to parse the address
+	&apos; to your local standard. We capitalize the country name to conform to international postal regulations.
+	&apos; See http://microformats.org/code/hcard/creator
+	&apos; See http://www.upu.int/uploads/tx_sbdownloader/sheetAddressingS42InternationalAddressingStandardsFactSheetEn.pdf
+	&apos; http://www.upu.int/en/activities/addressing/postal-addressing-systems-in-member-countries.html
+	&apos;	International Bureau
+	&apos;	of the Universal Postal Union
+	&apos;	PTC - ADU - POST*CODE
+	&apos;	P.O. Box 
+	&apos;	3000 BERNE 15
+	&apos;	SWITZERLAND
+	&apos;	Tél. +41 31 350 34 67
+	&apos;	Fax +41 31 350 31 10
+	&apos;	www.upu.int
+	&apos;
+	if fb_UseEuropeanAddress (ccountryregion) = false then
+		sA	= &quot;&lt;div id=&quot;&quot;x-ca+us.org.microformats.vcard-&quot; &amp; sB &amp; &quot;&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; _
+		&quot;&lt;div class=&quot;&quot;vcard&quot;&quot; title=&quot;&quot;&quot; &amp; fs_CONTACT (fsDocLanguage) &amp; &quot;&quot;&quot;&gt;&quot; &amp; chr$(10)
+		sA = sA &amp; fsNameAndOrgCode (sFullName, corg)
+		sA = sA &amp; &quot;&lt;div class=&quot;&quot;adr&quot;&quot;&gt;&quot; &amp; chr$(10)
+		if len (cstreet) &lt;&gt; 0 then
+			sA = sA &amp; &quot;&lt;div class=&quot;&quot;street-address&quot;&quot;&gt;&quot; &amp; cstreet &amp; &quot;&lt;/div&gt;&quot; &amp; chr$(10)
+		endif
+		if len (cpostalcode &amp; cprovince &amp; ccountryregion &amp; ctown ) &lt;&gt; 0 then
+			&apos; Canadian postal conventions. 
+			sA = sA &amp; &quot;&lt;div&gt;&lt;span class=&quot;&quot;locality&quot;&quot;&gt;&quot; &amp; ctown &amp; &quot;&lt;/span&gt;, &quot; &amp; _
+			&quot;&lt;span class=&quot;&quot;region&quot;&quot;&gt;&quot; &amp; cprovince &amp; &quot;&lt;/span&gt;&quot; &amp; chr$(10) &amp; _
+			&quot;&lt;span class=&quot;&quot;postal-code&quot;&quot;&gt;&quot; &amp;  cpostalcode &amp; &quot;&lt;/span&gt;&quot; &amp; chr$(10) &amp; _
+			&quot;&lt;br /&gt;&quot; &amp; chr$(10) &amp; _
+			&quot;&lt;span class=&quot;&quot;country-name&quot;&quot;&gt;&quot; &amp;  ucase (ccountryregion) &amp; &quot;&lt;/span&gt;&quot; &amp; chr$(10) &amp; _
+			&quot;&lt;/div&gt;&quot; &amp; chr$(10)
+		endif
+		if len (chomephone) &lt;&gt; 0 then
+			sA = sA &amp; &quot;&lt;div&gt;&quot; &amp; fs_HOMEPHONE_NO (fs_cL) &amp; &quot;: &lt;span class=&quot;&quot;tel&quot;&quot;&gt;&lt;span class=&quot;&quot;type ccache1&quot;&quot;&gt;home&lt;/span&gt; &lt;span class=&quot;&quot;value&quot;&quot;&gt;&quot; &amp; chomephone &amp; &quot;&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;&quot; &amp; chr$(10)
+		endif
+		if len (ctelephonenumber) &lt;&gt; 0 then
+			sA = sA &amp; &quot;&lt;div&gt;&quot; &amp; fs_PHONE_NO (fs_cL) &amp; &quot;: &lt;span class=&quot;&quot;tel&quot;&quot;&gt;&lt;span class=&quot;&quot;type ccache1&quot;&quot;&gt;work&lt;/span&gt; &lt;span class=&quot;&quot;value&quot;&quot;&gt;&quot; &amp; ctelephonenumber &amp; &quot;&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;&quot; &amp; chr$(10)
+		endif
+		if len (cfacsimiletelephonenumber) &lt;&gt; 0 then
+			sA = sA &amp; &quot;&lt;div&gt;&quot; &amp; chr$(10) &amp; _
+			&quot;&lt;span class=&quot;&quot;tel&quot;&quot;&gt;&lt;span class=&quot;&quot;type&quot;&quot;&gt;&quot; &amp; fs_FAX_NO (fs_cL) &amp; &quot;&lt;/span&gt;: &quot; &amp; chr$(10) &amp; _
+			&quot;&lt;span class=&quot;&quot;value&quot;&quot;&gt;&quot; &amp; cfacsimiletelephonenumber &amp; &quot;&lt;/span&gt;&lt;/span&gt;&quot; &amp; chr$(10) &amp; _
+			&quot;&lt;/div&gt;&quot; &amp; chr$(10) 
+		endif
+		if len (cmail) &lt;&gt; 0 then
+			sA = sA &amp; &quot;&lt;div&gt;&lt;a class=&quot;&quot;email&quot;&quot; href=&quot;&quot;mailto:&quot; &amp; cmail &amp; &quot;&quot;&quot;&gt;&quot; &amp; cmail &amp; &quot;&lt;/a&gt;&lt;/div&gt;&quot; &amp; chr$(10)
+		endif
+		if len (cimagepath) &lt;&gt; 0 and instr(trim(cimagepath),&quot;http&quot;) = 1 then
+			&apos; You seem to have entered a link to a person&apos;s on-line photo or webpage.
+			if rppIsGraphicFile ( cimagepath ) then
+				sA = sA &amp; &quot;&lt;div&gt;&quot; &amp; fs_IMAGE_CREDITS (fs_cL) &amp; &quot;: &lt;a href=&quot;&quot;&quot; &amp; cimagepath &amp; &quot;&quot;&quot; class=&quot;&quot;photo&quot;&quot;&gt;&quot; &amp; GetFileNameWithoutExtension(cimagepath) &amp; &quot;&lt;/a&gt;&lt;/div&gt;&quot; &amp; chr$(10)
+			else
+				sA = sA &amp; &quot;&lt;div&gt;&quot; &amp; fs_HOMEPAGE (fs_cL) &amp; &quot;: &lt;a href=&quot;&quot;&quot; &amp; cimagepath &amp; &quot;&quot;&quot; class=&quot;&quot;url&quot;&quot;&gt;&quot; &amp; GetFileNameWithoutExtension(cimagepath) &amp; &quot;&lt;/a&gt;&lt;/div&gt;&quot; &amp; chr$(10)
+			endif
+		endif
+		sA = sA &amp; &quot;&lt;/div&gt;&quot; &amp; chr$(10) &amp; _
+		&quot;&lt;/div&gt;&quot; &amp; chr$(10) &amp; _
+		&quot;&lt;/div&gt;&quot;
+	else
+		sA	= &quot;&lt;div id=&quot;&quot;x-eu.org.microformats.vcard-&quot; &amp; sB &amp; &quot;&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; _
+		&quot;&lt;div class=&quot;&quot;vcard&quot;&quot; title=&quot;&quot;&quot; &amp; fs_CONTACT (fsDocLanguage) &amp; &quot;&quot;&quot;&gt;&quot; &amp; chr$(10)
+		sA = sA &amp; fsNameAndOrgCode (sFullName, corg)
+		sA = sA &amp; &quot;&lt;div class=&quot;&quot;adr&quot;&quot;&gt;&quot; &amp; chr$(10)
+		if len (cstreet) &lt;&gt; 0 then
+			sA = sA &amp; &quot;&lt;div class=&quot;&quot;street-address&quot;&quot;&gt;&quot; &amp; cstreet &amp; &quot;&lt;/div&gt;&quot; &amp; chr$(10)
+		endif
+		if len (cpostalcode &amp; cprovince &amp; ccountryregion &amp; ctown ) &lt;&gt; 0 then
+			&apos; German postal conventions. 
+			sA = sA &amp; &quot;&lt;div&gt;&lt;span class=&quot;&quot;postal-code&quot;&quot;&gt;&quot; &amp;  cpostalcode &amp; &quot;&lt;/span&gt; &quot; &amp; chr$(10) &amp; _
+			&quot;&lt;span class=&quot;&quot;locality&quot;&quot;&gt;&quot; &amp; ctown &amp; &quot;&lt;/span&gt; &quot; &amp; _
+			&quot;&lt;span class=&quot;&quot;region&quot;&quot;&gt;&quot; &amp; cprovince &amp; &quot;&lt;/span&gt;&quot; &amp; chr$(10) &amp; _
+			&quot;&lt;br /&gt;&quot; &amp; chr$(10) &amp; _
+			&quot;&lt;span class=&quot;&quot;country-name&quot;&quot;&gt;&quot; &amp;  ucase (ccountryregion) &amp; &quot;&lt;/span&gt;&quot; &amp; chr$(10) &amp; _
+			&quot;&lt;/div&gt;&quot; &amp; chr$(10)
+		endif
+		if len (chomephone) &lt;&gt; 0 then
+			sA = sA &amp; &quot;&lt;div&gt;&quot; &amp; fs_HOMEPHONE_NO (fs_cL) &amp; &quot;: &lt;span class=&quot;&quot;tel&quot;&quot;&gt;&lt;span class=&quot;&quot;type ccache1&quot;&quot;&gt;home&lt;/span&gt; &lt;span class=&quot;&quot;value&quot;&quot;&gt;&quot; &amp; chomephone &amp; &quot;&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;&quot; &amp; chr$(10)
+		endif
+		if len (ctelephonenumber) &lt;&gt; 0 then
+			sA = sA &amp; &quot;&lt;div&gt;&quot; &amp; fs_PHONE_NO (fs_cL) &amp; &quot;: &lt;span class=&quot;&quot;tel&quot;&quot;&gt;&lt;span class=&quot;&quot;type ccache1&quot;&quot;&gt;work&lt;/span&gt; &lt;span class=&quot;&quot;value&quot;&quot;&gt;&quot; &amp; ctelephonenumber &amp; &quot;&lt;/span&gt;&lt;/span&gt;&lt;/div&gt;&quot; &amp; chr$(10)
+		endif
+		if len (cfacsimiletelephonenumber) &lt;&gt; 0 then
+			sA = sA &amp; &quot;&lt;div&gt;&quot; &amp; chr$(10) &amp; _
+			&quot;&lt;span class=&quot;&quot;tel&quot;&quot;&gt;&lt;span class=&quot;&quot;type&quot;&quot;&gt;&quot; &amp; fs_FAX_NO (fs_cL) &amp; &quot;&lt;/span&gt;: &quot; &amp; chr$(10) &amp; _
+			&quot;&lt;span class=&quot;&quot;value&quot;&quot;&gt;&quot; &amp; cfacsimiletelephonenumber &amp; &quot;&lt;/span&gt;&lt;/span&gt;&quot; &amp; chr$(10) &amp; _
+			&quot;&lt;/div&gt;&quot; &amp; chr$(10) 
+		endif
+		if len (cmail) &lt;&gt; 0 then
+			sA = sA &amp; &quot;&lt;div&gt;&lt;a class=&quot;&quot;email&quot;&quot; href=&quot;&quot;mailto:&quot; &amp; cmail &amp; &quot;&quot;&quot;&gt;&quot; &amp; cmail &amp; &quot;&lt;/a&gt;&lt;/div&gt;&quot; &amp; chr$(10)
+		endif
+		if len (cimagepath) &lt;&gt; 0 and instr(trim(cimagepath),&quot;http&quot;) = 1 then
+			&apos; You seem to have entered a link to a person&apos;s on-line photo or webpage.
+			if rppIsGraphicFile ( cimagepath ) then
+				sA = sA &amp; &quot;&lt;div&gt;&quot; &amp; fs_IMAGE_CREDITS (fs_cL) &amp; &quot;: &lt;a href=&quot;&quot;&quot; &amp; cimagepath &amp; &quot;&quot;&quot; class=&quot;&quot;photo&quot;&quot;&gt;&quot; &amp; GetFileNameWithoutExtension(cimagepath) &amp; &quot;&lt;/a&gt;&lt;/div&gt;&quot; &amp; chr$(10)
+			else
+				sA = sA &amp; &quot;&lt;div&gt;&quot; &amp; fs_HOMEPAGE (fs_cL) &amp; &quot;: &lt;a href=&quot;&quot;&quot; &amp; cimagepath &amp; &quot;&quot;&quot; class=&quot;&quot;url&quot;&quot;&gt;&quot; &amp; GetFileNameWithoutExtension(cimagepath) &amp; &quot;&lt;/a&gt;&lt;/div&gt;&quot; &amp; chr$(10)
+			endif
+		endif
+		sA = sA &amp; &quot;&lt;/div&gt;&quot; &amp; chr$(10) &amp; _
+		&quot;&lt;/div&gt;&quot; &amp; chr$(10) &amp; _
+		&quot;&lt;/div&gt;&quot;
+	endif	
+	
+	case else &apos; Mecard
+		&apos; This does not include fax or multiple phone fields. It matches the Mecard format
+		&apos; If contact does not have a website then link to a map instead.
+		if len (trim(cimagepath)) = 0 then
+			cimagepath = &quot;http://maps.google.com/maps?q=&quot; &amp; fsEscapeStr(ctown &amp; &quot; &quot; &amp; cpostalcode)
+		endif 
+		&apos; start the vcard with some divs and labels. Class identifies semantic content.
+		&apos; Actual content is within each element. xhtml forbids us from using unknown tags.
+		&apos; The structure is based on markup from the automated vcard creator at 
+		&apos; http://microformats.org/code/hcard/creator
+		sA = &quot;&lt;div id=&quot;&quot;x-mecardcompatible.org.microformats.vcard-&quot; &amp; sB &amp; &quot;&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; _
+			&quot;&lt;div title=&quot;&quot;&quot; &amp; fs_CONTACT (fsDocLanguage) &amp; &quot;&quot;&quot; class=&quot;&quot;vcard&quot;&quot;&gt;&quot; &amp; chr$(10)
+		if len (trim (sFullName)) &lt;&gt; 0 then  
+			sA = sA &amp;&quot;&lt;a class=&quot;&quot;url fn&quot;&quot; href=&quot;&quot;&quot; &amp; cimagepath &amp; &quot;&quot;&quot;&gt;&quot; &amp; sFullName &amp; &quot;&lt;/a&gt;&quot; &amp; chr$(10)
+			if len (trim (corg)) &lt;&gt; 0 then 
+				sA = sA &amp;&quot;&lt;div class=&quot;&quot;org&quot;&quot;&gt;&quot; &amp; corg &amp; &quot;&lt;/div&gt;&quot; &amp; chr$(10) 
+			endif
+		else
+			sA = sA &amp;&quot;&lt;a class=&quot;&quot;url fn org&quot;&quot; href=&quot;&quot;&quot; &amp; cimagepath &amp; &quot;&quot;&quot;&gt;&quot; &amp; corg &amp; &quot;&lt;/a&gt;&quot; &amp; chr$(10)
+		endif
+		if len (trim (cmail)) &lt;&gt; 0 then 
+			sA = sA &amp;&quot;&lt;div&gt;&quot; &amp; chr$(10)
+			sA = sA &amp;&quot;&lt;a class=&quot;&quot;email&quot;&quot; href=&quot;&quot;mailto:&quot; &amp; cmail &amp; &quot;&quot;&quot;&gt;&quot; &amp; cmail &amp; &quot;&lt;/a&gt;&quot; &amp; chr$(10) 
+			sA = sA &amp;&quot;&lt;/div&gt;&quot; &amp; chr$(10)
+		endif
+		sA = sA &amp;&quot;&lt;div class=&quot;&quot;adr&quot;&quot;&gt;&quot; &amp; chr$(10) 
+		if len (trim (cstreet)) &lt;&gt; 0 then
+			sA = sA &amp;&quot;&lt;div class=&quot;&quot;street-address&quot;&quot;&gt;&quot; &amp; cstreet &amp; &quot;&lt;/div&gt;&quot; &amp; chr$(10)
+		endif
+		if fb_UseEuropeanAddress (ccountryregion) = false then
+			if len (trim (ctown)) &lt;&gt; 0 then
+				sA = sA &amp;&quot;&lt;span class=&quot;&quot;locality&quot;&quot;&gt;&quot; &amp; ctown &amp; &quot;&lt;/span&gt;&quot; 
+				sA = sA &amp;&quot; &quot; &amp; chr$(10)
+			endif
+			
+			if len (trim (cprovince)) &lt;&gt; 0 then 
+				sA = sA &amp;&quot;&lt;span class=&quot;&quot;region&quot;&quot;&gt;&quot; &amp; cprovince &amp; &quot;&lt;/span&gt;&quot;
+				sA = sA &amp;&quot; &quot; &amp; chr$(10)
+			endif
+			
+			if len (trim (cpostalcode)) &lt;&gt; 0 then
+				sA = sA &amp;&quot;&lt;span class=&quot;&quot;postal-code&quot;&quot;&gt;&quot; &amp; cpostalcode &amp; &quot;&lt;/span&gt;&quot; &amp; chr$(10) 
+			endif
+		else
+			if len (trim (cpostalcode)) &lt;&gt; 0 then
+				sA = sA &amp;&quot;&lt;span class=&quot;&quot;postal-code&quot;&quot;&gt;&quot; &amp; cpostalcode &amp; &quot;&lt;/span&gt; &quot; &amp; chr$(10) 
+			endif
+			
+			if len (trim (ctown)) &lt;&gt; 0 then
+				sA = sA &amp;&quot;&lt;span class=&quot;&quot;locality&quot;&quot;&gt;&quot; &amp; ctown &amp; &quot;&lt;/span&gt;&quot; 
+				sA = sA &amp;&quot; &quot; &amp; chr$(10)
+			endif
+			
+			if len (trim (cprovince)) &lt;&gt; 0 then 
+				sA = sA &amp;&quot;&lt;span class=&quot;&quot;region&quot;&quot;&gt;&quot; &amp; cprovince &amp; &quot;&lt;/span&gt;&quot;
+				sA = sA &amp;&quot; &quot; &amp; chr$(10)
+			endif
+			
+		endif
+		
+		if len (ccountryregion) &lt;&gt; 0 then
+			sA = sA &amp; &quot;&lt;br /&gt;&quot; &amp; chr$(10) 
+			sA = sA &amp; &quot;&lt;span class=&quot;&quot;country-name&quot;&quot;&gt;&quot; &amp;  ucase (ccountryregion) &amp; &quot;&lt;/span&gt;&quot; &amp; chr$(10)
+		endif
+		sA = sA &amp; &quot;&lt;/div&gt;&quot; &amp; chr$(10) 
+		if len (trim (chomephone)) &lt;&gt; 0 then
+			sA = sA &amp;&quot;&lt;div class=&quot;&quot;tel&quot;&quot;&gt;&quot; &amp; chomephone &amp; &quot;&lt;/div&gt;&quot; &amp; chr$(10) 
+		endif
+		sA = sA &amp; &quot;&lt;/div&gt;&quot; &amp; chr$(10) &amp; _
+			&quot;&lt;/div&gt;&quot;
+	end select
+	&apos; final check - did you include some evil xhtml?
+	fsOrgMicroformatsVcardXhtml = fsFixCommonXhtmlProblems(sA, false)
+end function
+
+function fsNameAndOrgCode (sFullName, corg)
+	dim cFullName as string
+	cFullName = trim (sFullName)
+	dim sA as string
+	if len (cFullName) = 0 and len (corg) = 0 then
+		&apos; show nothing
+	elseif len (cFullName) = 0 and len (corg) &lt;&gt; 0 then
+		&apos; show the organization
+		sA = sA &amp; &quot;&lt;div class=&quot;&quot;fn org&quot;&quot;&gt;&quot; &amp; corg &amp; &quot;&lt;/div&gt;&quot; &amp; chr$(10)
+	elseif len (cFullName) &lt;&gt; 0 and len (corg) = 0 then
+		&apos; show the name
+		sA = sA &amp; &quot;&lt;div class=&quot;&quot;fn&quot;&quot;&gt;&quot; &amp; sFullName &amp; &quot;&lt;/div&gt;&quot; &amp; chr$(10)
+	else 
+		&apos; show the name and the organization
+		sA = sA &amp; &quot;&lt;div class=&quot;&quot;fn&quot;&quot;&gt;&quot; &amp; sFullName &amp; &quot;&lt;/div&gt;&quot; &amp; chr$(10)
+		sA = sA &amp; &quot;&lt;div class=&quot;&quot;org&quot;&quot;&gt;&quot; &amp; corg &amp; &quot;&lt;/div&gt;&quot; &amp; chr$(10)
+	endif
+	fsNameAndOrgCode = sA
+end function
+
+function fsSchoolToolsInputBox(optional sMsg as string, optional sTitle as string, optional sDefault as string)
+	&apos; fsSchoolToolsInputBox(sMsg, sTitle, sDefault) &apos; replaces InputBox
+	if ismissing (sMsg) then
+		sMsg=&quot;&quot;
+	endif	
+	if ismissing (sTitle) then
+		sTitle=getBranding(bI_SPOKEN_BRANDING)
+	endif
+	if ismissing (sDefault) then
+		sDefault=&quot;&quot;
+	endif
+	&apos; dim f_dlgImpressAsk
+	DialogLibraries.LoadLibrary(&quot;schooltools&quot;)
+	f_dlgImpressAsk=CreateUnoDialog( DialogLibraries.schooltools.schooltools3 )
+	if fbHelpIsInstalled then
+		f_dlgImpressAsk.model.HelpURL=fsMyID &amp; &quot;/write_notes.xhp&quot;
+	else 
+		f_dlgImpressAsk.model.HelpURL=&quot;&quot;
+	endif
+	f_dlgImpressAsk.Title = getBranding(bI_SPOKEN_BRANDING)
+	f_dlgImpressAsk.GetControl(&quot;CommandButton1&quot;).Label = fs_OKAY(fs_cL)
+	f_dlgImpressAsk.GetControl(&quot;CommandButton2&quot;).Label = fs_DIALOG_CANCEL(fs_cL)
+	f_dlgImpressAsk.GetControl(&quot;Label1&quot;).Model.Label = sMsg
+	f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text = sDefault
+	f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Text = fsGuessNoteLanguage
+	f_dlgImpressAsk.GetControl(&quot;CommandButton3&quot;).model.ImageURL=fsMyURL &amp; &quot;/images/opendocument-web_16.png&quot;
+	f_dlgImpressAsk.GetControl(&quot;CommandButton4&quot;).model.ImageURL=fsMyURL &amp; &quot;/images/document-open_16.png&quot;
+	f_dlgImpressAsk.GetControl(&quot;CommandButton5&quot;).model.ImageURL=fsMyURL &amp; &quot;/images/document-save_16.png&quot;
+	f_dlgImpressAsk.GetControl(&quot;CommandButton6&quot;).model.ImageURL=fsMyURL &amp; &quot;/images/document-save-as_16.png&quot;
+	f_dlgImpressAsk.GetControl(&quot;CommandButton7&quot;).model.ImageURL=fsMyURL &amp; &quot;/images/insert-text_16.png&quot;
+	f_dlgImpressAsk.GetControl(&quot;CommandButton7&quot;).model.helpText = fs_PASTE_QUESTION(fs_cL)
+	f_dlgImpressAsk.GetControl(&quot;CommandButton8&quot;).model.ImageURL=fsMyURL &amp; &quot;/images/text-x-preview_16.png&quot;
+	f_dlgImpressAsk.GetControl(&quot;CommandButton9&quot;).model.ImageURL=fsMyURL &amp; &quot;/images/textToSpeech_16.png&quot;
+	f_dlgImpressAsk.GetControl(&quot;CommandButton9&quot;).model.helpText = fs_READ_THE_NOTE(fs_cL)
+	f_dlgImpressAsk.GetControl(&quot;CommandButton10&quot;).model.ImageURL=fsMyURL &amp; &quot;/images/document-send_16.png&quot;
+	f_dlgImpressAsk.GetControl(&quot;CommandButton11&quot;).model.ImageURL=fsMyURL &amp; &quot;/images/style-text_16.png&quot;
+	f_dlgImpressAsk.GetControl(&quot;CommandButton11&quot;).model.helpText = fs_APPEARANCE(fs_cL)
+	f_dlgImpressAsk.GetControl(&quot;CommandButton12&quot;).model.ImageURL=fsMyURL &amp; &quot;/images/config-lang_16.png&quot;
+	f_dlgImpressAsk.GetControl(&quot;CommandButton12&quot;).model.helpText = fs_LANGUAGE(fs_cL)
+	&apos;Default to reading text in different languages if user has set the extension up to read multilingual text
+	if fileExists (fsSpeechSettingURL) then
+		f_dlgImpressAsk.GetControl(&quot;CommandButton12&quot;).model.State = 1
+		f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Enabled = true
+	endif
+	if sMsg=&quot;&quot; then
+		f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.PositionY = 2 + f_dlgImpressAsk.GetControl(&quot;CommandButton9&quot;).model.height
+		f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Height = 4 + f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Height + f_dlgImpressAsk.GetControl(&quot;Label1&quot;).Model.Height
+		f_dlgImpressAsk.GetControl(&quot;CommandButton12&quot;).model.helpText = fs_LANGUAGE(fs_cL)
+		f_dlgImpressAsk.GetControl(&quot;CommandButton10&quot;).model.helpText = fs_EMAIL_NOTE(fs_cL)
+		f_dlgImpressAsk.GetControl(&quot;CommandButton8&quot;).model.helpText = fs_PREVIEW(fs_cL)
+		f_dlgImpressAsk.GetControl(&quot;CommandButton6&quot;).model.helpText = fs_SAVE_AS(fs_cL)
+		f_dlgImpressAsk.GetControl(&quot;CommandButton5&quot;).model.helpText = fs_SAVE(fs_cL)
+		f_dlgImpressAsk.GetControl(&quot;CommandButton4&quot;).model.helpText = fs_OPEN(fs_cL)
+		if fbAppearsToBeXML(sDefault) then 
+			f_dlgImpressAsk.GetControl(&quot;CommandButton3&quot;).model.helpText = fs_DECODE(fs_cL)
+		else
+			f_dlgImpressAsk.GetControl(&quot;CommandButton3&quot;).model.helpText = fsSimpleParagraph
+		endif
+	else
+		f_dlgImpressAsk.GetControl(&quot;Label1&quot;).model.helpText = fs_READ_PROMPT(fs_cL)
+		&apos; If the slide show is running, other dialogs may not be visible
+		hideEditControls
+		f_dlgImpressAsk.GetControl(&quot;CommandButton7&quot;).model.Enabled = true &apos; paste message
+	endif
+	SchoolToolsTextEditorStyleSetup
+	if f_dlgImpressAsk.Execute() &lt;&gt; 0 then
+		if f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text = &quot;&quot; then
+			&apos; Return the prompt, but don&apos;t exit the script.
+			fsSchoolToolsInputBox = sDefault 
+		else
+			&apos; Return what you typed in the dialogue.
+			fsSchoolToolsInputBox = f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text
+		endif
+		&apos;Change the note&apos;s language to match the language of the text in the dialogue
+		if ThisComponent.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) then
+			if f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Enabled then
+				setNoteLanguage (f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Text)
+			endif
+		endif
+	else
+		fsSchoolToolsInputBox=&quot;&quot;
+		on error resume next
+		ThisComponent.Presentation.End
+	endif
+end function
+
+sub startEditingFirstNote
+	dim n as integer
+	dim sA, csummary as string
+	n=0
+	sA = fsSchoolToolsAddressBox(&quot;Imprint&quot;) &apos; Get publishing information
+	if len(sA) = 0 then 
+		exit sub
+	endif
+	thisComponent.setModified(true)
+	if len (sA) &lt;&gt; 0 then
+		UpdateSlideNote (sA)
+		if fileExists (fsLastPageTitle) then
+			csummary = fsSuperTrim (getTextFromFile(fsLastPageTitle, &quot;UTF-8&quot;))
+		else
+			csummary = getBranding (bI_SPOKEN_BRANDING)
+		endif
+		sA = fsSaveSchoolToolFile(csummary, &quot;ODF Presentation (.odp)&quot;,&quot;*.odp&quot;)
+		if sA &lt;&gt; &quot;&quot; then
+			fsSaveAsPresentation(sA)
+		endif
+	endif
+end sub
+
+sub UpdateSlideNote (byval sA, optional nPage)
+	if ismissing (nPage) then 
+		nPage = fnCurrentCard
+	endif
+	dim oDoc as object
+	dim i as integer
+	oDoc = ThisComponent
+	if oDoc.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) then
+		i = fiGetSlideNoteIndex (nPage)
+		&apos;******** showDialog (oDoc.getDrawPages().getByIndex( nPage ).getNotesPage.getByIndex(i).dbg_supportedInterfaces)
+		if i &lt;&gt; -1 then
+			if HasUnoInterfaces( oDoc.getDrawPages().getByIndex( nPage ).getNotesPage.getByIndex(i), &quot;com.sun.star.text.XText&quot;) then
+				oDoc.getDrawPages().getByIndex( nPage ).getNotesPage.getByIndex(i).String = sA
+				thisComponent.setModified(true)
+			endif
+		endif	
+	endif
+end sub
+
+function fbIsSimpleToken (sA)
+	&apos; Is the string a simple token like &quot;&lt;number&gt;&quot;?
+	dim x as integer
+	x = len(sA)
+	fbIsSimpleToken = false
+	if x &lt;&gt; 0 and x &lt; 100 then &apos; sanity check
+		if instr(sA,&quot;&gt;&quot;) = x then
+			if instr(sA,&quot; &quot;) = 0 then
+				if instr(sA,&quot;&lt;&quot;) = 1 then
+					fbIsSimpleToken = true
+				endif
+			endif
+		endif
+	endif
+end function
+
+function fsGetSlideNote
+	dim oDoc as object
+	dim nPage as double
+	dim sA as string
+	dim i as integer
+	oDoc = ThisComponent
+	sA = &quot;&quot;
+	fsGetSlideNote = &quot;&quot;
+	if oDoc.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) then
+		nPage=oDoc.getCurrentController.getCurrentPage().Number - 1
+		i = fiGetSlideNoteIndex (nPage)
+		if i &lt;&gt; -1 then
+			if HasUnoInterfaces( oDoc.getDrawPages().getByIndex( nPage ).getNotesPage.getByIndex(i), &quot;com.sun.star.text.XText&quot;) then  
+				sA = oDoc.getDrawPages().getByIndex( nPage ).getNotesPage.getByIndex(i).String
+				if len(sA) &lt;&gt; 0 then &apos;ignore empty text fields
+					if not (fbIsSimpleToken (sA)) then &apos; ignore PowerPoint utility fields
+						fsGetSlideNote = sA		
+					endif
+				endif
+			endif
+		endif				
+	else
+		fsGetSlideNote = &quot;&quot;
+	endif
+end function
+
+function fiGetSlideNoteIndex (optional nPage)
+	if B_DEBUG=false then
+		on error goto fiGetSlideNoteIndexErr
+	endif
+	dim oDoc as object
+	dim nPage as double
+	dim i as integer
+	dim sA as string
+	dim iNotesCount as integer
+	oDoc = ThisComponent
+	fiGetSlideNoteIndex = -1
+	if oDoc.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) then
+		if isMissing (nPage) then
+			nPage=oDoc.getCurrentController.getCurrentPage().Number - 1
+		endif
+		iNotesCount = oDoc.getDrawPages().getByIndex( nPage ).getNotesPage.getCount
+		if iNotesCount = 2 then 
+			&apos; it is a native Impress document
+			for i = iNotesCount - 1 to 0 step -1
+				if HasUnoInterfaces( oDoc.getDrawPages().getByIndex( nPage ).getNotesPage.getByIndex(i), &quot;com.sun.star.text.XText&quot;) then  
+					fiGetSlideNoteIndex = i	
+					exit for
+				endif
+			next
+		else 
+			&apos; Presentation probably originated from PowerPoint, so note page contains extra text fields. The order depends on
+			&apos; whether the original was a ppt or a pptx. We examine the contents to guess which PowerPoint field includes
+			&apos; the speaker notes. In most cases, the highest numbered text field is the presenter notes field.
+			&apos; If you add a new text field to the notes page, we use that field.
+			fiGetSlideNoteIndex = iNotesCount - 1 
+			for i = iNotesCount - 1 to 0 step -1
+				if HasUnoInterfaces( oDoc.getDrawPages().getByIndex( nPage ).getNotesPage.getByIndex(i), &quot;com.sun.star.text.XText&quot;) then  
+					sA = oDoc.getDrawPages().getByIndex( nPage ).getNotesPage.getByIndex(i).String
+					if len(sA) &lt;&gt; 0 then &apos;ignore empty text fields
+						if not (fbIsSimpleToken (sA)) then &apos; ignore PowerPoint page number display field
+							fiGetSlideNoteIndex = i	
+							exit for
+						endif
+					endif
+				endif
+			next
+		endif			
+	else
+		&apos; We didn&apos;t find a valid presentation text field. Signal the calling routine.
+		fiGetSlideNoteIndex = -1
+	endif
+	exit function
+	fiGetSlideNoteIndexErr:
+	fiGetSlideNoteIndex = -1
+end function
+
+function UpdateSlideTitle (byval optional sA, optional nPage)
+	if B_DEBUG=false then
+		on error goto UpdateSlideTitleErr
+	endif
+	UpdateSlideTitle = false
+	if ismissing (nPage) then 
+		nPage = fnCurrentCard
+	endif
+	if ismissing (sA) then
+		sA = fsNow()
+	endif
+	dim oDoc as object
+	dim i as integer
+	oDoc = ThisComponent
+	if oDoc.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) then
+
+		&apos; The function will update the first available text field, if one exists. Otherwise, exit
+		for i = 0 to oDoc.getDrawPages().getByIndex( nPage ).getCount - 1  step 1
+			if HasUnoInterfaces( oDoc.getDrawPages().getByIndex( nPage ).getByIndex(i), &quot;com.sun.star.text.XText&quot;) then
+				oDoc.getDrawPages().getByIndex( nPage ).getByIndex(i).string = sA
+				thisComponent.setModified(true)
+				exit for
+			endif
+		next
+	endif
+	UpdateSlideTitle = true
+	exit function
+	UpdateSlideTitleErr:
+	UpdateSlideTitle = false
+end function
+
+function fbisAsian (byval sB)
+	if instr(sB, &quot;-&quot;) = 4 then
+		sB = lcase(left(sB, 3))
+	else
+		sB = lcase(left(sB, 2))
+	endif
+	select case sB
+	case &quot;ja&quot;, &quot;jp&quot;, &quot;ko&quot;, &quot;zh&quot;
+		fbisAsian = true
+	case else
+		fbisAsian = false
+	end select
+end function
+
+function fbisComplex (byval sB)
+	if instr(sB, &quot;-&quot;) = 4 then
+		sB = lcase(left(sB, 3))
+	else
+		sB = lcase(left(sB, 2))
+	endif
+	select case sB
+	case &quot;am&quot;, &quot;ar&quot;, &quot;bh&quot;, &quot;bn&quot;, &quot;dz&quot;, &quot;fa&quot;, &quot;gu&quot;, &quot;he&quot;, &quot;hi&quot;, &quot;km&quot;, &quot;kn&quot;, &quot;lif&quot;, &quot;lo&quot;, &quot;ms&quot;, &quot;mr&quot;, &quot;my&quot;, &quot;ne&quot;, &quot;or&quot;, &quot;pa&quot;, &quot;ta&quot;, &quot;te&quot;, &quot;th&quot;, &quot;ur&quot;, &quot;ug&quot;, &quot;yi&quot;
+		fbisComplex = true
+	case else
+		fbisComplex = false
+	end select
+end function
+
+function fsGuessNoteLanguage
+	on error goto fsGuessNoteLanguageErr
+	  	if fBextensionOK (&quot;odp&quot;, ThisComponent.getURL()) then 
+			&apos; You saved the document, so we use the language you chose for the slide note
+			fsGuessNoteLanguage = fsLanguageOfNote1 (fnCurrentCard)
+		else
+			fsGuessNoteLanguage = fsDocLanguage &amp; &quot;-&quot; &amp; fsDocCountry
+		endif
+		exit function
+		fsGuessNoteLanguageErr:
+		fsGuessNoteLanguage = fsLanguageCountryEnvironment
+end function
+
+sub updateLanguageDisplay
+	dim sB as string
+	dim fontStyled
+	fontStyled = createUnoStruct(&quot;com.sun.star.awt.FontDescriptor&quot;) 
+	fontStyled = f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).Model.FontDescriptor
+	
+	sB = f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Text
+	if sB = fsGuessNoteLanguage then 
+		fontStyled.Slant = 0 
+	else
+		fontStyled.Slant = 2 
+	endif
+	f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).Model.FontDescriptor = fontStyled
+end sub
+
+sub setNoteLanguage(sA, optional nPage)
+	&apos; sA is a language code. nPage is the number of the page to change.
+	&apos; com.sun.star.lang.Locale supports western languages only. 
+	&apos; If you use an Asian or complex language, the language and country are left blank. 
+	dim sLocale as new com.sun.star.lang.Locale
+	dim sB as string
+	dim sC as string
+	if ismissing (nPage) then
+		nPage = fnCurrentCard
+	endif
+	if len (sA) &lt; 2 then
+		exit sub
+	endif
+	if instr(sA, &quot;-&quot;) = 4 then
+		sB = lcase(left(sA, 3))
+		sC = ucase(mid(sA, 5, 7)
+	else
+		sB = lcase(left(sA, 2))
+		sC = ucase(mid(sA, 4, 6)
+	endif
+	if fbisAsian (sB) then
+		&apos; The Asian language is stored - notepad always defaults to showing a Western language. 
+		sLocale.Language = sB
+		sLocale.Country = sC
+		ThisComponent.getDrawPages.getByIndex( nPage ).getNotesPage.getByIndex(fiGetSlideNoteIndex).CharLocaleAsian = sLocale
+	elseif fbisComplex (sB) then
+		&apos; The Complex language is stored - notepad always defaults to showing a Western language. 
+		sLocale.Language = sB
+		sLocale.Country = sC
+		ThisComponent.getDrawPages.getByIndex( nPage ).getNotesPage.getByIndex(fiGetSlideNoteIndex).CharLocaleComplex = sLocale
+	else
+		sLocale.Language = sB
+		sLocale.Country = sC
+		ThisComponent.getDrawPages.getByIndex( nPage ).getNotesPage.getByIndex(fiGetSlideNoteIndex).CharLocale = sLocale
+	endif
+	thisComponent.setModified(true)
+end sub
+
+sub hideEditControls
+	f_dlgImpressAsk.GetControl(&quot;CommandButton10&quot;).model.Enabled = false &apos; mail
+	f_dlgImpressAsk.GetControl(&quot;CommandButton8&quot;).model.Enabled = false &apos; preview
+	f_dlgImpressAsk.GetControl(&quot;CommandButton7&quot;).model.Enabled = false &apos; paste message
+	f_dlgImpressAsk.GetControl(&quot;CommandButton6&quot;).model.Enabled = false &apos; convert to xml
+	f_dlgImpressAsk.GetControl(&quot;CommandButton5&quot;).model.Enabled = false &apos; save as
+	f_dlgImpressAsk.GetControl(&quot;CommandButton4&quot;).model.Enabled = false &apos; save
+	f_dlgImpressAsk.GetControl(&quot;CommandButton3&quot;).model.Enabled = false &apos; open
+end sub
+
+sub showEditControls
+	f_dlgImpressAsk.GetControl(&quot;CommandButton11&quot;).model.Enabled = true &apos; view style
+	f_dlgImpressAsk.GetControl(&quot;CommandButton10&quot;).model.Enabled = true &apos; mail
+	f_dlgImpressAsk.GetControl(&quot;CommandButton9&quot;).model.Enabled = true &apos; say
+	f_dlgImpressAsk.GetControl(&quot;CommandButton8&quot;).model.Enabled = true &apos; preview
+	f_dlgImpressAsk.GetControl(&quot;CommandButton7&quot;).model.Enabled = true &apos; paste message
+	f_dlgImpressAsk.GetControl(&quot;CommandButton6&quot;).model.Enabled = true &apos; convert to xml
+	f_dlgImpressAsk.GetControl(&quot;CommandButton5&quot;).model.Enabled = true &apos; save as
+	f_dlgImpressAsk.GetControl(&quot;CommandButton4&quot;).model.Enabled = true &apos; save
+	f_dlgImpressAsk.GetControl(&quot;CommandButton3&quot;).model.Enabled = true &apos; open
+end sub
+
+function fbAppearsToBeXML (byVal sA)
+	if instr (sA,&quot;&lt;div&quot;) = 1 or instr (sA,&quot;&lt;!--&quot;) = 1 or instr (sA,&quot;&lt;html&quot;) = 1 or instr (sA,&quot;&lt;!DOCTYPE HTML&quot;) = 1 or instr (sA,&quot;&lt;body&quot;) = 1 or instr (sA,&quot;&lt;?xml&quot;) = 1 then 
+		fbAppearsToBeXML = true
+	else
+		fbAppearsToBeXML = false
+	endif
+end function 
+
+function fbIsEven (i)	
+	&apos; i should be a string or an integer.
+	if  (int(val(i)/2) * 2) = (int(val(i))) then
+		fbIsEven = true
+	else
+		fbIsEven = false
+	endif
+end function
+
+sub SchoolToolsTextEditorStyleSetup
+	dim fontDes, fontStyled, fontDefault, fontModern
+	dim iA, iB as integer
+	dim iDefaultFontSize as integer
+	dim sA, sB as string
+	fontDes = createUnoStruct(&quot;com.sun.star.awt.FontDescriptor&quot;) 
+	fontDes = f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.FontDescriptor
+	fontStyled = createUnoStruct(&quot;com.sun.star.awt.FontDescriptor&quot;) 
+	fontStyled = f_dlgImpressAsk.GetControl(&quot;Serif&quot;).Model.FontDescriptor
+	fontModern = createUnoStruct(&quot;com.sun.star.awt.FontDescriptor&quot;) 
+	fontModern = f_dlgImpressAsk.GetControl(&quot;Monospace&quot;).Model.FontDescriptor
+	fontDefault = createUnoStruct(&quot;com.sun.star.awt.FontDescriptor&quot;) 
+	fontDefault = f_dlgImpressAsk.GetControl(&quot;DefaultFont&quot;).Model.FontDescriptor	
+	select case fsGetOS()
+	case &quot;WINDOWS&quot;
+  		iDefaultFontSize = 9
+  	case &quot;MAC&quot;,&quot;OSX&quot;
+  		iDefaultFontSize = 8
+  	case else
+  		iDefaultFontSize = 10
+  	end select
+  	if fileExists (fsNotesMenuSettingURL) then
+		sA = fsSuperTrim (getTextFromFile(fsNotesMenuSettingURL, &quot;UTF-8&quot;))
+	else
+		sA = &quot;0&quot;
+	endif
+	select case sA
+	case &quot;1&quot;, &quot;2&quot;, &quot;3&quot;, &quot;4&quot;, &quot;5&quot;, &quot;6&quot;, &quot;7&quot;, &quot;8&quot;, &quot;9&quot;
+		f_dlgImpressAsk.Model.Width = int( f_dlgImpressAsk.Model.Width * 1.5 )
+		f_dlgImpressAsk.Model.Height = int (f_dlgImpressAsk.Model.Height * 1.5 )
+		hideEditControls
+	case else
+		if len (f_dlgImpressAsk.GetControl(&quot;Label1&quot;).Model.Label) = 0 then
+	  		showEditControls
+	  	else
+	  		f_dlgImpressAsk.GetControl(&quot;CommandButton7&quot;).model.Enabled = true 
+	  	endif
+	end select
+  	select case sA
+  	case &quot;1&quot;
+  		fontDes.Height = int( iDefaultFontSize * 1.41421356237 )
+  		f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.TextColor = RGB(255, 255, 255) 
+		f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.BackgroundColor = RGB(32, 32, 32)
+	case &quot;2&quot;
+  		fontDes.Height = int( iDefaultFontSize * 1.41421356237 * 1.189207115 )
+	case &quot;3&quot;
+  		fontDes.Height = int( iDefaultFontSize * 2 * 1.189207115 )
+  		f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.TextColor = RGB(255, 255, 255) 
+		f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.BackgroundColor = RGB(32, 32, 32)
+	case &quot;4&quot;
+  		fontDes.Height = int( iDefaultFontSize * 2 * 1.41421356237 )
+	case &quot;5&quot;
+  		fontDes.Height = int( iDefaultFontSize * 2 * 1.41421356237 * 1.189207115  )
+  		f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.TextColor = RGB(255, 255, 255) 
+		f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.BackgroundColor = RGB(32, 32, 32)
+ 	case &quot;6&quot;
+  		fontDes.Height = int( iDefaultFontSize * 4 )
+ 	case &quot;7&quot;
+  		fontDes.Height = int( iDefaultFontSize * 4 * 1.189207115 )
+  		f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.TextColor = RGB(255, 255, 255) 
+		f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.BackgroundColor = RGB(32, 32, 32)
+	case &quot;8&quot;
+  		fontDes.Height = int( iDefaultFontSize * 4  * 1.41421356237 )
+ 	case &quot;9&quot;
+  		fontDes.Height = int( iDefaultFontSize * 4  * 1.41421356237 * 1.189207115 )
+  		f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.TextColor = RGB(255, 255, 255) 
+		f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.BackgroundColor = RGB(32, 32, 32)
+  	case else
+  		fontDes.Height = iDefaultFontSize
+  		f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.FontDescriptor = fontDefault
+  	end select
+  	fontDefault.Height = fontDes.Height
+	fontStyled.Height = fontDes.Height
+	fontModern.Height = fontDes.Height
+	if fbIsEven (sA) = false then
+		f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.TextColor = RGB(255, 255, 255) 
+		f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.BackgroundColor = RGB(32, 32, 32)
+	  	f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.FontDescriptor = fontDefault
+	  	f_dlgImpressAsk.GetControl(&quot;CommandButton11&quot;).model.State = 1
+	else 
+		f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.TextColor = RGB(0, 0, 0)
+		f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.BackgroundColor = RGB(255, 255, 255)
+		f_dlgImpressAsk.GetControl(&quot;CommandButton11&quot;).model.State = 0
+		select case sA
+		case &quot;0&quot;	
+			f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.FontDescriptor = fontDefault
+		case else
+			if fbAppearsToBeXML(f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text) then
+				f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.FontDescriptor = fontModern &apos; Monospace
+			else
+				f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.FontDescriptor = fontStyled &apos; Serif
+			endif
+		end select
+	endif
+	if len (f_dlgImpressAsk.GetControl(&quot;Label1&quot;).Model.Label) = 0 then
+		iA = 0
+	else 
+		iA = f_dlgImpressAsk.GetControl(&quot;Label1&quot;).Model.Height
+	endif
+	iA = iA + f_dlgImpressAsk.GetControl(&quot;CommandButton4&quot;).Model.Height + f_dlgImpressAsk.GetControl(&quot;CommandButton2&quot;).Model.Height + 20
+	f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Width = f_dlgImpressAsk.Model.Width -5
+	f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Height = f_dlgImpressAsk.Model.Height - iA
+	f_dlgImpressAsk.GetControl(&quot;Label1&quot;).Model.Width = f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Width
+	f_dlgImpressAsk.GetControl(&quot;CommandButton1&quot;).Model.PositionY =  f_dlgImpressAsk.Model.Height - 23
+	f_dlgImpressAsk.GetControl(&quot;CommandButton2&quot;).Model.PositionY = f_dlgImpressAsk.GetControl(&quot;CommandButton1&quot;).Model.PositionY
+	f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).Model.PositionY = f_dlgImpressAsk.GetControl(&quot;CommandButton1&quot;).Model.PositionY
+	f_dlgImpressAsk.GetControl(&quot;CommandButton1&quot;).Model.PositionX =  f_dlgImpressAsk.Model.Width - (f_dlgImpressAsk.GetControl(&quot;CommandButton1&quot;).Model.Width + 10)
+	f_dlgImpressAsk.GetControl(&quot;CommandButton2&quot;).Model.PositionX = f_dlgImpressAsk.GetControl(&quot;CommandButton1&quot;).Model.PositionX -( f_dlgImpressAsk.GetControl(&quot;CommandButton1&quot;).Model.Width + 5)
+	if fbAppearsToBeXML(f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text) then
+		f_dlgImpressAsk.GetControl(&quot;CommandButton8&quot;).model.Enabled = true 
+	endif
+end sub
+
+sub SchoolToolsTextEditorStyle
+	dim fontDes, fontStyled, fontDefault, fontModern
+	dim iA, iB as integer
+	dim iDefaultFontSize as integer
+	dim sA, sB as string
+	fontDes = createUnoStruct(&quot;com.sun.star.awt.FontDescriptor&quot;) 
+	fontDes = f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.FontDescriptor
+	fontStyled = createUnoStruct(&quot;com.sun.star.awt.FontDescriptor&quot;) 
+	fontStyled = f_dlgImpressAsk.GetControl(&quot;Serif&quot;).Model.FontDescriptor
+	fontModern = createUnoStruct(&quot;com.sun.star.awt.FontDescriptor&quot;) 
+	fontModern = f_dlgImpressAsk.GetControl(&quot;Monospace&quot;).Model.FontDescriptor
+	fontDefault = createUnoStruct(&quot;com.sun.star.awt.FontDescriptor&quot;) 
+	fontDefault = f_dlgImpressAsk.GetControl(&quot;DefaultFont&quot;).Model.FontDescriptor	
+	select case fsGetOS()
+	case &quot;WINDOWS&quot;
+  		iDefaultFontSize = 9
+  	case &quot;MAC&quot;,&quot;OSX&quot;
+  		iDefaultFontSize = 8
+  	case else
+  		iDefaultFontSize = 10
+  	end select
+  	if fileExists (fsNotesMenuSettingURL) then
+		sA = fsSuperTrim (getTextFromFile(fsNotesMenuSettingURL, &quot;UTF-8&quot;))
+	else
+		sA = &quot;0&quot;
+	endif
+  	select case sA
+  	case &quot;0&quot;
+  		sB = &quot;1&quot;
+  		fontDes.Height = int( iDefaultFontSize * 1.41421356237 )
+  		f_dlgImpressAsk.Model.Width = int( f_dlgImpressAsk.Model.Width * 1.5 )
+		f_dlgImpressAsk.Model.Height = int (f_dlgImpressAsk.Model.Height * 1.5 )
+		hideEditControls
+	case &quot;1&quot;
+  		sB = &quot;2&quot;
+  		fontDes.Height = int( iDefaultFontSize * 1.41421356237 * 1.189207115 )
+  		hideEditControls
+	case &quot;2&quot;
+  		sB = &quot;3&quot;
+  		fontDes.Height = int( iDefaultFontSize * 2 * 1.189207115 )
+  		hideEditControls
+	case &quot;3&quot;
+  		sB = &quot;4&quot;
+  		fontDes.Height = int( iDefaultFontSize * 2 * 1.41421356237 )
+  		hideEditControls
+	case &quot;4&quot;
+  		sB = &quot;5&quot;
+  		fontDes.Height = int( iDefaultFontSize * 2 * 1.41421356237 * 1.189207115  )
+  		hideEditControls
+ 	case &quot;5&quot;
+  		sB = &quot;6&quot;
+  		fontDes.Height = int( iDefaultFontSize * 4 )
+  		hideEditControls
+ 	case &quot;6&quot;
+  		sB = &quot;7&quot;
+  		fontDes.Height = int( iDefaultFontSize * 4 * 1.189207115 )
+  		hideEditControls
+	case &quot;7&quot;
+  		sB = &quot;8&quot;
+  		fontDes.Height = int( iDefaultFontSize * 4  * 1.41421356237 )
+  		hideEditControls
+ 	case &quot;8&quot;
+  		sB = &quot;9&quot;
+  		fontDes.Height = int( iDefaultFontSize * 4  * 1.41421356237 * 1.189207115 )
+  		hideEditControls
+  	case else
+  		sB = &quot;0&quot;
+  		fontDes.Height = iDefaultFontSize
+  		f_dlgImpressAsk.Model.Width = int( f_dlgImpressAsk.Model.Width / 1.5 )
+		f_dlgImpressAsk.Model.Height = int( f_dlgImpressAsk.Model.Height / 1.5 )
+		if len (f_dlgImpressAsk.GetControl(&quot;Label1&quot;).Model.Label) = 0 then
+	  		showEditControls
+	  	else
+	  		f_dlgImpressAsk.GetControl(&quot;CommandButton7&quot;).model.Enabled = true 
+	  	endif
+  	end select
+  	&apos;f_dlgImpressAsk.GetControl(&quot;styleNo&quot;).Model.Text = sB
+  	if fileExists (fsNotesMenuSettingURL) then
+		kill fsNotesMenuSettingURL
+	endif
+	CreateFile(fsNotesMenuSettingURL,sB,&quot;UTF-8&quot;)
+  	fontDefault.Height = fontDes.Height
+	fontStyled.Height = fontDes.Height
+	fontModern.Height = fontDes.Height
+	if fbIsEven (sB) = false then
+		f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.TextColor = RGB(255, 255, 255) 
+		f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.BackgroundColor = RGB(32, 32, 32)
+	  	f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.FontDescriptor = fontDefault
+	else 
+		f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.TextColor = RGB(0, 0, 0)
+		f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.BackgroundColor = RGB(255, 255, 255)
+		select case sB
+		case &quot;0&quot;	
+			f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.FontDescriptor = fontDefault
+		case else
+			if fbAppearsToBeXML(f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text) then
+				f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.FontDescriptor = fontModern &apos; Monospace
+			else
+				f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.FontDescriptor = fontStyled &apos; Serif
+			endif
+		end select
+	endif
+	if len (f_dlgImpressAsk.GetControl(&quot;Label1&quot;).Model.Label) = 0 then
+		iA = 0
+	else 
+		iA = f_dlgImpressAsk.GetControl(&quot;Label1&quot;).Model.Height
+	endif
+	iA = iA + f_dlgImpressAsk.GetControl(&quot;CommandButton4&quot;).Model.Height + f_dlgImpressAsk.GetControl(&quot;CommandButton2&quot;).Model.Height + 20
+	f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Width = f_dlgImpressAsk.Model.Width -5
+	f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Height = f_dlgImpressAsk.Model.Height - iA
+	f_dlgImpressAsk.GetControl(&quot;Label1&quot;).Model.Width = f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Width
+	f_dlgImpressAsk.GetControl(&quot;CommandButton1&quot;).Model.PositionY =  f_dlgImpressAsk.Model.Height - 23
+	f_dlgImpressAsk.GetControl(&quot;CommandButton2&quot;).Model.PositionY = f_dlgImpressAsk.GetControl(&quot;CommandButton1&quot;).Model.PositionY
+	f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).Model.PositionY = f_dlgImpressAsk.GetControl(&quot;CommandButton1&quot;).Model.PositionY
+	f_dlgImpressAsk.GetControl(&quot;CommandButton1&quot;).Model.PositionX =  f_dlgImpressAsk.Model.Width - (f_dlgImpressAsk.GetControl(&quot;CommandButton1&quot;).Model.Width + 10)
+	f_dlgImpressAsk.GetControl(&quot;CommandButton2&quot;).Model.PositionX = f_dlgImpressAsk.GetControl(&quot;CommandButton1&quot;).Model.PositionX -( f_dlgImpressAsk.GetControl(&quot;CommandButton1&quot;).Model.Width + 5)
+	if fbAppearsToBeXML(f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text) then
+		f_dlgImpressAsk.GetControl(&quot;CommandButton8&quot;).model.Enabled = true 
+	endif
+end sub
+
+sub SchoolToolsPasteToTextEditor ()
+	&apos;&quot;Paste the message&quot;
+	dim sA, sB as string
+	dim nPage as integer
+
+	sA = f_dlgImpressAsk.GetControl(&quot;Label1&quot;).Model.Label &amp; chr$(10)
+	sB = f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text 
+	select case left (sB, 4)
+	case &quot;&lt;div&quot;
+		if len (sA) = 0 then
+			If ThisComponent.SupportsService(&quot;com.sun.star.sheet.SpreadsheetDocument&quot;) Then
+				nPage=ThisComponent.getCurrentController.getCurrentPage().Number-1
+			else
+				nPage= -1
+			endif		
+			sA = &quot;&lt;div id=&quot;&quot;SLIDE-&quot;&amp; fsNow &amp; &quot;&quot;&quot; &gt;&quot; &amp; chr(10) &amp; _
+				fsgetSlideAltContentText (nPage, true) &amp; chr(10) &amp; &quot;&lt;/div&gt;&quot; &amp; chr(10)
+		else
+			sA = &quot;&lt;div id=&quot;&quot;ASK-&quot;&amp; fsNow &amp; &quot;&quot;&quot; &gt;&quot; &amp; chr(10) &amp; _ 
+				sA &amp; chr(10) &amp; &quot;&lt;/div&gt;&quot; &amp; chr(10)
+		endif
+	case else
+		if len (sA) = 0 then
+			If ThisComponent.SupportsService(&quot;com.sun.star.sheet.SpreadsheetDocument&quot;) Then
+				nPage=ThisComponent.getCurrentController.getCurrentPage().Number-1
+			else
+				nPage= -1
+			endif
+		 	sA = sA &amp; fsgetSlideAltContentText (nPage, false) &amp; chr(10)
+		endif
+	end select
+	f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text = fssupertrim(sA &amp; f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text)
+end sub
+
+sub SchoolToolsSpeak
+	dim sA as string
+	sA = fsstripXMLTags(f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).SelectedText)
+	if len(sA) = 0 Then 
+		sA = f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text
+	endif
+	SchoolToolsSpeakLang (sA)
+end sub
+
+sub SchoolToolsReadQuestion
+	dim sA as string
+	sA = f_dlgImpressAsk.GetControl(&quot;Label1&quot;).Model.Label
+	SchoolToolsSpeakLang (sA)
+end sub
+
+sub SchoolToolsSpeakLang (byVal sA)
+	select case fsGetOS()
+	case &quot;WINDOWS&quot;
+		&apos; The Windows SAPI5 system voice does not read XML tags aloud.
+		&apos; We should leave the tags in because they may give the reader 
+		&apos; clues how to read the text.
+	case &quot;MAC&quot;,&quot;OSX&quot;
+		&apos; OSX speak reads all XML tags aloud.
+		if instr(sA,&quot;&lt;div&quot;) = 1 or instr(sA,&quot;&lt;ask&gt;&quot;) = 1 then
+			sA = fsstripXMLTags(sA)
+		endif
+	case else
+		&apos; By default, espeak reads all tags aloud and pico reads &lt;div&gt; tags aloud.
+		if instr(sA,&quot;&lt;div&quot;) = 1 or instr(sA,&quot;&lt;ask&gt;&quot;) = 1 then
+			sA = fsstripXMLTags(sA)
+		endif
+	end select
+	if f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Enabled then 
+		synthesizeSpeech (sA, f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Text, ENABLE_SYSTEM_LANGUAGES)
+	else
+		simpleSpeech (sA)
+	endif
+end sub
+
+
+sub SchoolToolsConvertText1
+	dim sA as string
+	sA = f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).SelectedText
+	if len(sA) = 0 Then 
+		sA = f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text
+	endif
+	simpleSpeech (sA)
+end sub
+
+sub SchoolToolsAboutText1
+	dim sA as string
+	sA = f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).SelectedText
+	if len(sA) = 0 Then 
+		sA = f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text
+	endif
+	msgBox ( len (sA))
+end sub
+
+sub SchoolToolsPreviewNote
+	dim iNO_SYSTEM_ERROR_MESSAGE as integer
+	dim oSvc2 as object
+	dim sFile
+	iNO_SYSTEM_ERROR_MESSAGE = 1
+	SchoolToolsDialogSave
+	sFile = f_dlgImpressAsk.GetControl(&quot;Destination1&quot;).Model.Text	
+	if len(sFile) &lt;&gt;0 then		
+		wait 1000
+		oSvc2 = createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
+		oSvc2.execute(sFile,&quot;&quot;,iNO_SYSTEM_ERROR_MESSAGE)
+	endif
+end sub
+
+sub SchoolToolsEditNotesDialog
+	if ThisComponent.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) then
+		&apos; We need to force the update of the notes field on the screen. Let&apos;s 
+		&apos; show normal view .
+		dim sA as string
+		viewNormal()
+		sA = fsSchoolToolsFillText()
+		sA = fsSchoolToolsInputBox(&quot;&quot;, getBranding (bI_SPOKEN_BRANDING), sA)
+		if len (sA) &lt;&gt; 0 then
+			UpdateSlideNote (sA)
+		endif
+	endif
+end sub
+
+function fsSchoolToolsFillText (optional bCheckField)
+	if ismissing (bCheckField) then 
+		bCheckField = true
+	endif
+	dim sA as string
+	sA = fsGetSlideNote
+	if bCheckField = true then
+		if instr(sA, &quot;&lt;div&quot;) = 1 or instr(sA, &quot;&lt;!--&quot;) = 1 then
+			sA = fsFixCommonXhtmlProblems(sA, false)
+		endif
+	endif
+	fsSchoolToolsFillText = sA
+end function
+
+sub SchoolToolsShare
+	&apos; You must call this from the schooltools editor dialog
+	&apos; This sends the text in the editor to an email program.
+	dim sFile as string
+	dim sEmail as string
+	dim sKey as string
+	dim sURL as string
+	dim msgs() as variant
+	dim errorCode as integer 
+	dim config(fiCountConfigOptions) as variant
+	&apos;Save the school tools notes file
+	SchoolToolsDialogSave
+	sURL = f_dlgImpressAsk.GetControl(&quot;Destination1&quot;).Model.Text
+	&apos;Load default settings, so any settings undefined by settings file are not empty
+	config()=fvDefaultConfig(msgs(), errorCode)
+	&apos;Load the settings you used last time
+	sFile= fsConfigurationFileURI()
+	if fileExists (sFile) then
+		ss_config_parseFile (sFile, config(), errorCode)
+	endif
+	sEmail = config(fiExternalCommand)
+	sKey = config(fiRandomKey)
+	mailDocument (sURL,sKey,sEmail)
+end sub
+
+sub SchoolToolsLanguage
+	dim fontStyled
+	fontStyled = createUnoStruct(&quot;com.sun.star.awt.FontDescriptor&quot;) 
+	fontStyled = f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).Model.FontDescriptor
+	if f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Enabled then 
+		f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Enabled = false
+		f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Text = fsGuessNoteLanguage
+		fontStyled.Slant = 0 
+		f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).Model.FontDescriptor = fontStyled
+	else
+		f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Enabled = true
+	endif
+end sub
+
+function fsSimpleParagraph
+	fsSimpleParagraph = &quot;&lt;div class=&quot;&quot;at-default&quot;&quot;&gt;&lt;p&gt;&lt;/p&gt;&lt;/div&gt;&quot;
+end function
+
+function fsNovel
+	fsNovel = &quot;&lt;div class=&quot;&quot;at-novel&quot;&quot;&gt;&lt;p&gt;&lt;/p&gt;&lt;/div&gt;&quot;
+end function
+
+function fsPoetryDiv
+	fsPoetryDiv = &quot;&lt;div class=&quot;&quot;at-poetry&quot;&quot;&gt;&lt;/div&gt;&quot;
+end function
+
+function fsInformationDiv
+	fsInformationDiv = &quot;&lt;div class=&quot;&quot;at-information&quot;&quot;&gt;&lt;/div&gt;&quot;
+end function
+
+function fsUnorderedList
+	fsUnorderedList = &quot;&lt;div class=&quot;&quot;at-bullets&quot;&quot;&gt;&lt;li&gt;&lt;/li&gt;&lt;/ul&gt;&lt;/div&gt;&quot;
+end function
+
+function fsOrderedList
+	fsOrderedList = &quot;&lt;div class=&quot;&quot;at-numbers&quot;&quot;&gt;&lt;ol type=&quot;&quot;1&quot;&quot;&gt;&lt;li&gt;&lt;/li&gt;&lt;/ol&gt;&lt;/div&gt;&quot;
+end function
+
+function fsCodeList
+	fsCodeList = &quot;&lt;div&gt;&lt;code&gt;&lt;br /&gt;&lt;/code&gt;&lt;/div&gt;&quot;
+end function
+
+function fsSmil
+	fsSmil = &quot;&lt;speak&gt;&lt;p&gt;&lt;/p&gt;&lt;/speak&gt;&quot;
+end function
+
+function fsAskXML
+	fsAskXML = &quot;&lt;ask&gt;&lt;/ask&gt;&quot;
+end function
+
+sub chooseNewEncoding
+	dim sA as string
+	dim sB as string
+	dim cA as string
+	cA = &quot;CommandButton3&quot;
+	sA = f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text
+	if len (f_dlgImpressAsk.GetControl(&quot;Label1&quot;).Model.Label ) = 0 then
+		sB = f_dlgImpressAsk.GetControl(cA).model.helpText
+		if sB = fsUnorderedList then
+			&apos; Convert to unordered list
+			f_dlgImpressAsk.GetControl(cA).model.helpText = fsOrderedList
+			sA = fsSuperTrim(fsstripXMLTags (sA), true)
+			sA = fsAlterStringMarkup (sA, &quot;&lt;div class=&quot;&quot;at-bullets&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;ul&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;li&gt;&quot;, &quot;&lt;/li&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;li&gt;&quot;, &quot;&lt;/li&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/ul&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/div&gt;&quot;, true)
+		elseif sB = fsNovel then
+			&apos;convert to novel format - indented paragraphs
+			f_dlgImpressAsk.GetControl(cA).model.helpText = fsInformationDiv
+			sA = fsSuperTrim(fsstripXMLTags (sA), true)
+			sA = fsAlterStringMarkup (sA, &quot;&lt;div class=&quot;&quot;at-novel&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;p&gt;&quot;, &quot;&lt;/p&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;p&gt;&quot;, &quot;&lt;/p&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/div&gt;&quot;, true)			
+		elseif sB = fsPoetryDiv then 
+			&apos;convert to poetry format - div list
+			f_dlgImpressAsk.GetControl(cA).model.helpText = fsNovel
+			sA = fsSuperTrim(fsstripXMLTags (sA), true)
+			sA = fsAlterStringMarkup (sA, &quot;&lt;div class=&quot;&quot;at-poetry&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;div&gt;&quot;, &quot;&lt;/div&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;div&gt;&quot;, &quot;&lt;/div&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/div&gt;&quot;, true)
+			sA = fsReplaceText(sA, &quot;&lt;div&gt;&lt;/div&gt;&quot;, &quot;&lt;div&gt;&lt;p&gt;&lt;/p&gt;&lt;/div&gt;&quot;)
+		elseif sB = fsInformationDiv then
+			&apos;convert to directory format - div list
+			f_dlgImpressAsk.GetControl(cA).model.helpText = fsUnorderedList
+			sA = fsSuperTrim(fsstripXMLTags (sA), true)
+			sA = fsAlterStringMarkup (sA, &quot;&lt;div class=&quot;&quot;at-information&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;div&gt;&quot;, &quot;&lt;/div&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;div&gt;&quot;, &quot;&lt;/div&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/div&gt;&quot;, true)
+			sA = fsReplaceText(sA, &quot;&lt;div&gt;&lt;/div&gt;&quot;, &quot;&lt;div&gt;&lt;p&gt;&lt;/p&gt;&lt;/div&gt;&quot;)
+		elseif sB = fsOrderedList then
+			&apos; Convert to ordered list
+			f_dlgImpressAsk.GetControl(cA).model.helpText = fsCodeList
+			sA = fsSuperTrim(fsstripXMLTags (sA), true)
+			sA = fsAlterStringMarkup (sA, &quot;&lt;div class=&quot;&quot;at-numbers&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;ol type=&quot;&quot;1&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;li&gt;&quot;, &quot;&lt;/li&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;li&gt;&quot;, &quot;&lt;/li&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/ol&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/div&gt;&quot;, true)
+		elseif sB = fsCodeList then
+			f_dlgImpressAsk.GetControl(cA).model.helpText = fsSmil
+			sA = fsSuperTrim(fsstripXMLTags (sA), true)
+			sA = fsAlterStringMarkup (sA,&quot;&lt;div&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;code&gt;&quot; &amp; chr$(10), &quot;&lt;br /&gt;&quot; &amp; chr$(10),  chr$(10) &amp; &quot;&lt;/code&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/div&gt;&quot;, true)
+		elseif sB = fsSmil then
+			f_dlgImpressAsk.GetControl(cA).model.helpText = fsAskXML
+			sA = fsSuperTrim(fsstripXMLTags (sA), true)
+			&apos; &quot;&lt;?xml version=&quot;&quot;1.0&quot;&quot;?&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;!DOCTYPE speak PUBLIC &quot;&quot;-//W3C//DTD SYNTHESIS 1.0//EN&quot;&quot; &quot;&quot;http://www.w3.org/TR/speech-synthesis/synthesis.dtd&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; 
+			sA = fsAlterStringMarkup (sA, &quot;&lt;speak version=&quot;&quot;1.0&quot;&quot; xmlns=&quot;&quot;http://www.w3.org/2001/10/synthesis&quot;&quot; xmlns:xsi=&quot;&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&quot; xsi:schemaLocation=&quot;&quot;http://www.w3.org/2001/10/synthesis http://www.w3.org/TR/speech-synthesis/synthesis.xsd&quot;&quot; xml:lang=&quot;&quot;&quot; &amp; fsLanguageOfNote1 (fnCurrentCard) &amp; &quot;&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;p&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;s&gt;&quot; &amp; chr$(10), &quot;&lt;/s&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;s&gt;&quot;, chr$(10) &amp; &quot;&lt;/s&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/p&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/speak&gt;&quot;, true)
+		elseif sB = fsAskXML then
+			f_dlgImpressAsk.GetControl(cA).model.helpText = fs_NEW(fs_cL)
+			sA = fsSuperTrim(sA)
+			sA = fsstripXMLTags (sA, false)
+			sA = removeXHTMLmarkup (sA)
+			sA = fsAlterStringMarkup (sA,&quot;&lt;ask&gt;&quot;, chr$(10), &quot;&lt;/ask&gt;&quot;, true)
+			sA = fsReplaceText (sA, &quot;&amp;amp;#39;&quot;, &quot;&apos;&quot;)
+		else
+			f_dlgImpressAsk.GetControl(cA).model.helpText = fs_REVERT(fs_cL)
+			sA = &quot;&quot;
+		endif
+		&apos; xxx -  When cycling through the code displays, the ampersand string
+		&apos; kept getting longer. An alternative solution  would be to always
+		&apos; generate the string from the contents of the note for the slide.
+		sA = fsReplaceText (sA, &quot;&amp;amp;amp;&quot;, &quot;&amp;amp;&quot;)
+		sA = fsReplaceText (sA, &quot;&amp;amp;#39;&quot;, &quot;&amp;#39;&quot;)
+	else
+		f_dlgImpressAsk.GetControl(cA).model.helpText = &quot;&quot;
+	endif
+	f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text = sA
+end sub
+
+sub upDateSchoolToolsNewStatus
+	dim sA as string
+	dim cA as string
+	dim CR as string
+	cA = &quot;CommandButton3&quot;
+	CR = chr$(10)
+	if len (f_dlgImpressAsk.GetControl(&quot;Label1&quot;).Model.Label ) = 0 then
+		sA = f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text
+		if len (sA) = 0 then
+			f_dlgImpressAsk.GetControl(cA).model.helpText = fs_REVERT(fs_cL)
+		elseif fbAppearsToBeXML(sA) then 
+			sA = trim(fsReplaceText (sA,chr$(10),&quot;&quot;))
+			if instr(sA,&quot;&lt;div class=&quot;&quot;at-default&quot;&quot;&gt;&quot;) = 1 then
+				f_dlgImpressAsk.GetControl(cA).model.helpText = fsPoetryDiv
+			elseif instr(sA,&quot;&lt;div class=&quot;&quot;at-poetry&quot;&quot;&gt;&quot;) = 1 then
+				f_dlgImpressAsk.GetControl(cA).model.helpText = fsNovel
+			elseif instr(sA,&quot;&lt;div class=&quot;&quot;at-novel&quot;&quot;&gt;&quot;) = 1 then
+				f_dlgImpressAsk.GetControl(cA).model.helpText = fsInformationDiv
+			elseif instr(sA,&quot;&lt;div class=&quot;&quot;at-information&quot;&quot;&gt;&quot;) = 1 then
+				f_dlgImpressAsk.GetControl(cA).model.helpText = fsUnorderedList
+			elseif instr(sA,&quot;&lt;div class=&quot;&quot;at-bullets&quot;&quot;&gt;&lt;ul&quot;) = 1 then 
+				f_dlgImpressAsk.GetControl(cA).model.helpText = fsOrderedList
+			elseif instr(sA,&quot;&lt;div class=&quot;&quot;at-numbers&quot;&quot;&gt;&lt;ol&quot;) = 1 then
+				f_dlgImpressAsk.GetControl(cA).model.helpText = fsCodeList
+			elseif instr(sA,&quot;&lt;div&gt;&lt;code&quot;) = 1 then
+				f_dlgImpressAsk.GetControl(cA).model.helpText = fsSmil
+			elseif instr(sA,&quot;&lt;speak &quot;) = 1 then
+				f_dlgImpressAsk.GetControl(cA).model.helpText = fsAskXML
+			elseif instr(sA,&quot;&lt;ask&gt;&quot;) = 1 then
+				f_dlgImpressAsk.GetControl(cA).model.helpText = fs_NEW(fs_cL)
+			else
+				f_dlgImpressAsk.GetControl(cA).model.helpText = fs_DECODE(fs_cL)
+			endif
+		elseif instr(sA, &quot;&lt;ask&gt;&quot;) = 1 then 
+			f_dlgImpressAsk.GetControl(cA).model.helpText = fs_NEW(fs_cL)
+		else
+			f_dlgImpressAsk.GetControl(cA).model.helpText = fsSimpleParagraph
+	endif
+	else
+		f_dlgImpressAsk.GetControl(cA).model.helpText = &quot;&quot;
+	endif
+end sub
+
+sub SchoolToolsNew
+	dim sA as string
+	sA = f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text
+	if len (sA) = 0 then
+		f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text = fsSchoolToolsFillText(false)
+		f_dlgImpressAsk.GetControl(&quot;CommandButton3&quot;).model.helpText = fs_REVERT(fs_cL)
+	else
+		select case left (sA, 5)
+		case &quot;&lt;div &quot;, &quot;&lt;div&gt;&quot;, &quot;&lt;!-- &quot;, &quot;&lt;ask&gt;&quot;, &quot;&lt;spea&quot;
+			if fsstripXMLTags (sA) = sA then &apos; bad xml was found by fsstripXMLTags
+				f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text = &quot;&quot;
+				f_dlgImpressAsk.GetControl(&quot;CommandButton3&quot;).model.helpText = fs_EPUB_XML_WARNING (fs_cL)
+			else
+				chooseNewEncoding
+			endif
+		case else
+			f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text = fsAlterStringMarkup(sA, &quot;&lt;div class=&quot;&quot;at-default&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;p&gt;&quot;, &quot;&lt;/p&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;p&gt;&quot;, &quot;&lt;/p&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/div&gt;&quot;, true)
+			f_dlgImpressAsk.GetControl(&quot;CommandButton3&quot;).model.helpText = fsPoetryDiv
+		end select	
+	endif
+	f_dlgImpressAsk.GetControl(&quot;Destination1&quot;).Model.Text = &quot;&quot; 
+	f_dlgImpressAsk.Title = getBranding(bI_SPOKEN_BRANDING)
+end sub
+
+sub SchoolToolsDialogFileOpen
+	&apos; &quot;Open...&quot;
+	dim sFile, sA, sB as string
+	if NOT GlobalScope.BasicLibraries.isLibraryLoaded(&quot;Tools&quot;) then 
+		GlobalScope.BasicLibraries.loadLibrary(&quot;Tools&quot;)
+	endif
+	sFile = fsOpenMyFileDialogURI(103)
+	if len (sFile) &lt;&gt; 0 then
+		sA = getTextFromFile(sFile, &quot;UTF-8&quot;)
+		sB = fsStripHeaderAndFooter(sA)
+		f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text = sB
+		f_dlgImpressAsk.GetControl(&quot;Destination1&quot;).Model.Text = sFile 
+		if fbAppearsToBeXML(sA) then
+			if instr(sA, &quot;&lt;html xmlns=&quot;&quot;http://www.w3.org/1999/xhtml&quot;) &lt; 1 then
+				ShowDialog(fs_EXPECTED_XHTML (fs_cL))
+			elseif instr(sB, &quot;&amp;nbsp;&quot;) &gt; 0 then
+				ShowDialog(fs_UNEXPECTED_TAG (fs_cL))
+			elseif instr(sB, &quot;&lt;img src=&quot;) &gt; 0 then
+				ShowDialog(fs_UNEXPECTED_IMAGE (fs_cL))
+			elseif instr(sB, &quot;&lt;iframe&quot;) &gt; 0 then
+				ShowDialog(fs_UNEXPECTED_TAG (fs_cL))
+			else
+				f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).Model.Text = fsExtractLangInfoFromxhtml (sA)
+				updateLanguageDisplay
+			endif
+		endif
+		f_dlgImpressAsk.Title = getBranding(bI_SPOKEN_BRANDING) &amp; &quot; - &quot; &amp; ConvertFromURL(GetFileNameWithoutExtension(sFile, &quot;/&quot;))
+	endif
+end sub
+
+function fsExtractLangInfoFromxhtml (byval sA)
+	if instr (sA, &quot;&lt;?xml version=&apos;1.0&apos; encoding=&apos;utf-8&apos;?&gt;&quot;) = 1 and _
+		instr (sA, &quot;&lt;!-- img src=&quot;&quot;../images/image-&quot;) &lt;&gt; 0 and _
+		instr (sA, fsAbilityMeta) &lt;&gt; 0 then
+		sA = mid (sA, instr(sA, &quot;xml:lang=&quot;&quot;&quot;) + 10)
+		sA = left(sA,instr(sA,&quot;&quot;&quot;&quot;)-1)
+	else
+		sA = f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).Model.Text
+	endif
+	fsExtractLangInfoFromxhtml = sA
+end function
+
+sub SchoolToolsDialogSave
+	&apos; &quot;Save&quot;
+	&apos; If file path is known, save without prompting.
+	dim sFile as string
+	dim sA, sB as string
+	sFile = f_dlgImpressAsk.GetControl(&quot;Destination1&quot;).Model.Text 
+	if len ( sFile ) = 0 then
+		SchoolToolsDialogSaveAs
+	else
+		sA = f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text
+		if fbAppearsToBeXML (sA) then
+			sB = f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text
+		elseif instr(sA, &quot;&lt;speak&quot;) = 1 then 
+			sB = f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text
+		else
+			sB = f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text
+			sB = fsAlterStringMarkup (sB, &quot;&lt;div&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;p&gt;&quot;, &quot;&lt;/p&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;p&gt;&quot;, &quot;&lt;/p&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/div&gt;&quot;, true
+		endif
+		finishSchoolToolsDialogSave (sFile, sB)
+	endif
+end sub
+
+sub SchoolToolsDialogSaveAs
+	&apos; &quot;Save As...&quot;
+	&apos; Always prompt for file name to save to.
+	dim sFile as string
+	dim sFilePrompt as string
+	dim sA, sB as string
+	if NOT GlobalScope.BasicLibraries.isLibraryLoaded(&quot;Tools&quot;) then 
+		GlobalScope.BasicLibraries.loadLibrary(&quot;Tools&quot;)
+	endif
+	sFilePrompt = f_dlgImpressAsk.GetControl(&quot;Destination1&quot;).Model.Text 
+	if len ( sFilePrompt ) = 0 then
+		sFilePrompt = ConvertFromURL(fsShortFileName()) &amp; &quot;-&quot; &amp; trim (str (fnCurrentCard + 1))
+	else
+		sFilePrompt = ConvertFromURL(GetFileNameWithoutExtension(sFilePrompt, &quot;/&quot;))  
+	endif
+	sA = f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text
+	
+	if fbAppearsToBeXML (sA) then
+		sB = f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text
+		sFile = fsSaveSchoolToolFile(sFilePrompt, fs_NOTE(fs_cL) &amp; &quot; (.xhtml)&quot;, &quot;*.xhtml&quot;)
+	elseif instr(sA, &quot;&lt;speak&quot;) = 1 then 
+		sB = f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text
+		sFile = fsSaveSchoolToolFile(sFilePrompt, fs_NOTE(fs_cL) &amp; &quot; (.smil)&quot;, &quot;*.smil&quot;)
+	else
+		sB = f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text
+		sB = fsAlterStringMarkup (sB, &quot;&lt;div&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;p&gt;&quot;, &quot;&lt;/p&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;p&gt;&quot;, &quot;&lt;/p&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/div&gt;&quot;, true
+		sFile = fsSaveSchoolToolFile(sFilePrompt, fs_NOTE(fs_cL) &amp; &quot; (.xhtml)&quot;, &quot;*.xhtml&quot;)
+	endif
+	finishSchoolToolsDialogSave (sFile, sB)
+end sub
+
+sub finishSchoolToolsDialogSave (sFile, optional sB)
+	dim sA, CR as string
+	if isMissing (sB) then
+		sB = f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text
+	endif
+	if NOT GlobalScope.BasicLibraries.isLibraryLoaded(&quot;Tools&quot;) then 
+		GlobalScope.BasicLibraries.loadLibrary(&quot;Tools&quot;)
+	endif
+	if len (sFile) &lt;&gt; 0 then
+		if fileExists (sFile) then
+			kill sFile
+		endif			
+		CR = chr$(10)
+		
+		select case left (sB, 5)
+		case &quot;&lt;div &quot;, &quot;&lt;div&gt;&quot;, &quot;&lt;!-- &quot;
+			&apos; Preview the ePub chapter. Your browser will only show an
+			&apos; approximation, because different ePub viewers and web browsers will not always render xhtml the same.
+			&apos; Most ePub readers require strict xhtml - no &amp;nbsp; &lt;br&gt; &lt;/li&gt; etc. Tags are lower case.
+			&apos; An html5 compatible webkit browser is recommended for checking iBook, txtr, and Readium xhtml.
+			sA = fsXhtmlPreviewHeaderCode( sFile, f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Text, &quot;&quot;, &quot;image-&quot; &amp; trim (str (fnCurrentCard + 1)) &amp; &quot;.jpg&quot; )
+			sA = sA &amp; &quot;&lt;body&gt;&quot; &amp; CR
+			sA = sA &amp; sB &amp; CR
+			sA = sA &amp; &quot;&lt;/body&gt;&quot; &amp; CR
+			sA = sA &amp; &quot;&lt;/html&gt;&quot;
+		case &quot;&lt;spea&quot;
+			&apos; If we add an &quot;&lt;?xml version=&apos;1.0&apos; encoding=&apos;utf-8&apos;?&gt;&quot; tag, then espeak reads the tag.
+			sA = sA &amp; &quot;&lt;!DOCTYPE speak PUBLIC &quot;&quot;-//W3C//DTD SYNTHESIS 1.0//EN&quot;&quot; &quot;&quot;http://www.w3.org/TR/speech-synthesis/synthesis.dtd&quot;&quot;&gt;&quot; &amp; CR
+			sA = sA &amp; sB &amp; CR
+		case &quot;&lt;body&quot;
+			&apos; We add a head section to view results with your default browser.
+			sA = fsXhtmlPreviewHeaderCode( sFile, f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Text, &quot;&quot;, &quot;image-&quot; &amp; trim (str (fnCurrentCard + 1)) &amp; &quot;.jpg&quot; )
+			sA = sA &amp; sB &amp; CR
+			sA = sA &amp; &quot;&lt;/html&gt;&quot;
+		case &quot;&lt;html&quot;
+			&apos; We add an xml section.
+			sA = &quot;&lt;?xml version=&apos;1.0&apos; encoding=&apos;utf-8&apos;?&gt;&quot; &amp; CR
+			sA = sA &amp; sB &amp; CR
+		case else
+			&apos;If  mark up is missing, then text file is okay to use as-is
+			sA = sB
+		end select
+		CreateFile(sFile, sA, &quot;UTF-8&quot;) 
+		f_dlgImpressAsk.GetControl(&quot;Destination1&quot;).Model.Text = sFile 
+		f_dlgImpressAsk.Title = getBranding(bI_SPOKEN_BRANDING) &amp; &quot; - &quot; &amp; ConvertFromURL(GetFileNameWithoutExtension(sFile, &quot;/&quot;))
+	endif
+end sub 
+
+function fsAbilityMeta
+	fsAbilityMeta = &quot;&lt;meta name=&quot;&quot;generator&quot;&quot; content=&quot;&quot;&quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp; &quot; - &quot; &amp; getBranding (bI_BRANDING) &amp; &quot;&quot;&quot; /&gt;&quot; 
+end function
+
+function fsXhtmlPreviewHeaderCode (byval sFile, optional byVal slang, optional byval sStyleOptions, optional byval sImage)
+	dim CR, sA, sB as string
+	if ismissing (slang) then
+		slang = fsDocLanguage
+	endif
+	if ismissing (sStyleOptions) then
+		&apos; optional stylesheet link(s) or embedded stylesheet
+		sStyleOptions=&quot;&quot;
+	endif
+	if ismissing (sImage) then
+		&apos; image normally associated with this page
+		sImage=&quot;image-&quot; &amp; trim (str (fnCurrentCard + 1)) &amp; &quot;.jpg&quot;
+	endif
+	CR = chr$(10)
+	sA = &quot;&quot;
+	sA = sA &amp; &quot;&lt;?xml version=&apos;1.0&apos; encoding=&apos;utf-8&apos;?&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;!DOCTYPE html PUBLIC &quot;&quot;-//W3C//DTD XHTML 1.0 Strict//EN&quot;&quot; &quot;&quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd&quot;&quot;&gt;&quot; &amp; CR
+
+	sA = sA &amp; &quot;&lt;html xmlns=&quot;&quot;http://www.w3.org/1999/xhtml&quot;&quot; xml:lang=&quot;&quot;&quot; &amp; sLang &amp; &quot;&quot;&quot;&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;head&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;title&gt;&quot; &amp; ConvertFromURL(GetFileNameWithoutExtension(sFile, &quot;/&quot;)) &amp; &quot;&lt;/title&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;meta http-equiv=&quot;&quot;content-type&quot;&quot; content=&quot;&quot;text/html; charset=utf-8&quot;&quot; /&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;meta name=&quot;&quot;created&quot;&quot; content=&quot;&quot;&quot; &amp; fsCreationDate &amp; &quot;&quot;&quot; /&gt;&quot; &amp; CR
+	sB = trim(fsDocAuthor)
+	if len (sB) &lt;&gt; 0 then
+		sB = fsstripXMLTags (sB)
+		sB = fsReplaceText(sB,&quot;&quot;&quot;&quot;, &quot;&amp;#34;&quot;)
+		sA = sA &amp; &quot;&lt;meta name=&quot;&quot;author&quot;&quot; content=&quot;&quot;&quot; &amp; sB &amp; &quot;&quot;&quot; /&gt;&quot; &amp; CR
+	endif
+	sA = sA &amp; &quot;&lt;meta name=&quot;&quot;modified&quot;&quot; content=&quot;&quot;&quot; &amp; fsNow &amp; &quot;&quot;&quot; /&gt;&quot; &amp; CR
+	sB = trim(fsEditorInfo)
+	if len (sB) &gt; 1 then
+		sB = fsstripXMLTags (sB)
+		sB = fsReplaceText(sB,&quot;&quot;&quot;&quot;, &quot;&amp;#34;&quot;)
+		sA = sA &amp; &quot;&lt;meta name=&quot;&quot;modifiedby&quot;&quot; content=&quot;&quot;&quot; &amp; sB &amp; &quot;&quot;&quot; /&gt;&quot; &amp; CR
+	endif	
+	sB = fsSubject
+	if len (sB) &lt;&gt; 0 then
+		sB = fsstripXMLTags (sB)
+		sB = fsReplaceText(sB,&quot;&quot;&quot;&quot;, &quot;&amp;#34;&quot;)
+		sA = sA &amp; &quot;&lt;meta name=&quot;&quot;subject&quot;&quot; content=&quot;&quot;&quot; &amp; sB &amp; &quot;&quot;&quot; /&gt;&quot; &amp; CR
+	endif	
+
+	sB = fsKeyWords
+		if len (sB) &lt;&gt; 0 then
+		sB = fsstripXMLTags (sB)
+		sB = fsReplaceText(sB,&quot;&quot;&quot;&quot;, &quot;&amp;#34;&quot;)
+		sA = sA &amp; &quot;&lt;meta name=&quot;&quot;keywords&quot;&quot; content=&quot;&quot;&quot; &amp; sB &amp; &quot;&quot;&quot; /&gt;&quot; &amp; CR
+	endif
+	sA = sA &amp; fsAbilityMeta &amp; CR
+	sA = sA &amp; sStyleOptions &amp; CR
+	sA = sA &amp; &quot;&lt;style type=&quot;&quot;text/css&quot;&quot;&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;/*&lt;![CDATA[*/&quot; &amp; CR
+	sA = sA &amp; &quot; span.ccache1 {display:none}&quot; &amp; CR
+	sA = sA &amp; &quot;/*]]&gt;*/&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/style&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;!-- img src=&quot;&quot;../images/&quot; &amp; sImage &amp; &quot;&quot;&quot; --&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/head&gt;&quot; &amp; CR
+	fsXhtmlPreviewHeaderCode = sA
+end function
+
+function fsStripHeaderAndFooter (byval sA)
+	&apos; If the xhtml was created by Ability Tools, strip the header and footer
+	&apos; In this case, the extension will substitute the appropriate header and footer
+	&apos; when the document is exported. If Ability Tools extension is not the creator, 
+	&apos; then we retain the header and footer because the header may contain a special 
+	&apos; stylesheet or other metadata.
+	if instr (sA, &quot;&lt;?xml version=&apos;1.0&apos; encoding=&apos;utf-8&apos;?&gt;&quot;) = 1 and _
+		instr (sA, &quot;&lt;!-- img src=&quot;&quot;../images/image-&quot;) &lt;&gt; 0 and _
+		instr (sA, fsAbilityMeta) &lt;&gt; 0 then
+		sA = mid (sA, instr(sA, &quot;&lt;body&quot;) + 6)
+		sA = fsReplaceText (sA , &quot;&lt;/html&gt;&quot;, &quot;&quot;)
+		sA = fsReplaceText (sA , &quot;&lt;/body&gt;&quot;, &quot;&quot;)
+		sA = fsSuperTrim (sA)
+	endif
+	fsStripHeaderAndFooter = sA
+end function
+
+sub SetPageNotesToQuestion
+	&apos; We need to force the update of the notes field on the screen. Let&apos;s 
+	&apos; show normal view .
+	viewNormal()
+	SetPageNotesToNoXHTML
+	AlterThisNoteMarkup (&quot;&lt;ask&gt;&quot;, chr$(10),&quot;&lt;/ask&gt;&quot;,false)
+end sub
+
+sub SetPageNotesToSimpleXHTML
+	AlterThisNoteMarkup (&quot;&lt;div&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;p&gt;&quot;, &quot;&lt;/p&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;p&gt;&quot;, &quot;&lt;/p&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/div&gt;&quot;, true)
+end sub
+
+sub SetPageNotesToBulletedXHTML
+	AlterThisNoteMarkup (&quot;&lt;div&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;ul&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;li&gt;&quot;, &quot;&lt;/li&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;li&gt;&quot;, &quot;&lt;/li&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/ul&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/div&gt;&quot;, true)
+end sub
+
+sub SetPageNotesToComputerCode
+	AlterThisNoteMarkup (&quot;&lt;div&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;code&gt;&quot; &amp; chr$(10), &quot;&lt;br /&gt;&quot; &amp; chr$(10),  chr$(10) &amp; &quot;&lt;/code&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/div&gt;&quot;, true)
+end sub
+
+sub SetPageNotesToNumberedListXHTML
+	&apos; http://www.w3schools.com/tags/att_ol_type.asp
+	&apos; &quot;the &lt;ol&gt; element is no longer deprecated in HTML5.&quot;
+	&apos; type options:
+	&apos; 1   Default
+	&apos; i I Roman numerals
+	&apos; a A Letters
+	AlterThisNoteMarkup (&quot;&lt;div&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;ol type=&quot;&quot;1&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;li&gt;&quot;, &quot;&lt;/li&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;li&gt;&quot;, &quot;&lt;/li&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/ol&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/div&gt;&quot;, true)
+end sub
+
+
+sub SetPageNotesToNoXHTML
+	&apos; Remove code for &lt; and &gt; signs (XML markup)
+	dim sA as string
+	viewNormal()
+	sA = fsGetSlideNote
+	sA = removeXHTMLmarkup (sA)
+	UpdateSlideNote (sA)
+end sub
+
+function removeXHTMLmarkup (byval sA)
+	sA = fsReplaceText (sA, &quot;&amp;lt;&quot;, &quot;&lt;&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;gt;&quot;, &quot;&gt;&quot;)
+	sA = fsSuperTrim (sA)
+	sA = fsAlterStringMarkup (sA, &quot;&quot;, chr$(10), &quot;&quot;, false)
+	removeXHTMLmarkup = sA
+	
+end function
+
+sub AlterThisNoteMarkup (optional sPrefix, optional sMidfix, optional sSuffix, optional bCleanXML)
+	if ismissing (sPrefix) then
+		sPrefix = &quot;&quot;
+	endif
+	if ismissing (sMidfix) then
+		sMidfix = chr$(10)
+	endif	
+	if ismissing (sSuffix) then
+		sSuffix = &quot;&quot;
+	endif
+	if ismissing (bCleanXML) then
+		bCleanXML = false
+	endif
+	dim oDoc
+	dim nPage as integer
+	dim sA as string
+	&apos; We need to force the update of the notes field on the screen. Let&apos;s 
+	&apos; show normal view .
+	viewNormal()
+	oDoc=ThisComponent 
+	if oDoc.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) then
+		sA = fsGetSlideNote
+		sA = fsAlterStringMarkup (sA, sPrefix, sMidfix, sSuffix, bCleanXML)
+		UpdateSlideNote (sA)
+	endif
+end sub 
+
+function fsAlterStringMarkup (byval sA, optional sPrefix, optional sMidfix, optional sSuffix, optional bCleanXML)
+	&apos; Replaces chr$(10) with a tag. 
+	&apos; Also adds a prefix and a suffix.
+	&apos; For example, to code a note as an xhtml fragment with paragraph markup, use
+	&apos; sA = fsAlterStringMarkup (sA, &quot;&lt;div&gt;&lt;p&gt;&quot; &amp; chr$(10), &quot;&lt;/p&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;p&gt;&quot;, chr$(10) &amp; &quot;&lt;/p&gt;&lt;/div&gt;&quot;)
+	if ismissing (sPrefix) then
+		sPrefix = &quot;&quot;
+	endif
+	if ismissing (sMidfix) then
+		sMidfix = chr$(10)
+	endif	
+	if ismissing (sSuffix) then
+		sSuffix = &quot;&quot;
+	endif
+	if ismissing (bCleanXML) then
+		bCleanXML = false
+	endif
+	if bCleanXML = true then
+		sA = fsCleanForXtml(sA)
+	endif	
+	sA = fsstripXMLTags(sA)
+	sA = fsReplaceText (sA,chr$(10),sMidfix)
+	sA = fsSuperTrim (sA)
+	fsAlterStringMarkup = sPrefix &amp; sA &amp; sSuffix
+end function 
+
+function previewHTML (optional bPreview, optional iType)
+	if ismissing (bPreview) then
+		bPreview = true
+	endif
+	if ismissing (iType) then
+		iType = 1 &apos; Simple editable HTML text with arial font
+	endif
+	dim sA, sFile as string
+	dim iNO_SYSTEM_ERROR_MESSAGE as integer
+	dim oSvc2 as object
+	iNO_SYSTEM_ERROR_MESSAGE = 1
+	sFile = fsSaveSchoolToolFile(fsShortFileName(), &quot;Hypertext (.htm)&quot;, &quot;*.htm&quot;)
+	if sFile &lt;&gt; &quot;&quot; then
+		if fileExists (sFile) then 
+			kill sFile
+		endif
+		sA = ImpressAssembleHTML (iType)
+		CreateFile(sFile,sA,&quot;UTF-8&quot;)
+		if bPreview = true then
+			wait 1000
+			oSvc2 = createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
+			oSvc2.execute(sFile,&quot;&quot;,iNO_SYSTEM_ERROR_MESSAGE)
+		endif
+	endif
+	previewHTML = sFile
+end function
+
+function previewBrailleUnicodeHTML (optional bPreview)
+	if ismissing (bPreview) then
+		bPreview = true
+	endif
+	previewBrailleUnicodeHTML = previewHTML (bPreview, 5)
+end function
+
+function previewBrailleFontHTML (optional bPreview)
+	if ismissing (bPreview) then
+		bPreview = true
+	endif
+	previewBrailleFontHTML = previewHTML (bPreview, 4)
+end function
+
+function previewHighContrastHTML (optional bPreview)
+	if ismissing (bPreview) then
+		bPreview = true
+	endif
+	previewHighContrastHTML = previewHTML (bPreview, 3)
+end function
+
+function previewThemedHTML (optional bPreview)
+	if ismissing (bPreview) then
+		bPreview = true
+	endif
+	previewThemedHTML = previewHTML (bPreview, 2)
+end function
+
+function previewRegularContrastHTML (optional bPreview)
+		if ismissing (bPreview) then
+		bPreview = true
+	endif
+	previewRegularContrastHTML = previewHTML (bPreview, 1)
+end function
+
+function ImpressAssembleHTML (Optional nStyle)
+	&apos;Assemble to the text of the slides in a Impress presentation.
+	&apos;Adapted from code by Danny Brewer at http://www.oooforum.org/forum/viewtopic.phtml?t=10795 
+	&apos;next step is to translate to Braille http://www.brailletranslator.org/
+	&apos; See also http://www.miusa.org/ncde/tipsheets/languageguide/infoguide/transcribingbraille
+	dim oDoc, oDrawPages,oDrawPage,oShape,oElem
+	dim nNumShapes,nShape,nPage,nNumPages,nThisPage
+	dim cTitle,cDialogTitle
+	dim n1
+	dim sA
+	dim CR
+	if ismissing (nStyle) then
+		nStyle = 3
+	endif
+	CR = chr(10)
+	sA = &quot;&quot;
+	cTitle= fsShortFileName
+	cTitle = fsCodeTheHTML ( cTitle ,false )
+	select case nStyle
+	case 5 &apos; styled for Unicode braille (no abbreviations) - this uses Unicode fonts that include Braille glyphs. We need to translate the characters
+		sA = sA &amp; &quot;&lt;style type=&quot;&quot;text/css&quot;&quot;&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;h1,h2,h3,h4,h5,p,li,strong,b,i,br,body {background-color:white; text-transform:lowercase; color:black; font-family: braille, &quot;&quot;dejavu sans&quot;&quot;, &quot;&quot;segoe ui symbol&quot;&quot;, &quot;&quot;apple symbols&quot;&quot;, monospace; font-weight:normal; font-size:64px; }&quot; &amp; CR		
+		sA = sA &amp; &quot;a { text-decoration: none; }&quot; &amp; CR
+		sA = sA &amp; &quot;span:hover, strong:hover, b:hover{ background-color:yellow; }&quot; &amp; CR
+		sA = sA &amp; &quot;h1 { margin-left:4em; }&quot; &amp; CR
+		sA = sA &amp; &quot;h2 { margin-left:2em; }&quot; &amp; CR
+		sA = sA &amp; &quot;h3 { margin-left:1em; }&quot; &amp; CR
+		sA = sA &amp; &quot;h4 { margin-left:1em; }&quot; &amp; CR
+		sA = sA &amp; &quot;hr{ visibility:hidden; }&quot; &amp; CR
+		sA = sA &amp; &quot;&lt;/style&gt;&quot; &amp; CR
+	case 4 &apos; styled for braille (no abbreviations)
+		sA = sA &amp; &quot;&lt;style type=&quot;&quot;text/css&quot;&quot;&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;h1,h2,h3,h4,h5,p,li,strong,b,i,br,body {background-color:white; text-transform:lowercase; color:black; font-family: Braille, SimBraille, &quot;&quot;Swell Braille&quot;&quot;, monospace; font-weight:normal; font-size:64px; }&quot; &amp; CR
+		sA = sA &amp; &quot;span:hover, strong:hover, b:hover{ text-transform:lowercase; background-color:yellow; font-family: Courier, &quot;&quot;Courier New&quot;&quot;, monospace; font-weight:normal; paddingBottom=25%; letter-spacing:.125em; font-size:64px; }&quot; &amp; CR	
+		sA = sA &amp; &quot;a { text-decoration: none; }&quot; &amp; CR
+		sA = sA &amp; &quot;h1 { margin-left:4em; }&quot; &amp; CR
+		sA = sA &amp; &quot;h2 { margin-left:2em; }&quot; &amp; CR
+		sA = sA &amp; &quot;h3 { margin-left:1em; }&quot; &amp; CR
+		sA = sA &amp; &quot;h4 { margin-left:1em; }&quot; &amp; CR
+		sA = sA &amp; &quot;hr{ visibility:hidden; }&quot; &amp; CR
+		sA = sA &amp; &quot;&lt;/style&gt;&quot; &amp; CR
+	case 103 &apos; styled for visually impaired - with highlighting of current selection
+		sA = sA &amp; &quot;&lt;style type=&quot;&quot;text/css&quot;&quot;&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;body { background-color:black; color:white; font-family: Arial, Helvetica, sans-serif; font-size:x-large }&quot; &amp; CR
+		sA = sA &amp; &quot;h1 { background-color:white; color:black; voice-rate: slow; rest-before: medium  }&quot; &amp; CR
+		sA = sA &amp; &quot;a { background-color:yellow; color:black; voice-rate: slow; rest-before: medium  }&quot; &amp; CR
+		sA = sA &amp; &quot;a:hover { background-color:white; }&quot; &amp; CR
+		sA = sA &amp; &quot;h1:hover, span:hover { background-color:red; }&quot; &amp; CR
+		sA = sA &amp; &quot;h2:hover,h3:hover,p:hover,li:hover { background-color:red; }&quot; &amp; CR
+		sA = sA &amp; &quot;div:hover { background-color:darkblue; }&quot; &amp; CR
+		sA = sA &amp; &quot;&lt;/style&gt;&quot; &amp; CR
+	case 3 &apos; styled for visually impaired
+		sA = sA &amp; &quot;&lt;style type=&quot;&quot;text/css&quot;&quot;&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;body { background-color:black; color:white; font-family: Arial, Helvetica, sans-serif; font-size:x-large }&quot; &amp; CR
+		sA = sA &amp; &quot;h1 { background-color:white; color:black; voice-rate: slow; rest-before: medium  }&quot; &amp; CR
+		sA = sA &amp; &quot;a { background-color:yellow; color:black; voice-rate: slow; rest-before: medium  }&quot; &amp; CR
+		sA = sA &amp; &quot;&lt;/style&gt;&quot; &amp; CR
+	case 2 &apos; styled with extension theme
+		sA = sA &amp; &quot;&lt;style type=&quot;&quot;text/css&quot;&quot;&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;body { background-color:&quot; &amp; fsBackgroundColour &amp; &quot;; color:&quot; &amp; fsTextColour &amp; &quot;; font-family: Arial, Helvetica, sans-serif }&quot; &amp; CR
+		sA = sA &amp; &quot;h1 { background-color:&quot; &amp; fsAccentColour &amp; &quot;; color:&quot; &amp; fsTextColour &amp; &quot; }&quot; &amp; CR
+		sA = sA &amp; &quot;&lt;/style&gt;&quot;
+	case 1 &apos; styled with helvetica, otherwise default
+		sA = sA &amp; &quot;&lt;style type=&quot;&quot;text/css&quot;&quot;&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;body {font-family: arial, helvetica, sans-serif }&quot; &amp; CR
+		sA = sA &amp; &quot;&lt;/style&gt;&quot;
+	case else  &apos;default style
+		&apos;
+	end select
+	sA = sA &amp; CR
+	sA = fsXhtmlPreviewHeaderCode( cTitle, fsDocLanguage, sA, &quot;cover.jpg&quot; )
+	select case nStyle
+	case 1
+		&apos; sA = sA &amp; &quot;&lt;body contenteditable=&quot;&quot;true&quot;&quot;&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;&lt;body&gt;&quot; &amp; CR
+	case else 
+		sA = sA &amp; &quot;&lt;body&gt;&quot; &amp; CR
+	end select
+
+	if nStyle = 4 or nStyle = 5 then 
+		cTitle= fsToGradeOneBraille (cTitle, nStyle)
+	endif
+	sA = sA &amp; &quot;&lt;h1&gt;&quot; &amp;cTitle &amp; &quot;&lt;/h1&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;p&gt;&lt;strong&gt;&quot; &amp; fsDocAuthor &amp; &quot;&lt;/strong&gt;&lt;/p&gt;&quot; &amp; CR
+	oDoc=ThisComponent 
+	oDoc.getcurrentcontroller().setCurrentPage(odoc.drawpages(0))
+	viewNormal()
+	
+	if oDoc.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) then
+		oDrawPages=oDoc.getDrawPages() 
+		nNumPages=oDrawPages.getCount()
+		oElem=oDoc.getDrawPages().getElementNames() 
+		nThisPage=oDoc.getCurrentController.getCurrentPage().Number-1
+		for nPage=nThisPage To nNumPages - 1 
+			cTitle = fs_SLIDE(fs_cL)
+			if nStyle = 4 or nStyle = 5 then 
+				cTitle=  &quot;&lt;h1&gt;&quot; &amp; fsToGradeOneBraille ( cTitle &amp; &quot; &quot; &amp; nPage + 1 , nStyle)  &amp; &quot;&lt;/h1&gt;&quot; &amp; CR
+				sA = sA &amp; cTitle
+			else
+				sA = sA &amp; &quot;&lt;h1&gt;&quot; &amp; cTitle &amp; &quot; &quot; &amp; nPage + 1 &amp; &quot;&lt;/h1&gt;&quot; &amp; CR
+			endif
+			
+			oDrawPage=oDrawPages.getByIndex( nPage ) 
+			nNumShapes=oDrawPage.getCount() 
+			for nShape=0 To nNumShapes - 1 
+				
+				oShape=oDrawPage.getByIndex( nShape ) 
+				if HasUnoInterfaces( oShape, &quot;com.sun.star.lang.XServiceInfo&quot;) then 
+					&apos;msgBox &quot;Getting Shapes&quot;
+					cTitle = &quot;&quot;
+					on error resume next &apos; The slide has object that doesn&apos;t support getString 
+					cTitle=fsstripXMLTags (trim(oShape.getText().getString()) )
+					h567rsf:
+					if len(cTitle) &lt;&gt; 0 then
+						cTitle = fsReplaceText (cTitle, chr(10) &amp; &quot; &quot; &amp; chr(10), chr(10))				
+						if nStyle = 4 or nStyle = 5 then
+							cTitle = fsCodeTheHTML ( cTitle, true)	 
+							cTitle= fsToGradeOneBraille (cTitle, nStyle)
+							sA = sA &amp; &quot;&lt;p&gt;&quot; &amp; cTitle &amp; &quot;&lt;/p&gt;&quot; &amp; CR
+						else 
+							cTitle = fsCodeTheHTML ( cTitle, false)	
+							sA = sA &amp; &quot;&lt;p&gt;&quot; &amp; cTitle &amp; &quot;&lt;/p&gt;&quot; &amp; CR
+						endif	
+					endif
+				endif 
+			next
+			if nStyle = 4 or nStyle = 5 then 
+				sA = sA &amp; &quot;&lt;h2&gt;&quot; &amp; fsToGradeOneBraille (fs_NOTE(fs_cL) &amp; &quot; &quot; &amp; nPage + 1 , nStyle) &amp; &quot;&lt;/h2&gt;&quot; &amp; CR
+			else
+				sA = sA &amp; &quot;&lt;h2&gt;&quot; &amp; fs_NOTE(fs_cL) &amp; &quot; &quot; &amp; nPage + 1 &amp; &quot;&lt;/h2&gt;&quot; &amp; CR
+			endif
+			&apos; &quot;Getting Note&quot;
+			cTitle=oDrawPage.getNotesPage.getByIndex(fiGetSlideNoteIndex).getText().getString()
+			if len(cTitle) &lt;&gt; 0 then
+				oDoc.getcurrentcontroller().setCurrentPage(odoc.drawpages(nPage))
+				cTitle = fsAskForNote(cTitle)
+				if instr (cTitle,&quot;http&quot;) = 1 and instr(cTitle,&quot; &quot;) = 0 then
+					sA = sA &amp; &quot;&lt;p&gt;&lt;a href=&quot;&quot;&quot; &amp; cTitle &amp; &quot;&quot;&quot; target=&quot;&quot;_blank&quot;&quot;&gt;&quot; &amp; _
+					fsCodeTheHTML ( cTitle ) &amp; &quot;&lt;/a&gt;&lt;/p&gt;&quot; &amp; CR
+				else
+					if nStyle = 4 or nStyle = 5 then &apos;Braille
+						cTitle = fsstripXMLTags (cTitle)
+						cTitle= fsToGradeOneBraille (cTitle, nStyle)
+						sA = sA &amp; &quot;&lt;p&gt;&quot; &amp; cTitle &amp; &quot;&lt;/p&gt;&quot; &amp; CR
+					else &apos; Default
+						if instr (cTitle, &quot;&lt;div&quot;) = 1 or instr (cTitle, &quot;&lt;p&quot;) = 1 or instr (cTitle, &quot;&lt;h&quot;) = 1 or instr (cTitle, &quot;&lt;body&quot;) = 1 then  
+							&apos; write contents as-is
+							sA = sA &amp; cTitle &amp; CR
+						else
+							&apos; set the carriage returns to paragraphs
+							cTitle =  (fsReplaceText(cTitle,chr(10),&quot;&lt;/p&gt;&quot; &amp; CR &amp; &quot;&lt;p&gt;&quot;) )
+							sA = sA &amp; &quot;&lt;p&gt;&quot; &amp; cTitle &amp; &quot;&lt;/p&gt;&quot; &amp; CR
+						endif
+					endif
+					
+				endif	
+			endif
+			sA = sA &amp; &quot;&lt;hr/&gt;&quot; &amp; CR
+		next
+	endif
+	select case nStyle
+	case 3 &apos; visually impaired
+		sA = sA &amp; &quot;&lt;p&gt;&lt;strong&gt;&lt;a href = &quot;&quot;http://www.brailletranslator.org/&quot;&quot;  target = &quot;&quot;_blank&quot;&quot; title = &quot;&quot;brailletranslator&quot;&quot; alt = &quot;&quot;brailletranslator&quot;&quot;&gt;BrailleTranslator.org&lt;/a&gt;&lt;/strong&gt;&lt;/p&gt;&quot; &amp; CR
+	case else 
+		&apos;
+	end select
+	sA = sA &amp; &quot;&lt;/body&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/html&gt;&quot; &amp; CR
+	ImpressAssembleHTML = sA
+end function
+
+
+
+&apos;-------------------------------
+
+function fsAskForNote( byval optional cTitle, optional cHeading)
+	dim sDemand, sArret, sDefault as string
+	sDemand = fs_COMPUTER_ASK(fs_cL)
+	sArret = fs_COMPUTER_STOP(fs_cL)
+	if ismissing ( cTitle ) or cTitle = &quot;&quot; then
+		cTitle = fs_WHAT_DO_YOU_SAY(fs_cL)
+	endif
+	if ismissing ( cHeading ) or cHeading = &quot;&quot; then
+		cHeading = getBranding (bI_SPOKEN_BRANDING)
+	endif
+	cTitle = trim(cTitle)
+	if instr (cTitle,&quot;&lt;ask&gt;&quot;) = 1 and right(cTitle, 6 ) = &quot;&lt;/ask&gt;&quot; then
+		&apos; Ask
+		cTitle = fsReplaceText ( cTitle , &quot;&lt;ask&gt;&quot; , &quot;&quot;) 
+		cTitle = fsReplaceText ( cTitle , &quot;&lt;/ask&gt;&quot; , &quot;&quot;)
+		sDefault = &quot;&quot;
+		cTitle = fsSchoolToolsInputBox(cTitle, cHeading, sDefault)
+		if instr(lcase (cTitle), sDemand) = 1 then
+			cTitle = right ( cTitle , len (cTitle) - len (sDemand &amp; &quot; &quot;))
+			cTitle = ucase ( left (cTitle, 1 )) &amp; right( cTitle, len (cTitle) - 1)
+			if fbIsAQuestion (cTitle) and right (cTitle, 1) &lt;&gt; &quot;?&quot; then
+				cTitle = cTitle &amp; &quot;?&quot;
+			endif
+			cTitle = &quot;&lt;ask&gt;&quot; &amp; cTitle &amp; &quot;&lt;/ask&gt;&quot;
+		elseif instr(lcase (cTitle), sArret) = 1 then 
+			cTitle = &quot;&quot;
+		endif
+		if cTitle = &quot;&quot; then &apos; You hit the cancel button. Abort.
+			ThisComponent.Presentation.End
+			end
+		endif
+	endif
+	fsAskForNote = cTitle
+end function
+
+function fbIsAQuestion(byval optional sA as string, optional sLanguage as string) as boolean
+	if ismissing(sA) then 
+		sA = &quot;xxxx&quot;
+	endif
+	if ismissing(sLanguage) then 
+		sLanguage=fsGetSetting(&quot;language&quot;)
+	endif
+	&apos;Note to translator: Please translate from the English strings.
+	&apos;This function checks for a question word.
+	dim sB as string
+	dim i, j as integer
+	i = 23
+	sA = lcase (sA)
+	dim sQuestion(i) as string
+	select case left(sLanguage,2)
+	case &quot;fr&quot; &apos;French
+		sQuestion(0) = &quot;qui &quot; 
+		sQuestion(1) = &quot;quoi &quot; 
+		sQuestion(2) = &quot;quand &quot; 
+		sQuestion(3) = &quot;où &quot;
+		sQuestion(4) = &quot;pourquoi&quot;
+		sQuestion(5) = &quot;est-&quot;
+		sQuestion(6) = &quot;as &quot;
+		sQuestion(7) = &quot;avez&quot;
+		sQuestion(8) = &quot;êtes&quot;
+		sQuestion(9) = &quot;voulez-vous &quot;
+		sQuestion(10) = &quot;veux&quot;
+		sQuestion(11) = &quot;pouvez&quot;
+		sQuestion(12) = &quot;peux&quot;
+		sQuestion(13) = &quot;peut&quot;
+		sQuestion(14) = &quot;combien&quot;
+		sQuestion(15) = &quot;qu&apos;est-ce&quot;
+		sQuestion(16) = &quot;sont&quot;
+		sQuestion(17) = &quot;comment&quot;
+		sQuestion(18) = &quot;suis &quot;
+		sQuestion(19) = &quot;es &quot;
+		sQuestion(20) = &quot;est&quot;
+		sQuestion(21) = &quot;ai &quot;
+		sQuestion(22) = &quot;a &quot;
+		sQuestion(23) = &quot;sommes&quot;
+	case else  &apos; &quot;en&quot; &apos;  English default. &quot;zxx-&quot; is LibreOffice code for undefined language
+		sQuestion(0) = &quot;am &quot;
+		sQuestion(1) = &quot;are&quot;
+		sQuestion(2) = &quot;can &quot;
+		sQuestion(3) = &quot;can&apos;t&quot;
+		sQuestion(4) = &quot;do &quot;
+		sQuestion(5) = &quot;does&quot;
+		sQuestion(6) = &quot;has&quot;
+		sQuestion(7) = &quot;have&quot;
+		sQuestion(8) = &quot;how &quot;
+		sQuestion(9) = &quot;is &quot;
+		sQuestion(10) = &quot;isn&apos;t &quot;
+		sQuestion(11) = &quot;what &quot; 
+		sQuestion(12) = &quot;what&apos;s&quot;
+		sQuestion(13) = &quot;whats &quot;
+		sQuestion(14) = &quot;when &quot; 
+		sQuestion(15) = &quot;where &quot;
+		sQuestion(16) = &quot;who &quot; 
+		sQuestion(17) = &quot;whose &quot;
+		sQuestion(18) = &quot;why &quot;
+		sQuestion(19) = &quot;will &quot;
+		sQuestion(20) = &quot;won&apos;t&quot;
+		sQuestion(21) = &quot;should&quot;
+		sQuestion(22) = &quot;shall&quot;
+		sQuestion(23) = &quot;did&quot;
+	end select	
+	for j = 0 to i
+		if instr( sA, sQuestion(j)) = 1 and len (sQuestion(j)) &lt;&gt; 0 then
+			fbIsAQuestion = true
+			exit for
+		endif
+	next
+end function
+
+&apos;------------------------------------------------------------
+sub testLatin
+	synthesizeSpeech(&quot;Lorem. Ego sum a magister.&quot;, &quot;la-VA&quot;)
+end sub
+
+sub testDefault
+	simpleSpeech(&quot;This is the default voice on your system.&quot;)
+end sub
+
+sub testDefaultVoice
+	synthesizeSpeech (&quot;Hello world&quot;)
+end sub
+
+sub testFrCA
+	synthesizeSpeech (&quot;Salut! Je m&apos;appelle Alexandre.&quot;, &quot;fr-CA&quot;)
+end sub
+
+sub testEsMx
+	synthesizeSpeech (&quot;Hola. Soy Javier.&quot;, &quot;es-MX&quot;)
+end sub
+
+sub testEnGB
+	synthesizeSpeech (&quot;Good evening. My name is Sarah.&quot;, &quot;en-GB&quot;)
+end sub
+
+sub testRuRU
+	synthesizeSpeech (&quot;Привет. Меня зовут Дмитрий.&quot;, &quot;ru-RU&quot;)
+end sub
+
+sub testZhCN
+	synthesizeSpeech (&quot;你好。我是老师。&quot;, &quot;zh-CN&quot;)
+end sub
+
+sub testZxx
+	&apos;  &quot;zxx-&quot; is the LibreOffice code for an undefined language string.
+	synthesizeSpeech (&quot;Hello. This language is undefined.&quot;, &quot;zxx-&quot;)
+end sub
+
+sub testEnAU2
+	getOnlineSpeech (&quot;Good day! I teach English.&quot;, &quot;en-AU&quot;, false)
+end sub
+
+sub testEsMx2
+	getOnlineSpeech (&quot;¡Hola! Doy clases de español.&quot;, &quot;es-ES&quot;, false)
+end sub
+
+sub testZhCn2
+	getOnlineSpeech (&quot;你好。我教普通话。&quot;,&quot;zh-CN&quot;,false)
+end sub
+
+sub testRuRU2
+	getOnlineSpeech (&quot;Привет. Меня зовут Дмитрий.&quot;, &quot;ru-RU&quot;, false)
+end sub
+
+sub testHiIn2
+	getOnlineSpeech (&quot;नमस्कार.मैं हिंदी सिखाने के लिए.&quot;,&quot;hi-IN&quot;,false)
+end sub
+
+sub testFrCa2
+	getOnlineSpeech (&quot;Salut! J&apos;enseigne le français.&quot;,&quot;fr-CA&quot;,false)
+end sub
+
+sub testLtLt2
+	getOnlineSpeech (&quot;Sveiki. Esu mokytojas.&quot;,&quot;lt-LT&quot;,false)
+end sub
+
+sub testLongPhraseOnline()
+	dim strA as string
+	strA = fs_ONLINE_WARNING(fs_cL)
+	getOnlineSpeech(strA,&quot;en-CA&quot;,false)
+end sub
+
+sub testEnAU4 &apos; Dartmouth Sportsplex recorded message
+	getOnlineSpeech (&quot;(902) 464-2600&quot;, &quot;en-AU&quot;,false)
+end sub
+
+sub testLongPhraseOnline2()
+	dim strA as string
+	strA= fs_ONLINE_WARNING(&quot;fr&quot;)
+	getOnlineSpeech(strA,&quot;fr-CA&quot;,false)
+end sub
+
+function fsDefaultLocale (optional cType)
+	dim oNode
+	if isMissing (cType) then
+		cType=&quot;DefaultLocale&quot;
+	endif
+	&apos; http://forum.openoffice.org/en/forum/viewtopic.php?f=20&amp;t=14750
+	&apos; look at file &lt;&lt;OOo-Profile/3/user/registry/data&gt;&gt; /org/openoffice/UserProfile.xcu, XML-node &quot;Data&quot;:
+	const sNodePath$ = &quot;/org.openoffice.Office.Linguistic/General&quot;
+	oNode = getOOoSetupNode(sNodePath$)
+	select case cType
+	case &quot;DefaultLocale_CJK&quot;, &quot;ASIA&quot;
+		fsDefaultLocale = oNode.getByName(&quot;DefaultLocale_CJK&quot;)
+	case &quot;DefaultLocale_CTL&quot;, &quot;COMPLEX&quot;
+		fsDefaultLocale = oNode.getByName(&quot;DefaultLocale_CTL&quot;)
+	case &quot;UNDEFINED&quot;
+		fsDefaultLocale = &quot;zxx&quot;
+	case &quot;UILocale&quot;
+		fsDefaultLocale = oNode.getByName(&quot;UILocale&quot;)
+	case else 
+		fsDefaultLocale = oNode.getByName(&quot;DefaultLocale&quot;)
+	end select
+	if len(fsDefaultLocale) = 0 then &apos; Fall back to western language
+		fsDefaultLocale = oNode.getByName(&quot;DefaultLocale&quot;)
+	endif
+	if len(fsDefaultLocale) = 0 then &apos; fall back to English
+		fsDefaultLocale = &quot;en-US&quot;
+	endif
+end function
+
+function fsEditorInfo (optional cType as string, optional bVerbose)
+	if ismissing (cType) then
+		cType = &quot;fn&quot;
+	endif
+	if ismissing (bVerbose) then
+		bVerbose = true
+	endif	
+	&apos; http://forum.openoffice.org/en/forum/viewtopic.php?f=20&amp;t=14750
+	&apos; look at file &lt;&lt;OOo-Profile/3/user/registry/data&gt;&gt; /org/openoffice/UserProfile.xcu, XML-node &quot;Data&quot;:
+	&apos; Arabic and Persian naming conventions vary from region to region and by context. 
+	&apos; Always let people have a chance to correct their name manually.
+	const sNodePath$ = &quot;/org.openoffice.UserProfile/Data&quot;
+	dim oNode, snval, gnval, ival, sFullname
+	oNode = getOOoSetupNode(sNodePath$)
+	
+	snval = oNode.getByName(&quot;sn&quot;)
+	gnval = oNode.getByName(&quot;givenname&quot;)
+	select case fsDefaultLocale (&quot;UILocale&quot;)
+	case &quot;zh&quot;, &quot;jp&quot;, &quot;ja&quot;, &quot;yu&quot;, &quot;ko&quot; &apos;Asian
+		sFullname = snval &amp; gnval 
+	case else
+		sFullname = gnval &amp; &quot; &quot; &amp; snval
+	end select
+	select case cType
+	case &quot;fn&quot;, &quot;fullname&quot;
+		fsEditorInfo = sFullname
+	case &quot;c&quot;, &quot;country&quot; &apos; region (province or state and country)
+		fsEditorInfo = oNode.getByName(&quot;c&quot;)
+	case &quot;facsimiletelephonenumber&quot;
+		fsEditorInfo = oNode.getByName(&quot;facsimiletelephonenumber&quot;)		
+	case &quot;givenname&quot;, &quot;gn&quot;
+		fsEditorInfo = oNode.getByName(&quot;givenname&quot;)		
+	case &quot;homephone&quot;
+		fsEditorInfo = oNode.getByName(&quot;homephone&quot;)		
+	case &quot;initials&quot;
+		fsEditorInfo = oNode.getByName(&quot;initials&quot;)		
+	case &quot;l&quot;, &quot;city&quot;
+		fsEditorInfo = oNode.getByName(&quot;l&quot;)		
+	case &quot;mail&quot;, &quot;email&quot;
+		fsEditorInfo = oNode.getByName(&quot;mail&quot;)		
+	case &quot;o&quot;, &quot;organization&quot;
+		fsEditorInfo = oNode.getByName(&quot;o&quot;)		
+	case &quot;position&quot;
+		fsEditorInfo = oNode.getByName(&quot;position&quot;)		
+	case &quot;postalcode&quot;, &quot;zipcode&quot;
+		fsEditorInfo = oNode.getByName(&quot;postalcode&quot;)		
+	case &quot;sn&quot;, &quot;surname&quot;
+		fsEditorInfo = oNode.getByName(&quot;sn&quot;)		
+	case &quot;st&quot;, &quot;state&quot;, &quot;province&quot;
+		fsEditorInfo = oNode.getByName(&quot;st&quot;)		
+	case &quot;street&quot;, &quot;address&quot;
+		fsEditorInfo = oNode.getByName(&quot;street&quot;)
+	case &quot;telephonenumber&quot;, &quot;workphone&quot;
+		fsEditorInfo = oNode.getByName(&quot;telephonenumber&quot;)	
+	case &quot;title&quot;
+		fsEditorInfo = oNode.getByName(&quot;title&quot;)
+	case &quot;hcard&quot;
+		fsEditorInfo = fsOrgMicroformatsVcardXhtml (sFullName, _
+			oNode.getByName(&quot;o&quot;), _
+			oNode.getByName(&quot;street&quot;), _
+			oNode.getByName(&quot;postalcode&quot;), _
+			oNode.getByName(&quot;c&quot;), _
+			oNode.getByName(&quot;l&quot;), _
+			oNode.getByName(&quot;st&quot;), _
+			oNode.getByName(&quot;homephone&quot;), _
+			oNode.getByName(&quot;telephonenumber&quot;), _
+			oNode.getByName(&quot;facsimiletelephonenumber&quot;), _
+			oNode.getByName(&quot;mail&quot;), _
+			&quot;&quot;)
+	case &quot;mecard&quot;
+		fsEditorInfo = fsMeCard(oNode.getByName(&quot;sn&quot;), _
+			oNode.getByName(&quot;givenname&quot;), _
+			oNode.getByName(&quot;o&quot;), _
+			oNode.getByName(&quot;homephone&quot;), _
+			oNode.getByName(&quot;mail&quot;), _
+			oNode.getByName(&quot;street&quot;), _
+			oNode.getByName(&quot;l&quot;), _
+			oNode.getByName(&quot;st&quot;), _
+			oNode.getByName(&quot;c&quot;), _
+			oNode.getByName(&quot;postalcode&quot;), _
+			oNode.getByName(&quot;position&quot;), _
+			true)
+	case else
+	fsEditorInfo = &quot;&quot;
+	end select
+end function
+
+function fsMeCard(sn, givenname, o, telephonenumber, mail, street, l, st, c, postalcode, note, bVerbose)
+	&apos; The mecard format does not specify home or work address. The iOS and Android
+	&apos; mobile clients that I checked offered to save the card as a home address. 
+	&apos; The clients required a space before the MECARD string.
+	dim sA as string
+	dim sB as string
+	sA = &quot; MECARD:&quot;
+	sB = sn &amp; givenname
+	if len(sB) &lt;&gt; 0 then
+		sA = sA &amp; &quot;N:&quot; &amp; fsStripforMeCard(sn &amp; &quot;,&quot; &amp; givenname)
+	else
+		if len (o) = 0 then
+			sA = sA &amp; &quot;N:&quot; &amp; &quot;Anonymous&quot;
+		else
+			sA = sA &amp; &quot;N:&quot; &amp; fsStripforMeCard(o)
+		endif
+	endif
+	if len(o) &lt;&gt; 0 then
+		sA = sA &amp; &quot;;ORG:&quot; &amp; fsStripforMeCard(o)
+	endif
+	if len(telephonenumber) &lt;&gt; 0 then
+		sA = sA &amp; &quot;;TEL:&quot; &amp; fsStripForPhone(telephonenumber, bVerbose)
+	endif
+	if len(mail) &lt;&gt; 0 then
+		sA = sA &amp; &quot;;EMAIL:&quot; &amp; fsStripforMeCard(mail)
+	endif
+	sB = street &amp; l &amp; st &amp; c &amp; postalcode
+	if len(sB) &lt;&gt; 0 then
+		sA = sA &amp; &quot;;ADR:&quot; &amp; fsStripforMeCard(street &amp; &quot; &quot; &amp; l &amp; &quot; &quot; &amp; st &amp; &quot; &quot; &amp; c &amp; &quot; &quot; &amp; postalcode)
+	endif
+	if len (note) &lt;&gt; 0 then
+		sA = sA &amp; &quot;;NOTE:&quot; &amp; fsStripforMeCard(note)
+	endif
+	sA = sA &amp; &quot;;;&quot;
+	fsMeCard = sA
+end function
+
+function fsStripforMeCard (sA)
+	dim cGood, cBad, cB, cA as string
+	dim n, i  as integer
+	fsStripforMeCard = &quot; &quot;
+	cA = sA
+	cBad = &quot;;&quot;
+	n = len(sA)
+	for i = 1 to n
+		cB = mid (cA,i,1)
+		if instr(cBad, cB) = 0 then
+			fsStripforMeCard = fsStripforMeCard &amp; cB
+		endif
+	next 
+	fsStripforMeCard = trim (fsStripforMeCard)
+end function
+
+function fsStripForPhone (byval sA, optional bVerbose)
+	if isMissing (bVerbose) then
+		bVerbose = true
+	endif
+	dim cGood, cBad, cB, cA as string
+	dim n, i  as integer
+	fsStripForPhone = &quot; &quot;
+	cA = lcase (sA)
+	cA = fsReplaceText (cA, &quot;)&quot;,&quot;&quot;)
+	cA = fsReplaceText (cA, &quot;(&quot;,&quot;,&quot;)
+	cGood = &quot;+,#@*1234567890&quot;
+	cBad = &quot;abcdefghijklmnopqrstuvwxyz&quot;
+	n = len(sA)
+	for i = 1 to n
+		cB = mid (cA,i,1)
+		if instr(cGood, cB) &lt;&gt; 0 then
+			fsStripForPhone = fsStripForPhone &amp; cB
+		endif
+	next 
+	fsStripForPhone = trim (fsStripForPhone)
+	if bVerbose = true then 
+		for i = 1 to n
+			cB = mid (cA,i,1)
+			if instr(cBad, cB) &lt;&gt; 0 then
+				fsStripForPhone = inputBox (fs_CHECK_THE_PHONE_NO (fs_cL) &amp; chr$(10) &amp; sA, getBranding (bI_SPOKEN_BRANDING), fsStripForPhone)
+				exit for
+			endif
+		next
+	fsStripForPhone = trim (fsStripForPhone)
+	endif
+end function
+
+Function getOOoSetupNode(sNodePath$)
+	&apos; http://forum.openoffice.org/en/forum/viewtopic.php?f=20&amp;t=14750
+	Dim aConfigProvider, oNode, args(0) As new com.sun.star.beans.PropertyValue
+	aConfigProvider = createUnoService(&quot;com.sun.star.configuration.ConfigurationProvider&quot;)
+	args(0).Name = &quot;nodepath&quot;
+	args(0).Value = sNodePath
+	getOOoSetupNode = aConfigProvider.createInstanceWithArguments(&quot;com.sun.star.configuration.ConfigurationAccess&quot;, args())
+End Function
+
+</script:module>

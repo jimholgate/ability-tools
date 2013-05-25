@@ -1,0 +1,1780 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="userl18n" script:language="StarBasic">REM  *****  BASIC  *****
+option explicit
+
+function fs_cL
+    fs_cL= fsGetSetting(&quot;language&quot;)
+end function
+
+function fs_PUBLISH (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_PUBLISH = &quot;Publier&quot;
+	case else
+		fs_PUBLISH = &quot;Publish&quot;
+	end select
+end function
+
+function fs_COMPANY (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_COMPANY = &quot;Société&quot;
+	case else
+		fs_COMPANY = &quot;Company&quot;
+	end select
+end function
+
+function fs_FIRSTNAMELASTNAME (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_FIRSTNAMELASTNAME = &quot;Prénom/Nom&quot;
+	case else
+		fs_FIRSTNAMELASTNAME = &quot;First Name/Name&quot;
+	end select
+end function
+
+function fs_URL404ERROR (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_URL404ERROR = &quot;404 - La ressource demandée n’existe pas&quot;
+	case else
+		fs_URL404ERROR = &quot;404 - The requested resource is unavailable&quot;
+	end select
+end function
+
+function fs_POSTALCODECITY (cL)
+	select case cL
+	case &quot;fr&quot;
+		if ucase(fsDocCountry) = &quot;CA&quot; or lcase(fsEditorInfo (&quot;c&quot;, false)) = &quot;canada&quot; then
+			fs_POSTALCODECITY = &quot;Code Postal/Ville/Province&quot;
+		else
+			fs_POSTALCODECITY = &quot;Code Postal/Ville/ État&quot;	
+		endif
+	case else
+		if ucase(fsDocCountry) = &quot;CA&quot; or lcase(fsEditorInfo (&quot;c&quot;, false)) = &quot;canada&quot; then
+			fs_POSTALCODECITY = &quot;Postal Code/City/Province&quot;
+		else
+			fs_POSTALCODECITY = &quot;Zip Code/City/State&quot;	
+		endif
+	end select
+	
+end function
+
+function fs_COUNTRYREGION (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_COUNTRYREGION = &quot;Pays/Région&quot;
+	case else
+		fs_COUNTRYREGION = &quot;Country/Region&quot;
+	end select
+end function
+
+function fs_TITLEPOSITION (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_TITLEPOSITION = &quot;Titre/Position&quot;
+	case else
+		fs_TITLEPOSITION = &quot;Title/Position&quot;
+	end select
+end function
+
+function fs_PHONEHOMEOFFICE (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_PHONEHOMEOFFICE = &quot;Tél (Domicile/Bureau)&quot;
+	case else
+		fs_PHONEHOMEOFFICE = &quot;Phone (Home/Office)&quot;
+	end select
+end function
+
+function fs_FAXEMAIL (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_FAXEMAIL = &quot;Télécopieur/E-mail&quot;
+	case else
+		fs_FAXEMAIL = &quot;Fax/Email&quot;
+	end select
+end function
+
+function fs_DESCRIPTION (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_DESCRIPTION = &quot;Description&quot;
+	case else
+		fs_DESCRIPTION = &quot;Description&quot;
+	end select
+end function
+
+function fs_HOMEPAGE (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_HOMEPAGE = &quot;Page d&apos;accueil&quot;
+	case else
+		fs_HOMEPAGE = &quot;Home page&quot;
+	end select
+end function
+
+function fs_STREET (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_STREET = &quot;Rue&quot;
+	case else
+		fs_STREET = &quot;Street&quot;
+	end select
+end function
+
+function fs_OKAY (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_OKAY = &quot;OK&quot;
+	case else
+		fs_OKAY = &quot;OK&quot;
+	end select
+end function
+
+function fs_EMAIL (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_EMAIL = &quot;E-mail&quot;
+	case else
+		fs_EMAIL = &quot;Email&quot;
+	end select
+end function
+&apos; Voulez-vous ajouter un horodatage?
+
+function fs_ADD_TIMESTAMP (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_ADD_TIMESTAMP = &quot;Voulez-vous ajouter un horodatage?&quot;
+	case else
+		fs_ADD_TIMESTAMP = &quot;Add a time stamp?&quot;
+	end select
+end function
+
+function fs_ABOUT_MICROFORMAT (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_ABOUT_MICROFORMAT = &quot;&lt;!-- microformats.org hcard et vevent pour Firefox Operator /--&gt;&quot;
+	case else
+		fs_ABOUT_MICROFORMAT = &quot;&lt;!-- microformats.org hcard and vevent for Firefox Operator /--&gt;&quot;
+	end select
+end function
+
+function fs_HOMEPHONE_NO (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_HOMEPHONE_NO = &quot;Tél (domicile)&quot;
+	case else
+		fs_HOMEPHONE_NO = &quot;Home phone&quot;
+	end select
+end function
+
+function fs_PHONE_NO (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_PHONE_NO = &quot;Téléphone&quot;
+	case else
+		fs_PHONE_NO = &quot;Telephone&quot;
+	end select
+end function
+
+function fs_FAX_NO (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_FAX_NO = &quot;Fax&quot;
+	case else
+		fs_FAX_NO = &quot;Fax&quot;
+	end select
+end function
+
+function fs_CHECK_THE_PHONE_NO (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_CHECK_THE_PHONE_NO = &quot;Verifier votre numéro de téléphone&quot;
+	case else
+		fs_CHECK_THE_PHONE_NO = &quot;Check your phone number&quot;
+	end select
+end function
+
+function fs_UNEXPECTED_TAG (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_UNEXPECTED_TAG = &quot;Ce document XHTML a un code inattendu.&quot;
+	case else
+		fs_UNEXPECTED_TAG = &quot;This XHTML document has an unexpected tag.&quot;	
+	end select
+end function
+
+function fs_UNEXPECTED_IMAGE (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_UNEXPECTED_IMAGE = &quot;Ce document XHTML fait référence à une image incorporée. Il pourrait ne pas apparaître dans un document ePub exporté.&quot;
+	case else
+		fs_UNEXPECTED_IMAGE = &quot;This XHTML document refers to an embedded image. It might not show up as expected in an exported ePub document.&quot;		
+	end select
+end function
+
+function fs_EXPECTED_XHTML (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_EXPECTED_XHTML = &quot;Ce n&apos;est pas un document XHTML. Pour les documents ePub, vous devez utiliser XHTML. Vous pouvez installer l’éxtension Writer2xhtml, et utiliser la commande « Fichier -. Exporter ... - XHTML ». Pour plus d&apos;informations, consultez http://www.w3.org/TR/xhtml1/ &quot;
+	case else
+		fs_EXPECTED_XHTML = &quot;This is not an XHTML document. You must use valid XHTML in ePub documents. To create XHTML with Writer, install Writer2xhtml, then use “File - Export... - XHTML”. For more information, consult http://www.w3.org/TR/xhtml1/&quot;		
+	end select
+end function
+
+function fs_SAVE_BEFORE_SENDING (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_SAVE_BEFORE_SENDING = &quot;Enregister le document au format &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp; &quot;.odp avant de le publier.&quot;
+	case else
+		fs_SAVE_BEFORE_SENDING = &quot;Please save the presentation as a &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp; &quot;.odp file before publishing it.&quot;
+	end select
+end function
+
+function fs_LINK (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_LINK = &quot;Hyperlien&quot;
+	case else
+		fs_LINK = &quot;Link&quot;
+	end select
+end function
+
+function fs_WEBCAMTITLE (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_WEBCAMTITLE = &quot;Titre de l&apos;image ou de la page&quot;
+	case else
+		fs_WEBCAMTITLE = &quot;Title of the image or page&quot;
+	end select
+end function
+
+function fs_UNKNOWN_ERROR (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_UNKNOWN_ERROR = fsGetSetting(&quot;ooname&quot;) &amp; &quot; ne peut pas utiliser un client auxiliaire. Verifiez la configuration.&quot;
+	case else
+		fs_UNKNOWN_ERROR = fsGetSetting(&quot;ooname&quot;) &amp; &quot; couldn&apos;t use a program or script with these settings. Check the settings.&quot;
+	end select
+end function
+
+function fs_MAIL_TOPIC (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_MAIL_TOPIC = fsGetSetting(&quot;ooname&quot;) &amp; &quot; envoie : &quot; &amp; fsShortFileName()
+	case else
+		fs_MAIL_TOPIC = fsGetSetting(&quot;ooname&quot;) &amp; &quot; is sending : &quot; &amp; fsShortFileName()
+	end select
+end function
+
+function fs_IMAGE (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_IMAGE = &quot;Image&quot;
+	case else
+		fs_IMAGE = &quot;Image&quot;
+	end select
+end function
+
+function fs_PLEASE_WAIT (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_PLEASE_WAIT = &quot;Veuillez attendre quelques secondes...&quot;
+	case else
+		fs_PLEASE_WAIT = &quot;Please wait a moment...&quot;
+	end select
+end function
+
+function fs_MYOFFICESUITE_URL (cL)
+	select case cL
+	case &quot;fr&quot;
+        select case lcase(fsGetSetting(&quot;ooname&quot;))
+		case &quot;libreoffice&quot;
+			fs_MYOFFICESUITE_URL = &quot;http://fr.libreoffice.org/&quot;
+		case else 
+			fs_MYOFFICESUITE_URL = &quot;http://www.openoffice.org/fr/&quot;	
+		end select
+	case else
+        select case lcase(fsGetSetting(&quot;ooname&quot;))
+		case &quot;libreoffice&quot;
+			fs_MYOFFICESUITE_URL = &quot;http://www.libreoffice.org/&quot;
+		case else 
+			fs_MYOFFICESUITE_URL = &quot;http://www.openoffice.org/&quot;
+		end select
+	end select
+end function
+
+function fs_BLOCKQUOTE (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_BLOCKQUOTE = &quot;Citation&quot;
+	case else
+		fs_BLOCKQUOTE = &quot;Block Quote&quot;
+	end select
+end function
+
+function fs_UNFIXABLE_XHTML (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_UNFIXABLE_XHTML = &quot;Désolé. Votre code XHTML n&apos;est pas valide. Les délimiteurs ne correspondent pas ou les délimiteurs sont incompatibles avec le format de publication.&quot;
+	case else
+		fs_UNFIXABLE_XHTML = &quot;Your XHTML code does not appear to be valid. Mismatched or unrecognized delimiters.&quot;
+	end select
+end function
+
+function fs_OSX_APPLICATION_PATH (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_OSX_APPLICATION_PATH = &quot;/Applications/&quot;
+	case else
+		fs_OSX_APPLICATION_PATH = &quot;/Applications/&quot;
+	end select
+end function
+
+function fs_HOW_TO_USE_EMAIL (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_HOW_TO_USE_EMAIL = &quot;Entrez une adresse de messagerie.&quot;
+	case else
+		fs_HOW_TO_USE_EMAIL = &quot;Enter an email address.&quot;
+	end select
+end function
+
+function fs_DIALOG_OK (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_DIALOG_OK = &quot;OK&quot;
+	case else
+		fs_DIALOG_OK = &quot;OK&quot;
+	end select
+end function
+
+function fs_DIALOG_CANCEL(cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_DIALOG_CANCEL= &quot;Annuler&quot;
+	case else
+		fs_DIALOG_CANCEL= &quot;Cancel&quot;
+	end select
+end function
+
+function fs_MAIL_BODY (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_MAIL_BODY = &quot;Merci. On va vous envoyer une réponse dans quelques minutes...&quot;
+	case else
+		fs_MAIL_BODY = &quot;Thank you. You will receive a response shortly ...&quot;
+	end select
+end function
+
+function fs_OPTIONS (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_OPTIONS = &quot;Options&quot;
+	case else
+		fs_OPTIONS = &quot;Options&quot;
+	end select
+end function
+
+function fs_BAD_MAC_FILENAME (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_BAD_MAC_FILENAME = &quot;Le nom de fichier ou chemin d&apos;accès contient des caractères spéciaux. Ces caractères peuvent être incompatibles avec votre programme de messagerie. Si nécessaire, essayez de joindre le fichier directement à partir du programme de messagerie.&quot;
+	case else
+		fs_BAD_MAC_FILENAME = &quot;The filename or path contains special characters. These characters may be incompatible with your email program. if necessary, try attaching the file directly from the email program.&quot;
+	end select
+end function
+
+function fs_APPLICATION (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_APPLICATION = &quot;Destination&quot;
+	case else
+		fs_APPLICATION = &quot;Destination&quot;
+	end select
+end function
+
+function fs_ADDRESS (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_ADDRESS = &quot;Adresse&quot;
+	case else
+		fs_ADDRESS = &quot;Address&quot;
+	end select
+end function
+
+function fs_F1_IS_HELP (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_F1_IS_HELP = &quot;F1 - Aide&quot;
+	case else
+		fs_F1_IS_HELP = &quot;F1 - Help&quot;
+	end select
+end function
+
+function fs_KEY (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_KEY = &quot;Clé&quot;
+	case else
+		fs_KEY = &quot;Key&quot;
+	end select
+end function
+
+function fs_ABOUT_KEY (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_ABOUT_KEY = &quot;Cette clé peut vous aider à gérer vos paramètres en ligne.&quot;
+	case else
+		fs_ABOUT_KEY = &quot;Save this key. It can help you manage your on-line security and preferences.&quot;
+	end select
+end function
+
+function c1_ONLINE_HELP (cL)
+	select case cL
+	case &quot;fr&quot;
+		c1_ONLINE_HELP = &quot;Aide en ligne&quot;
+	case else
+		c1_ONLINE_HELP = &quot;On-line help&quot;
+	end select
+end function
+
+function fs_PLEASE_SIMPLIFY_NAME (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_PLEASE_SIMPLIFY_NAME = &quot;Le nom du fichier n’est pas compatible avec un component &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp; &quot;. Renommez le nom du fichier et le chemin avec des caractères alphanumériques.&quot;
+	case else
+		fs_PLEASE_SIMPLIFY_NAME = &quot;The filename or path is not compatible with a &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp; &quot; scripting component. Try renaming the file or path with alphanumeric characters.&quot;
+	end select
+end function
+
+function fs_END_OF_SLIDESHOW (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_END_OF_SLIDESHOW = &quot;Fin du diaporama.&quot;
+	case else
+		fs_END_OF_SLIDESHOW = &quot;End of Slide Show.&quot;
+	end select
+end function
+
+function fs_WRITE_DRAW_SAVE (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_WRITE_DRAW_SAVE = &quot;Utiliser le bloc-notes pour ecrire des textes. Faire des diapositives. Enregistrez la présentation. Exportez le diaporama.&quot;
+	case else
+		fs_WRITE_DRAW_SAVE = &quot;Use the notepad to write text. Add images and text to slides. Save the presentation. Export it.&quot;
+	end select
+end function
+
+function fs_NO_ACTION  (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_NO_ACTION  = &quot;&lt;!--L’action n’est pas disponible avec cette version de l’extension &quot; &amp; getBranding ( bI_SPOKEN_BRANDING ) &amp; &quot;. Il faut choisir une autre option. --&gt;&quot; &amp; chr$(10)
+	case else
+		fs_NO_ACTION  = &quot;&lt;!--The action is unavailable with this version of &quot; &amp; getBranding ( bI_SPOKEN_BRANDING ) &amp; &quot;. Select another action. --&gt;&quot; &amp; chr$(10)
+	end select
+end function
+
+function fs_SPEAK_ALOUD (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_SPEAK_ALOUD = &quot;Lire les notes de présentation à haute voix&quot;
+	case else
+		fs_SPEAK_ALOUD = &quot;Read the presentation notes aloud&quot;
+	end select
+end function
+
+function fs_PREVIEW (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_PREVIEW = &quot;Aperçu de la note&quot;
+	case else
+		fs_PREVIEW = &quot;Preview note&quot;
+	end select
+end function
+
+function fs_APPEARANCE (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_APPEARANCE = &quot;Apparence&quot;
+	case else
+		fs_APPEARANCE = &quot;Appearance&quot;
+	end select
+end function
+
+function fs_DECODE (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_DECODE = &quot;Decode&quot;
+	case else
+		fs_DECODE = &quot;Decode&quot;
+	end select
+end function
+
+function fs_REVERT (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_REVERT = &quot;Revert&quot;
+	case else
+		fs_REVERT = &quot;Revert&quot;
+	end select
+end function
+
+function fs_BAD_KEY (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_BAD_KEY = &quot;Votre clé n’est pas valide. Vérifiez votre compte en ligne avec soin et changer votre mot de passe.&quot;
+	case else
+		fs_BAD_KEY = &quot;Your security key was found to be invalid. Check your on-line account carefully and change your password.&quot;
+	end select
+end function
+
+function fs_ONLINE_WARNING (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_ONLINE_WARNING = &quot;Attention. Vous allez permettre à l’extension « &quot; &amp; getBranding ( bI_SPOKEN_BRANDING ) &amp; &quot; » d’envoyer du texte en clair à un programme ou service en ligne. Vous affirmez que vous avez lu les conditions de service pour le prestataire de services en ligne, et s’engagent à les respecter. Vous comprenez que les conditions de service peuvent changer de temps en temps, et il est de votre responsabilité de veiller à la conformité. Les services en ligne peuvent être indisponibles. Ne comptez pas sur eux pour les services essentiels. Les auteurs et les distributeurs du logiciel &quot; &amp; getBranding ( bI_SPOKEN_BRANDING ) &amp; &quot; déclinent toute responsabilité financière ou juridique de votre utilisation du matériel protégé par les lois.&quot;
+	case else
+		fs_ONLINE_WARNING = &quot;Caution. You are allowing &quot; &amp; getBranding ( bI_SPOKEN_BRANDING ) &amp; &quot; to send unencrypted text to an online program or service. You affirm that you have read the terms of service for the online service provider and agree to abide by them. You understand that the terms of service may change from time to time, and it is your responsibility to ensure compliance. On-line services may be unavailable. Do not rely on them for essential services. The authors and distributors of &quot; &amp; getBranding ( bI_SPOKEN_BRANDING ) &amp; &quot; disclaim financial and legal responsibility for your use of copyrighted or restricted material.&quot;
+	end select
+end function
+
+function fs_COULD_NOT_SPEAK (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_COULD_NOT_SPEAK = getBranding ( bI_SPOKEN_BRANDING ) &amp; &quot; ne peut rien dire.&quot;
+	case else
+		fs_COULD_NOT_SPEAK = getBranding ( bI_SPOKEN_BRANDING ) &amp; &quot; can’t say anything.&quot;
+	end select
+end function
+
+function fs_DOWNLOAD_FAILED (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_DOWNLOAD_FAILED = &quot;Téléchargement d&apos;un fichier a échoué.&quot;
+	case else
+		fs_DOWNLOAD_FAILED = &quot;Downloading from the Internet failed.&quot;
+	end select
+end function
+
+function fs_NO_ONLINE_LANGUAGE (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_NO_ONLINE_LANGUAGE = getBranding ( bI_SPOKEN_BRANDING ) &amp; &quot; ne peut pas lire cela. Vérifiez la langue.&quot;
+	case else
+		fs_NO_ONLINE_LANGUAGE = getBranding ( bI_SPOKEN_BRANDING ) &amp; &quot; is not able to read this. Check the language.&quot;
+	end select
+end function
+
+function fs_SLIDE (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_SLIDE = &quot;Diapositive&quot;
+	case else
+		fs_SLIDE = &quot;Slide&quot;
+	end select
+end function
+
+function fs_EPUB_XML_WARNING (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_EPUB_XML_WARNING = &quot;&lt;!-- Vous avez utilisé XML dans vos notes. Vérifiez les résultats.--&gt;&quot; &amp; chr$(10)
+	case else
+		fs_EPUB_XML_WARNING = &quot;&lt;!-- You used XML text in your notes. Check the results carefully. --&gt;&quot; &amp; chr$(10)
+	end select
+end function
+
+function fs_EPUB_CALIBRE (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_EPUB_CALIBRE = getBranding ( bI_SPOKEN_BRANDING ) &amp; &quot; produit les livres électroniques optimisés pour les gens qui ne peuvent pas lire facilement. Calibre est une application de gestion pour les livres électroniques. Utilisez calibre pour la conversion et la optimisation des livres électroniques pour vos appareils mobiles. Transférer le livres électronique sur votre appareil mobile avec email, un service « cloud » , ou  l&apos;outil de partage de calibre.  Voir les livres avec http://www.readium.org ou http://www.magicscroll.net. Téléchargez calibre du site http://calibre-ebook.com&quot;
+	case else
+		fs_EPUB_CALIBRE = getBranding ( bI_SPOKEN_BRANDING ) &amp; &quot; produces unencrypted ePub 2.0 format eBooks that are optimized for programs and devices that can read text aloud. You can transfer eBooks to devices by sending the eBooks via email, posting them to a blog, using a “cloud” service, or with the calibre-ebook document management program. if you can’t install an ePub reader on your computer, you can use http://www.readium.org or http://www.magicscroll.net/ to read and share unencrypted ePub files. Download calibre software from http://calibre-ebook.com&quot;
+	end select
+end function
+
+function fs_COMPUTER_ASK (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_COMPUTER_ASK = &quot;ordinateur demand&quot;
+	case else
+		fs_COMPUTER_ASK = &quot;computer ask&quot;
+	end select
+end function
+
+
+function fs_TITLE_NOT_UNIQUE (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_TITLE_NOT_UNIQUE = &quot;Le titre n&apos;est pas unique&quot;
+	case else
+		fs_TITLE_NOT_UNIQUE = &quot;The title is not unique&quot;
+	end select
+end function
+
+&apos; 
+function fs_EXPORT_SELECTION (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_EXPORT_SELECTION = &quot;Exporter le texte à une note dans une nouvelle présentation &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp; &quot;.&quot;
+	case else
+		fs_EXPORT_SELECTION = &quot;Export the text to a note in a new &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp; &quot; presentation&quot;
+	end select
+end function
+
+function fs_WHAT_DO_YOU_SAY (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_WHAT_DO_YOU_SAY = &quot;&lt;ask&gt;Que voulez-vous dire? Inserez une note.&lt;/ask&gt;&quot;
+	case else
+		fs_WHAT_DO_YOU_SAY = &quot;&lt;ask&gt;What do you say? Add a note.&lt;/ask&gt;&quot;
+	end select
+end function
+
+function fs_INVALID_LINK (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_INVALID_LINK = &quot;La présentation a une image avec une référence non valide. Il peut être corrigé avec &quot;&quot; Edition - lien ... &quot;&quot; ou avec l&apos;extension Présentation Minimizer. &quot;
+	case else
+		fs_INVALID_LINK = &quot;The presentation includes an image that can’t be exported. You may be able to correct the problem with &quot;&quot; Edit - links ... - Break Link&quot;&quot; or by using the Presentation Minimizer Extension.&quot;
+	end select
+end function
+
+function fs_MINIMIZE_PRESENTATION (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_MINIMIZE_PRESENTATION = &quot;Si vous avez inséré des photos depuis un appareil photo numérique, utilisez « Outils - Minimiser Présentation » de l’Extension  « Minimizer Présentation ». Images: %nn. &lt;http://extensions.openoffice.org/fr/project/PresentationMinimizer&gt;&quot;
+	case else
+		fs_MINIMIZE_PRESENTATION = &quot;if you used photographs directly from a digital camera, use &quot;&quot;Tools - Minimize Presentation&quot;&quot; from the Presentation Minimizer Extension to optimize the size of the imported images. Images: %nn. &lt;http://extensions.openoffice.org/en/project/PresentationMinimizer&gt;&quot;
+	end select
+end function
+
+function fs_TABLE_OF_CONTENTS (cL)
+	&apos; Translations by Google. If you have a better translation, please contact me.
+	select case cL
+	case &quot;en&quot;
+		fs_TABLE_OF_CONTENTS = &quot;Table of Contents&quot;
+	case &quot;fr&quot; &apos;french
+		fs_TABLE_OF_CONTENTS = &quot;Table des matières&quot;
+	case &quot;af&quot; &apos;africaans
+		fs_TABLE_OF_CONTENTS = &quot;Inhoudsopgawe&quot;
+	case &quot;ar&quot; &apos;arabic
+		fs_TABLE_OF_CONTENTS = &quot;جدول المحتويات&quot;
+	case &quot;az&quot;
+		fs_TABLE_OF_CONTENTS = &quot;Mündəricat&quot;
+	case &quot;bg&quot; &apos;bulgarian
+		fs_TABLE_OF_CONTENTS = &quot;Съдържание&quot;
+	case &quot;ca&quot; &apos;catalan
+		fs_TABLE_OF_CONTENTS = &quot;Taula de continguts&quot;
+	case &quot;cs&quot; &apos;czech
+		fs_TABLE_OF_CONTENTS = &quot;Obsah&quot;
+	case &quot;da&quot; &apos;danish
+		fs_TABLE_OF_CONTENTS = &quot;Indholdsfortegnelse&quot;
+	case &quot;de&quot; &apos;german
+		fs_TABLE_OF_CONTENTS = &quot;Inhaltsverzeichnis&quot;
+	case &quot;el&quot; &apos;greek
+		fs_TABLE_OF_CONTENTS = &quot;Πίνακα περιεχομένων&quot;
+	case &quot;es&quot; &apos;spanish
+		fs_TABLE_OF_CONTENTS = &quot;Tabla de contenidos&quot;
+	case &quot;et&quot; &apos;estonian
+		fs_TABLE_OF_CONTENTS = &quot;Sisukord&quot;
+	case &quot;eu&quot;
+		fs_TABLE_OF_CONTENTS = &quot;Edukien taula&quot;
+	case &quot;fa&quot; &apos;farsi
+		fs_TABLE_OF_CONTENTS = &quot;فهرست مندرجات&quot;
+	case &quot;fi&quot; &apos;finnish 	
+		fs_TABLE_OF_CONTENTS = &quot;Sisällysluettelo&quot;
+	case &quot;ga&quot; &apos;irish
+		fs_TABLE_OF_CONTENTS = &quot;Clár Ábhair&quot;
+	case &quot;hi&quot; &apos;hindi
+		fs_TABLE_OF_CONTENTS = &quot;सामग्री तालिका&quot;
+	case &quot;hu&quot; &apos;hungarian
+		fs_TABLE_OF_CONTENTS = &quot;Tartalom&quot;
+	case &quot;hy&quot;
+		fs_TABLE_OF_CONTENTS = &quot;Պահեստավորված նյութեր&quot;
+	case &quot;id&quot; &apos;indonesian
+		fs_TABLE_OF_CONTENTS = &quot;Daftar Isi&quot;
+	case &quot;is&quot; &apos;icelandic
+		fs_TABLE_OF_CONTENTS = &quot;Table of Contents&quot;
+	case &quot;it&quot; &apos;italian
+		fs_TABLE_OF_CONTENTS = &quot;Indice&quot;
+	case &quot;ja&quot;,&quot;jp&quot; &apos;japanese
+		fs_TABLE_OF_CONTENTS= &quot;目次&quot;
+	case &quot;ko&quot; &apos;korean
+		fs_TABLE_OF_CONTENTS = &quot;차례&quot;
+	case &quot;lv&quot; &apos;latvian
+		fs_TABLE_OF_CONTENTS = &quot;Satura&quot;
+	case &quot;lt&quot; &apos;lithuanian
+		fs_TABLE_OF_CONTENTS = &quot;Turinys&quot;
+	case &quot;mt&quot; &apos;maltese
+		fs_TABLE_OF_CONTENTS = &quot;Tabella ta &apos;Kontenuti&quot;
+	case &quot;nl&quot; &apos;dutch
+		fs_TABLE_OF_CONTENTS = &quot;Inhoudsopgave&quot;
+	case &quot;no&quot;, &quot;nb&quot;, &quot;nn&quot; &apos;norwegian	
+		fs_TABLE_OF_CONTENTS = &quot;Innhold&quot;
+	case &quot;pa&quot; &apos;punjabi
+		fs_TABLE_OF_CONTENTS = &quot;ਤਬਲੇ ਓਫ ਕੋਨ੍ਤੇੰਟ੍ਸ&quot;
+	case &quot;pl&quot; &apos;polish
+		fs_TABLE_OF_CONTENTS = &quot;Spis treści&quot;
+	case &quot;pt&quot; &apos;portuguese
+		fs_TABLE_OF_CONTENTS = &quot;Índice analítico&quot;
+	case &quot;ro&quot; &apos;romanian
+		fs_TABLE_OF_CONTENTS = &quot;Cuprins&quot;
+	case &quot;ru&quot; &apos;russian
+		fs_TABLE_OF_CONTENTS = &quot;Оглавление&quot;
+	case &quot;sk&quot; &apos;slovak
+		fs_TABLE_OF_CONTENTS = &quot;Obsah&quot;
+	case &quot;sl&quot; &apos;slovenian
+		fs_TABLE_OF_CONTENTS = &quot;Kazalo&quot;
+	case &quot;sv&quot; &apos;swedish
+		fs_TABLE_OF_CONTENTS = &quot;Innehållsförteckning&quot;
+	case &quot;ta&quot; &apos;tamil
+		fs_TABLE_OF_CONTENTS = &quot;பொருளடக்கம்&quot;
+	case &quot;tl&quot; &apos;tagalog
+		fs_TABLE_OF_CONTENTS = &quot;Talaan ng nilalaman&quot;
+	case &quot;tr&quot; &apos;turkish
+		fs_TABLE_OF_CONTENTS = &quot;Talaan ng mga Nilalaman&quot;
+	case &quot;uk&quot; &apos;ukrainian
+		fs_TABLE_OF_CONTENTS = &quot;Зміст&quot;
+	case &quot;ur&quot; &apos;urdu
+		fs_TABLE_OF_CONTENTS = &quot;فہرست مشمولات&quot;
+	case &quot;vi&quot; &apos;vietnamese
+		fs_TABLE_OF_CONTENTS = &quot;Mục lục&quot;
+	case &quot;zh&quot; &apos;chinese
+		if fsGetSetting(&quot;country&quot;) &lt;&gt; &quot;tw&quot; then
+			fs_TABLE_OF_CONTENTS = &quot;目录&quot;
+		else
+			fs_TABLE_OF_CONTENTS = &quot;目錄&quot;
+		endif
+	case else &apos;Simple English
+		fs_TABLE_OF_CONTENTS = &quot;Table of Contents&quot;
+	end select
+end function
+
+function fs_IMPRINT (cL)
+	&apos; Translations by Google. If you have a better translation, please contact me.
+	select case cL
+	case &quot;af&quot; &apos;afrikaans
+		fs_IMPRINT = &quot;Imprint&quot;
+	case &quot;bg&quot; &apos;bulgarian
+		fs_IMPRINT = &quot;отпечатък&quot;
+	case &quot;ca&quot; &apos;catalan
+		fs_IMPRINT = &quot;Empremta&quot;
+	case &quot;cs&quot; &apos;czech
+		fs_IMPRINT = &quot;Otisk&quot;
+	case &quot;da&quot; &apos;danish
+		fs_IMPRINT = &quot;Imprint&quot;
+	case &quot;de&quot; &apos;german
+		fs_IMPRINT = &quot;Impressum&quot;
+	case &quot;el&quot; &apos;greek
+		fs_IMPRINT = &quot;αποτύπωμα&quot;
+	case &quot;en&quot; &apos;english
+		fs_IMPRINT = &quot;Imprint&quot;
+	case &quot;es&quot; &apos;spanish
+		fs_IMPRINT = &quot;Imprenta&quot;
+	case &quot;et&quot; &apos;estonian
+		fs_IMPRINT = &quot;Jälg&quot;
+	case &quot;fi&quot; &apos;finnish
+		fs_IMPRINT = &quot;Jälki&quot;
+	case &quot;fr&quot; &apos;french
+		fs_IMPRINT = &quot;Empreinte&quot;
+	case &quot;ga&quot; &apos;irish
+		fs_IMPRINT = &quot;Imprint&quot;
+	case &quot;hi&quot; &apos;hindi
+		fs_IMPRINT = &quot;छाप&quot;
+	case &quot;hu&quot; &apos;hungarian
+		fs_IMPRINT = &quot;Impresszium&quot;
+	case &quot;id&quot; &apos;indonesian
+		fs_IMPRINT = &quot;Jejak&quot;
+	case &quot;is&quot; &apos;icelandic
+		fs_IMPRINT = &quot;Imprint&quot;
+	case &quot;it&quot; &apos;italian
+		fs_IMPRINT = &quot;Impronta&quot;
+	case &quot;ja&quot;, &quot;jp&quot; &apos;japanese
+		fs_IMPRINT = &quot;フットプリント&quot;
+	case &quot;ko&quot; &apos;korean
+		fs_IMPRINT = &quot;발자국&quot;
+	case &quot;lv&quot; &apos;latvian
+		fs_IMPRINT = &quot;Nospiedums&quot;
+	case &quot;lt&quot; &apos;lithuanian
+		fs_IMPRINT = &quot;Atspaudas&quot;
+	case &quot;mt&quot; &apos;maltese
+		fs_IMPRINT = &quot;Imprint&quot;
+	case &quot;nl&quot; &apos;dutch
+		fs_IMPRINT = &quot;Impressum&quot;
+	case &quot;no&quot;, &quot;nb&quot;, &quot;nn&quot; &apos;norwegian	
+		fs_IMPRINT = &quot;Avtrykk&quot;
+	case &quot;pl&quot; &apos;polish
+		fs_IMPRINT = &quot;Odcisk&quot;
+	case &quot;pt&quot; &apos;portuguese
+		fs_IMPRINT = &quot;Capa&quot;
+	case &quot;ro&quot; &apos;romanian
+		fs_IMPRINT = &quot;Imprima&quot;
+	case &quot;ru&quot; &apos;russian
+		fs_IMPRINT = &quot;отпечаток&quot;
+	case &quot;sk&quot; &apos;slovak
+		fs_IMPRINT = &quot;Odtlačok&quot;
+	case &quot;sl&quot; &apos;slovenian
+		fs_IMPRINT = &quot;Osnovni podatki&quot;
+	case &quot;sv&quot; &apos;swedish
+		fs_IMPRINT = &quot;Imprint&quot;
+	case &quot;tl&quot; &apos;tagalog
+		fs_IMPRINT = &quot;Mabakas&quot;
+	case &quot;tr&quot; &apos;turkish
+		fs_IMPRINT = &quot;Damga&quot;
+	case &quot;uk&quot; &apos;ukrainian
+		fs_IMPRINT = &quot;відбиток&quot;
+	case &quot;zh&quot; &apos;chinese
+		if fsGetSetting(&quot;country&quot;) &lt;&gt; &quot;tw&quot; then
+			fs_IMPRINT = &quot;版本說明&quot;
+		else
+			fs_IMPRINT = &quot;版本说明&quot;
+		endif
+	case else &apos;Simple English
+		fs_IMPRINT = &quot;Imprint&quot;
+	end select
+end function
+
+function fs_CONTACT (cL)
+	&apos; Translations by Google. If you have a better translation, please contact me.
+	select case cL
+	case &quot;af&quot; &apos;afrikaans
+		fs_CONTACT = &quot;Kontak&quot;
+	case &quot;bg&quot; &apos;bulgarian
+		fs_CONTACT = &quot;контакт&quot;
+	case &quot;ca&quot; &apos;catalan
+		fs_CONTACT = &quot;Contacte&quot;
+	case &quot;cs&quot; &apos;czech
+		fs_CONTACT = &quot;Kontakt&quot;
+	case &quot;da&quot; &apos;danish
+		fs_CONTACT = &quot;Kontakt&quot;
+	case &quot;de&quot; &apos;german
+		fs_CONTACT = &quot;Kontakt&quot;
+	case &quot;el&quot; &apos;greek
+		fs_CONTACT = &quot;επαφή&quot;
+	case &quot;en&quot; &apos;english
+		fs_CONTACT = &quot;Contact&quot;
+	case &quot;es&quot; &apos;spanish
+		fs_CONTACT = &quot;Contact&quot;
+	case &quot;et&quot; &apos;estonian
+		fs_CONTACT = &quot;Kontakti&quot;
+	case &quot;fi&quot; &apos;finnish
+		fs_CONTACT = &quot;Yhteystiedon&quot;
+	case &quot;fr&quot; &apos;french
+		fs_CONTACT = &quot;Contact&quot;
+	case &quot;ga&quot; &apos;irish
+		fs_CONTACT = &quot;Teagmhála&quot;
+	case &quot;hi&quot; &apos;hindi
+		fs_CONTACT = &quot;घटना&quot;
+	case &quot;hu&quot; &apos;hungarian
+		fs_CONTACT = &quot;Névjegyet&quot;
+	case &quot;id&quot; &apos;indonesian
+		fs_CONTACT = &quot;Kontak&quot;
+	case &quot;is&quot; &apos;icelandic
+		fs_CONTACT = &quot;Tengilið&quot;
+	case &quot;it&quot; &apos;italian
+		fs_CONTACT = &quot;Contatto&quot;
+	case &quot;ja&quot;, &quot;jp&quot; &apos;japanese
+		fs_CONTACT = &quot;あなたのアドレス帳の連絡先を入力してください&quot;
+	case &quot;ko&quot; &apos;korean
+		fs_CONTACT = &quot;주소록의 연락처를 입력하십시오&quot;
+	case &quot;lv&quot; &apos;latvian
+		fs_CONTACT = &quot;Kontaktu&quot;
+	case &quot;lt&quot; &apos;lithuanian
+		fs_CONTACT = &quot;Kontaktą&quot;
+	case &quot;mt&quot; &apos;maltese
+		fs_CONTACT = &quot;Kuntatt&quot;
+	case &quot;nl&quot; &apos;dutch
+		fs_CONTACT = &quot;Contactpersoon&quot;
+	case &quot;no&quot;, &quot;nb&quot;, &quot;nn&quot; &apos;norwegian	
+		fs_CONTACT = &quot;Kontakt&quot;
+	case &quot;pl&quot; &apos;polish
+		fs_CONTACT = &quot;Kontakt&quot;
+	case &quot;pt&quot; &apos;portuguese
+		fs_CONTACT = &quot;Contato&quot;
+	case &quot;ro&quot; &apos;romanian
+		fs_CONTACT = &quot;Contact&quot;
+	case &quot;ru&quot; &apos;russian
+		fs_CONTACT = &quot;Контактов&quot;
+	case &quot;sk&quot; &apos;slovak
+		fs_CONTACT = &quot;Kontaktu&quot;
+	case &quot;sl&quot; &apos;slovenian
+		fs_CONTACT = &quot;Stik&quot;
+	case &quot;sv&quot; &apos;swedish
+		fs_CONTACT = &quot;Kontakt&quot;
+	case &quot;tl&quot; &apos;tagalog
+		fs_CONTACT = &quot;Contact&quot;
+	case &quot;tr&quot; &apos;turkish
+		fs_CONTACT = &quot;İletişim&quot;
+	case &quot;uk&quot; &apos;ukrainian
+		fs_CONTACT = &quot;Контакти&quot;
+	case &quot;zh&quot; &apos;chinese
+		if fsGetSetting(&quot;country&quot;) &lt;&gt; &quot;tw&quot; then
+			fs_CONTACT = &quot;請輸入你的地址簿中的聯繫人&quot;
+		else
+			fs_CONTACT = &quot;请输入你的地址簿中的联系人&quot;
+		endif
+	case else &apos;Simple English
+		fs_CONTACT = &quot;Contact&quot;
+	end select
+end function
+
+function fs_EVENT (cL)
+	&apos; Translations by Google. If you have a better translation, please contact me.
+	select case cL
+	case &quot;af&quot; &apos;afrikaans
+		fs_EVENT = &quot;Gebeurtenis&quot;
+	case &quot;bg&quot; &apos;bulgarian
+		fs_EVENT = &quot;Събитие&quot;
+	case &quot;ca&quot; &apos;catalan
+		fs_EVENT = &quot;Esdeveniment&quot;
+	case &quot;cs&quot; &apos;czech
+		fs_EVENT = &quot;Uudálost&quot;
+	case &quot;da&quot; &apos;danish
+		fs_EVENT = &quot;Begivenhed&quot;
+	case &quot;de&quot; &apos;german
+		fs_EVENT = &quot;Veranstaltung&quot;
+	case &quot;el&quot; &apos;greek
+		fs_EVENT = &quot;Γεγονός&quot;
+	case &quot;en&quot; &apos;english
+		fs_EVENT = &quot;Event&quot;
+	case &quot;es&quot; &apos;spanish
+		fs_EVENT = &quot;Evento&quot;
+	case &quot;et&quot; &apos;estonian
+		fs_EVENT = &quot;Sündmuse&quot;
+	case &quot;fi&quot; &apos;finnish
+		fs_EVENT = &quot;Tapahtuma&quot;
+	case &quot;fr&quot; &apos;french
+		fs_EVENT = &quot;Évènement&quot;
+	case &quot;ga&quot; &apos;irish
+		fs_EVENT = &quot;Imeacht&quot;
+	case &quot;hi&quot; &apos;hindi
+		fs_EVENT = &quot;घटना&quot;
+	case &quot;hu&quot; &apos;hungarian
+		fs_EVENT = &quot;Eseményt&quot;
+	case &quot;id&quot; &apos;indonesian
+		fs_EVENT = &quot;Acara&quot;
+	case &quot;is&quot; &apos;icelandic
+		fs_EVENT = &quot;Atburði&quot;
+	case &quot;it&quot; &apos;italian
+		fs_EVENT = &quot;Evento&quot;
+	case &quot;ja&quot;, &quot;jp&quot; &apos;japanese
+		fs_EVENT = &quot;イベント&quot;
+	case &quot;ko&quot; &apos;korean
+		fs_EVENT = &quot;이벤트&quot;
+	case &quot;lv&quot; &apos;latvian
+		fs_EVENT = &quot;Notikumu&quot;
+	case &quot;lt&quot; &apos;lithuanian
+		fs_EVENT = &quot;Įvykis&quot;
+	case &quot;mt&quot; &apos;maltese
+		fs_EVENT = &quot;Avveniment&quot;
+	case &quot;nl&quot; &apos;dutch
+		fs_EVENT = &quot;Gebeurtenis&quot;
+	case &quot;no&quot;, &quot;nb&quot;, &quot;nn&quot; &apos;norwegian	
+		fs_EVENT = &quot;Hendelse&quot;
+	case &quot;pl&quot; &apos;polish
+		fs_EVENT = &quot;Wydarzenie&quot;
+	case &quot;pt&quot; &apos;portuguese
+		fs_EVENT = &quot;Evento&quot;
+	case &quot;ro&quot; &apos;romanian
+		fs_EVENT = &quot;Eveniment&quot;
+	case &quot;ru&quot; &apos;russian
+		fs_EVENT = &quot;Событие&quot;
+	case &quot;sk&quot; &apos;slovak
+		fs_EVENT = &quot;Udalosť&quot;
+	case &quot;sl&quot; &apos;slovenian
+		fs_EVENT = &quot;Dogodek&quot;
+	case &quot;sv&quot; &apos;swedish
+		fs_EVENT = &quot;Händelse&quot;
+	case &quot;tl&quot; &apos;tagalog
+		fs_EVENT = &quot;Kaganapan&quot;
+	case &quot;tr&quot; &apos;turkish
+		fs_EVENT = &quot;Olay&quot;
+	case &quot;uk&quot; &apos;ukrainian
+		fs_EVENT = &quot;Подія&quot;
+	case &quot;zh&quot; &apos;chinese
+		if fsGetSetting(&quot;country&quot;) &lt;&gt; &quot;tw&quot; then
+			fs_EVENT = &quot;日曆中的活動&quot;
+		else
+			fs_EVENT = &quot;日历中的活动&quot;
+		endif
+	case else &apos;Simple English
+		fs_EVENT = &quot;Event&quot;
+	end select
+end function
+
+function fs_BOOK_COVER (cL)
+	&apos; Translations by Google. If you have a better translation, please contact me.
+	select case cL
+	case &quot;af&quot; &apos;afrikaans
+		fs_BOOK_COVER = &quot;Cover&quot;
+	case &quot;bg&quot; &apos;bulgarian
+		fs_BOOK_COVER = &quot;Cover&quot;
+	case &quot;ca&quot; &apos;catalan
+		fs_BOOK_COVER = &quot;Cobrir&quot;
+	case &quot;cs&quot; &apos;czech
+		fs_BOOK_COVER = &quot;Cover&quot;
+	case &quot;da&quot; &apos;danish
+		fs_BOOK_COVER = &quot;Cover&quot;
+	case &quot;de&quot; &apos;german
+		fs_BOOK_COVER = &quot;Cover&quot;
+	case &quot;el&quot; &apos;greek
+		fs_BOOK_COVER = &quot;Κάλυψη&quot;
+	case &quot;es&quot; &apos;spanish
+		fs_BOOK_COVER = &quot;Cover&quot;
+	case &quot;et&quot; &apos;estonian
+		fs_BOOK_COVER = &quot;Katte&quot;
+	case &quot;fi&quot; &apos;finnish
+		fs_BOOK_COVER = &quot;Cover&quot;
+	case &quot;fr&quot; &apos;french
+		fs_BOOK_COVER = &quot;Couverture&quot;
+	case &quot;ga&quot; &apos;irish
+		fs_BOOK_COVER = &quot;Clúdach&quot;
+	case &quot;hi&quot; &apos;hindi
+		fs_BOOK_COVER = &quot;कवर&quot;
+	case &quot;hu&quot; &apos;hungarian
+		fs_BOOK_COVER = &quot;Cover&quot;
+	case &quot;id&quot; &apos;indonesian
+		fs_BOOK_COVER = &quot;Cover&quot;
+	case &quot;is&quot; &apos;icelandic
+		fs_BOOK_COVER = &quot;Cover&quot;
+	case &quot;it&quot; &apos;italian
+		fs_BOOK_COVER = &quot;Cover&quot;
+	case &quot;ja&quot;, &quot;jp&quot; &apos;japanese
+		fs_BOOK_COVER = &quot;表紙&quot;
+	case &quot;ko&quot; &apos;korean
+		fs_BOOK_COVER = &quot;커버&quot;
+	case &quot;lv&quot; &apos;latvian
+		fs_BOOK_COVER = &quot;Sega&quot;
+	case &quot;lt&quot; &apos;lithuanian
+		fs_BOOK_COVER = &quot;Cover&quot;
+	case &quot;mt&quot; &apos;maltese
+		fs_BOOK_COVER = &quot;Qoxra&quot;
+	case &quot;nl&quot; &apos;dutch
+		fs_BOOK_COVER = &quot;Cover&quot;
+	case &quot;no&quot;, &quot;nb&quot;, &quot;nn&quot; &apos;norwegian	
+		fs_BOOK_COVER = &quot;Cover&quot;
+	case &quot;pl&quot; &apos;polish
+		fs_BOOK_COVER = &quot;Cover&quot;
+	case &quot;pt&quot; &apos;portuguese
+		fs_BOOK_COVER = &quot;Capa&quot;
+	case &quot;ro&quot; &apos;romanian
+		fs_BOOK_COVER = &quot;Cover&quot;
+	case &quot;ru&quot; &apos;russian
+		fs_BOOK_COVER = &quot;Обложка книги&quot;
+	case &quot;sk&quot; &apos;slovak
+		fs_BOOK_COVER = &quot;Cover&quot;
+	case &quot;sl&quot; &apos;slovenian
+		fs_BOOK_COVER = &quot;Cover&quot;
+	case &quot;sv&quot; &apos;swedish
+		fs_BOOK_COVER = &quot;Cover&quot;
+	case &quot;tl&quot; &apos;tagalog
+		fs_BOOK_COVER = &quot;Cover&quot;
+	case &quot;tr&quot; &apos;turkish
+		fs_BOOK_COVER = &quot;Kapak&quot;
+	case &quot;uk&quot; &apos;ukrainian
+		fs_BOOK_COVER = &quot;Cover&quot;
+	case &quot;zh&quot; &apos;chinese
+		if fsGetSetting(&quot;country&quot;) &lt;&gt; &quot;tw&quot; then
+			fs_BOOK_COVER = &quot;图书封面&quot;
+		else
+			fs_BOOK_COVER = &quot;圖書封面&quot;
+		endif
+	case else &apos;Simple English
+		fs_BOOK_COVER = &quot;Cover&quot;
+	end select
+end function
+
+function fs_NOTE (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_NOTE = &quot;Note&quot;
+	case else
+		fs_NOTE = &quot;Note&quot;
+	end select
+end function
+
+function fs_REPAIRED_BAD_XHTML (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_REPAIRED_BAD_XHTML = getBranding ( bI_SPOKEN_BRANDING ) &amp; &quot; a essayé de réparer votre code XHTML. Vérifiez les résultats.&quot;
+	case else
+		fs_REPAIRED_BAD_XHTML = getBranding ( bI_SPOKEN_BRANDING ) &amp; &quot; tried to repair your XHTML code. Check the results. &quot;
+	end select
+end function
+
+function fs_COMPUTER_STOP (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_COMPUTER_STOP = &quot;ordinateur arrêt&quot;
+	case else
+		fs_COMPUTER_STOP = &quot;computer stop&quot;
+	end select
+end function
+
+function fs_BULLET (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_BULLET = &quot;Puce&quot;
+	case else
+		fs_BULLET = &quot;Bullet&quot;
+	end select
+end function
+
+function fs_DATEHEURE (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_DATEHEURE = &quot;Date/Heure&quot;
+	case else
+		fs_DATEHEURE = &quot;Date/Time&quot;
+	end select
+end function
+
+function fs_TITLE (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_TITLE = &quot;Titre&quot;
+	case else
+		fs_TITLE = &quot;Title&quot;
+	end select
+end function
+
+function fs_HEADING (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_HEADING = &quot;Titre&quot;
+	case else
+		fs_HEADING = &quot;Heading&quot;
+	end select
+end function
+
+function fs_MECARD (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_MECARD = &quot;Mecard image pour mobile&quot;
+	case else
+		fs_MECARD = &quot;Mecard image for mobile&quot;
+	end select
+end function
+
+function fs_WEBCAM (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_WEBCAM = &quot;URL de l&apos;image à insérer. Vérifiez que le lien reste bon.&quot;
+	case else
+		fs_WEBCAM = &quot;URL of the image or resource to insert. Make sure the link is good.&quot;
+	end select
+end function
+
+function fs_POWERBYGOGLE (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_POWERBYGOGLE = &quot;Google Charts API fourni par Google™&quot;
+	case else
+		fs_POWERBYGOGLE = &quot;Google Charts API powered by Google™&quot;
+	end select
+end function
+
+function fs_IMAGE_CREDITS (cL)
+	&apos; Translations by Google. If you have a better translation, please contact me.
+	select case cL
+	case &quot;af&quot; &apos;afrikaans
+		fs_IMAGE_CREDITS = &quot;Aflaai&quot;
+	case &quot;bg&quot; &apos;bulgarian
+		fs_IMAGE_CREDITS = &quot;Изтегляне&quot;
+	case &quot;ca&quot; &apos;catalan
+		fs_IMAGE_CREDITS = &quot;Descàrrega&quot;
+	case &quot;cs&quot; &apos;czech
+		fs_IMAGE_CREDITS = &quot;Stažení&quot;
+	case &quot;da&quot; &apos;danish
+		fs_IMAGE_CREDITS = &quot;Downloading&quot;
+	case &quot;de&quot; &apos;german
+		fs_IMAGE_CREDITS = &quot;Herunterladen&quot;
+	case &quot;el&quot; &apos;greek
+		fs_IMAGE_CREDITS = &quot;Λήψη&quot;
+	case &quot;es&quot; &apos;spanish
+		fs_IMAGE_CREDITS = &quot;Descarga&quot;
+	case &quot;et&quot; &apos;estonian
+		fs_IMAGE_CREDITS = &quot;Allalaadimine&quot;
+	case &quot;fi&quot; &apos;finnish
+		fs_IMAGE_CREDITS = &quot;Lataaminen&quot;
+	case &quot;fr&quot; &apos;french
+		fs_IMAGE_CREDITS = &quot;Téléchargement&quot;
+	case &quot;ga&quot; &apos;irish
+		fs_IMAGE_CREDITS = &quot;Íosluchtú&quot;
+	case &quot;hi&quot; &apos;hindi
+		fs_IMAGE_CREDITS = &quot;डाउनलोड&quot;
+	case &quot;hu&quot; &apos;hungarian
+		fs_IMAGE_CREDITS = &quot;Letöltés&quot;
+	case &quot;id&quot; &apos;indonesian
+		fs_IMAGE_CREDITS = &quot;Unduh&quot;
+	case &quot;is&quot; &apos;icelandic
+		fs_IMAGE_CREDITS = &quot;Download&quot;
+	case &quot;it&quot; &apos;italian
+		fs_IMAGE_CREDITS = &quot;Scarica&quot;
+	case &quot;ja&quot;, &quot;jp&quot; &apos;japanese
+		fs_IMAGE_CREDITS = &quot;ダウンロード&quot;
+	case &quot;ko&quot; &apos;korean
+		fs_IMAGE_CREDITS = &quot;다운로드&quot;
+	case &quot;lv&quot; &apos;latvian
+		fs_IMAGE_CREDITS = &quot;Lejupielādēt&quot;
+	case &quot;lt&quot; &apos;lithuanian
+		fs_IMAGE_CREDITS = &quot;Larsisiųsti&quot;
+	case &quot;mt&quot; &apos;maltese
+		fs_IMAGE_CREDITS = &quot;Download&quot;
+	case &quot;nl&quot; &apos;dutch
+		fs_IMAGE_CREDITS = &quot;Download&quot;
+	case &quot;no&quot;, &quot;nb&quot;, &quot;nn&quot; &apos;norwegian	
+		fs_IMAGE_CREDITS = &quot;Last ned&quot;
+	case &quot;pl&quot; &apos;polish
+		fs_IMAGE_CREDITS = &quot;Ściąganie&quot;
+	case &quot;pt&quot; &apos;portuguese
+		fs_IMAGE_CREDITS = &quot;Baixar&quot;
+	case &quot;ro&quot; &apos;romanian
+		fs_IMAGE_CREDITS = &quot;Descarca&quot;
+	case &quot;ru&quot; &apos;russian
+		fs_IMAGE_CREDITS = &quot;скачивание&quot;
+	case &quot;sk&quot; &apos;slovak
+		fs_IMAGE_CREDITS = &quot;Stiahnuť&quot;
+	case &quot;sl&quot; &apos;slovenian
+		fs_IMAGE_CREDITS = &quot;Prenos&quot;
+	case &quot;sv&quot; &apos;swedish
+		fs_IMAGE_CREDITS = &quot;Nedladdning&quot;
+	case &quot;tl&quot; &apos;tagalog
+		fs_IMAGE_CREDITS = &quot;Download&quot;
+	case &quot;tr&quot; &apos;turkish
+		fs_IMAGE_CREDITS = &quot;Indir&quot;
+	case &quot;uk&quot; &apos;ukrainian
+		fs_IMAGE_CREDITS = &quot;Завантажити&quot;
+	case &quot;zh&quot; &apos;chinese
+		if fsGetSetting(&quot;country&quot;) &lt;&gt; &quot;tw&quot; then
+			fs_IMAGE_CREDITS = &quot;下载&quot;
+		else
+			fs_IMAGE_CREDITS = &quot;下載&quot;
+		endif
+	case else &apos;Simple English
+		fs_IMAGE_CREDITS = &quot;Link&quot;
+	end select
+end function
+
+function fs_INSERT_TEXT_HERE (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_INSERT_TEXT_HERE = &quot;&lt;!-- Insérer XHTML ou texte entre les balises « div » /--&gt;&quot; &amp; chr$(10)
+	case else
+		fs_INSERT_TEXT_HERE = &quot;&lt;!-- Insert XHTML or text between div tags /--&gt;&quot; &amp; chr$(10)
+	end select
+end function
+
+function fs_SEARCH_TWITTER (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_SEARCH_TWITTER = &quot;Insérer Twitter™ code 2D (#Rechercher ou @Connecter)&quot;
+	case else
+		fs_SEARCH_TWITTER = &quot;Insert 2D code for Twitter™ #Discover or @Connect&quot;
+	end select
+end function
+
+function fs_TWITTER (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_TWITTER = &quot;Twitter™&quot;
+	case else
+		fs_TWITTER = &quot;Twitter™&quot;
+	end select
+end function
+
+function fs_SEARCH_IDENTICA (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_SEARCH_IDENTICA = &quot;Insérer Identi.ca code 2D&quot;
+	case else
+		fs_SEARCH_IDENTICA = &quot;Insert 2D code for Identi.ca search&quot;
+	end select
+end function
+
+function fs_IDENTICA (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_IDENTICA = &quot;Identi.ca&quot;
+	case else
+		fs_IDENTICA = &quot;Identi.ca&quot;
+	end select
+end function
+
+function fs_ELEARNING (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_ELEARNING = &quot;#apprentissage&quot;
+	case else
+		fs_ELEARNING = &quot;#elearning&quot;
+	end select
+end function
+
+function fs_OPEN (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_OPEN = &quot;Ouvrir...&quot;
+	case else
+		fs_OPEN = &quot;Open...&quot;
+	end select
+end function
+
+function fs_PASTE_QUESTION (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_PASTE_QUESTION = &quot;Coller le message&quot;
+	case else
+		fs_PASTE_QUESTION = &quot;Paste the message&quot;
+	end select
+end function
+
+function fs_SAVE_AS (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_SAVE_AS = &quot;Enregistrer sous...&quot;
+	case else
+		fs_SAVE_AS = &quot;Save as...&quot;
+	end select
+end function
+
+function fs_SAVE (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_SAVE = &quot;Enregistrer&quot;
+	case else
+		fs_SAVE = &quot;Save&quot;
+	end select
+end function
+
+function fs_NEW (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_NEW = &quot;Nouveau...&quot;
+	case else
+		fs_NEW = &quot;New...&quot;
+	end select
+end function
+
+function fs_EMAIL_NOTE (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_EMAIL_NOTE = &quot;Joindre à un messagerie...&quot;
+	case else
+		fs_EMAIL_NOTE = &quot;Attach to an email message...&quot;
+	end select
+end function
+
+function fs_READ_THE_NOTE (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_READ_THE_NOTE = &quot;Lire la note&quot;
+	case else
+		fs_READ_THE_NOTE = &quot;Read the note&quot;
+	end select
+end function
+
+function fs_LANGUAGE (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_LANGUAGE = &quot;Langue&quot;
+	case else
+		fs_LANGUAGE = &quot;Language&quot;
+	end select
+end function
+
+function fs_READ_PROMPT (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_READ_PROMPT = &quot;Lisez le message à haute voix&quot;
+	case else
+		fs_READ_PROMPT = &quot;Read the message aloud&quot;
+	end select
+end function
+
+&apos;----
+
+function fsMyURL as string
+	fsMyURL=fsGetPackageDirURL(fsMyID)
+end function
+
+function getBrailleL10N(i as integer, optional sLanguage ) as string
+&apos;Note to translator: Please translate from the English strings.
+&apos;This function looks up a stringby integer and language.
+	dim sA, CR as string
+	CR = chr$(13)
+	if ismissing(sLanguage) then 
+		sLanguage= fsGetSetting(&quot;language&quot;)
+	endif
+	dim sBrailleL10N(25) as string
+	select case left(sLanguage,2)
+	case &quot;fr&quot; &apos;French
+		sBrailleL10N(0) = &quot;Braille&quot;
+		sBrailleL10N(1) = &quot;accent&quot;
+		sBrailleL10N(2) = &quot;espace&quot;
+		sBrailleL10N(3) = &quot;retour&quot;
+		sBrailleL10N(4) = &quot;cellule&quot;
+		sBrailleL10N(5) = &quot;position&quot;
+		sBrailleL10N(6) = &quot;caractère inconnu&quot;
+		sBrailleL10N(7) = &quot;machine à écrire&quot;
+		sBrailleL10N(8) = &quot;écrire&quot;
+		sBrailleL10N(9) = &quot;lire&quot;
+		sBrailleL10N(10) = &quot;dictation&quot;
+		sBrailleL10N(11) = &quot;écouter&quot;
+		sBrailleL10N(12) = &quot;Buvez de ce whisky que le patron juge fameux.&quot;
+		sBrailleL10N(13) = &quot;nouvelle ligne&quot;
+		sBrailleL10N(14) = &quot;effacer&quot;
+		sBrailleL10N(15) = &quot;touche de tabulation&quot;
+		sBrailleL10N(16) = &quot;La note est vierge. Vous devez écrire quelque chose.&quot;
+		sBrailleL10N(17) = &quot;(c)&quot;
+		sBrailleL10N(18) = &quot; (md)&quot;
+		sBrailleL10N(19) = &quot;supérieure à&quot;
+		sBrailleL10N(20) = &quot;moins que&quot;
+		sBrailleL10N(21) = &quot;&quot;
+		sBrailleL10N(22) = &quot;&quot;
+		sBrailleL10N(23) = &quot;&quot;
+		sBrailleL10N(24) = &quot;&quot;
+		sBrailleL10N(25) = &quot;&quot;	
+	case else  &apos; &quot;en&quot; &apos; English default. &quot;zxx-&quot; is LibreOffice code for undefined language
+		sBrailleL10N(0) = &quot;Braille&quot;
+		sBrailleL10N(1) = &quot;accent&quot;
+		sBrailleL10N(2) = &quot;space&quot;
+		sBrailleL10N(3) = &quot;return&quot;
+		sBrailleL10N(4) = &quot;cell&quot;
+		sBrailleL10N(5) = &quot;position&quot;
+		sBrailleL10N(6) = &quot;unknown letter&quot;
+		sBrailleL10N(7) = &quot;typewriter&quot;
+		sBrailleL10N(8) = &quot;write&quot;
+		sBrailleL10N(9) = &quot;read&quot;
+		sBrailleL10N(10) = &quot;dictation&quot;
+		sBrailleL10N(11) = &quot;listen&quot;
+		sBrailleL10N(12) = &quot;The quick red fox jumped over the lazy brown dog.&quot;
+		sBrailleL10N(13) = &quot;new line&quot;
+		sBrailleL10N(14) = &quot;erase&quot;
+		sBrailleL10N(15) = &quot;tab key&quot;
+		sBrailleL10N(16) = &quot;The note is blank. Click the note and write something.&quot;
+		sBrailleL10N(17) = &quot;(c)&quot;
+		sBrailleL10N(18) = &quot; (tm)&quot;
+		sBrailleL10N(19) = &quot;greater than&quot;
+		sBrailleL10N(20) = &quot;less than&quot;
+		sBrailleL10N(21) = &quot;&quot;
+		sBrailleL10N(22) = &quot;&quot;
+		sBrailleL10N(23) = &quot;&quot;
+		sBrailleL10N(24) = &quot;&quot;
+		sBrailleL10N(25) = &quot;&quot;
+	end select
+	getBrailleL10N= sBrailleL10N(i)
+end function
+
+function fsTrimArticle (byval sA, optional sLanguage ) as string
+	&apos; for titles in en and fr, move the initial article to the end
+	&apos; for sorting purposes
+	if ismissing(sLanguage) then 
+		sLanguage= fsGetSetting(&quot;language&quot;)
+	endif
+	if len ( sA ) &lt;&gt; 0 then
+		sA = lcase ( fsSuperTrim (sA) )
+		select case sLanguage
+		case &quot;fr&quot;
+			&apos; Always use len function instead of guessing length 
+			&apos; complex languages may not have the apparent length
+			&apos; in all coding systems.
+			if instr ( sA, &quot;la &quot;) = 1 then
+				sA = mid(sA, len (&quot;la &quot;) + 1 ) &amp; &quot;, la&quot;
+			elseif instr ( sA, &quot;le &quot;) = 1 then
+				sA = mid(sA, len (&quot;le &quot;) + 1 ) &amp; &quot;, le&quot;
+			elseif instr ( sA, &quot;les &quot;) = 1 then
+				sA = mid(sA, len (&quot;les &quot;) + 1 ) &amp; &quot;, les&quot;
+			elseif instr ( sA, &quot;un &quot;) = 1 then
+				sA = mid(sA, len (&quot;un &quot;) + 1 ) &amp; &quot;, un&quot;
+			elseif instr ( sA, &quot;une &quot;) = 1 then
+				sA = mid(sA, len (&quot;une &quot;) + 1 ) &amp; &quot;, une&quot;
+			elseif instr ( sA, &quot;l&apos;&quot;) = 1 then
+				sA = mid(sA, len (&quot;l&apos;&quot;) + 1 ) &amp; &quot;, l&apos;&quot;
+			elseif instr ( sA, &quot;l’&quot;) = 1 then
+				sA = mid(sA, len (&quot;l’&quot;) + 1 ) &amp; &quot;, l’&quot;
+			endif
+		case &quot;en&quot;
+			if instr ( sA, &quot;the &quot;) = 1 then
+				sA = mid(sA, len (&quot;the &quot;) + 1) &amp; &quot;, the&quot;
+			elseif instr ( sA, &quot;an &quot;) = 1 then
+				sA = mid(sA, len (&quot;an &quot;) + 1) &amp; &quot;, an&quot;
+			elseif instr ( sA, &quot;a &quot;) = 1 then
+				sA = mid(sA, len (&quot;a &quot;) + 1) &amp; &quot;, a&quot;
+			endif
+		case else 
+			fsTrimArticle = sA
+		end select
+	endif
+		fsTrimArticle = sA
+end function
+
+function fsGetSetting(sA) as string
+	if NOT GlobalScope.BasicLibraries.isLibraryLoaded(&quot;Tools&quot;) then 
+		GlobalScope.BasicLibraries.loadLibrary(&quot;Tools&quot;)
+	endif
+	dim oProdNameAccess As object
+	oProdNameAccess=GetRegistryKeyContent(&quot;org.openoffice.Setup/Product&quot;)
+    select case lcase(sA)
+    case &quot;language&quot;
+		fsGetSetting=GetStarOfficeLocale().language
+	case &quot;country&quot;
+		fsGetSetting=GetStarOfficeLocale().country
+	case &quot;ooname&quot;
+		fsGetSetting=oProdNameAccess.getByName(&quot;ooName&quot;)
+	case &quot;ooversion&quot;,&quot;oosetupversion&quot;
+		fsGetSetting=oProdNameAccess.getByName(&quot;ooSetupVersion&quot;)
+	case else 
+		fsGetSetting=&quot;???&quot;
+	end select
+end function
+
+function fsAnOrA
+	select case lcase(left(fsGetSetting(&quot;ooname&quot;),1))
+	case &quot;a&quot;,&quot;e&quot;,&quot;i&quot;,&quot;o&quot;,&quot;u&quot;
+		fsAnOrA=&quot;an &quot;
+	case else 
+		fsAnOrA=&quot;a &quot;
+	end select
+end function
+
+function fsReplaceText (sA as string, sFind as string, sReplace as string) as string
+	if NOT GlobalScope.BasicLibraries.isLibraryLoaded(&quot;Tools&quot;) then 
+		GlobalScope.BasicLibraries.loadLibrary(&quot;Tools&quot;)
+	endif
+	fsReplaceText = ReplaceString (sA, sReplace, sFind)
+end function
+
+function fsShortMailFileName
+	select case fsGetOS()
+	case &quot;WINDOWS&quot; &apos; Raw URL format for email subject
+		fsShortMailFileName =fsWindowsShortFileName()
+	case else  &apos; Convert from URL for email subject
+		fsShortMailFileName = fsReplaceText(ConvertFromURL(fsWindowsShortFileName()),&quot;&apos;&quot;,&quot;’&quot;)
+	end select
+end function
+
+function fsShortFileName
+	fsShortFileName = ConvertFromURL(fsWindowsShortFileName)
+end function
+
+function fsWindowsShortFileName
+	dim s1 as string
+	on error goto fsWindowsShortFileNameError
+	if NOT GlobalScope.BasicLibraries.isLibraryLoaded(&quot;Tools&quot;) then 
+		GlobalScope.BasicLibraries.loadLibrary(&quot;Tools&quot;)
+	endif
+	s1=	GetFileNameWithoutExtension(ThisComponent.getURL(), &quot;/&quot;)
+	if s1 = &quot;&quot; then
+		fsWindowsShortFileName=fsGetSetting(&quot;ooname&quot;)&amp; &quot;%20&quot; &amp; fsGetSetting(&quot;ooversion&quot;) &amp; &quot;.odp&quot;
+	else
+		fsWindowsShortFileName = s1
+	endif
+	exit function
+	fsWindowsShortFileNameError:
+	fsWindowsShortFileName=fsGetSetting(&quot;ooname&quot;)&amp; &quot;%20&quot; &amp; fsGetSetting(&quot;ooversion&quot;) &amp; &quot;.odp&quot;
+end function
+
+function fsCreationDate
+	fsCreationDate = fsCreationShortDate &amp; &quot;T&quot; &amp; _
+	fsPrefixZeroes(ThisComponent.DocumentProperties.CreationDate.Hours(),2) &amp; &quot;:&quot; &amp; _
+	fsPrefixZeroes(ThisComponent.DocumentProperties.CreationDate.Minutes(),2) &amp; &quot;:&quot; &amp; _
+	fsPrefixZeroes(ThisComponent.DocumentProperties.CreationDate.Seconds(),2)
+end function
+
+function fsCreationShortDate
+	fsCreationShortDate = ThisComponent.DocumentProperties.CreationDate.Year() &amp; &quot;-&quot; &amp; _
+	fsPrefixZeroes(ThisComponent.DocumentProperties.CreationDate.Month(),2) &amp; &quot;-&quot; &amp; _
+	fsPrefixZeroes(ThisComponent.DocumentProperties.CreationDate.Day(),2)
+end function
+
+function fsSubject
+	on error goto fsSubjectError
+	fsSubject=ThisComponent.DocumentProperties.Subject
+	exit function
+	fsSubjectError:
+	fsSubject = &quot;&quot;
+end function
+
+function fsKeywords
+	on error goto fsKeywordsErr
+	dim aSx
+	dim i
+	aSx = ThisComponent.DocumentProperties.Keywords
+	fsKeywords = &quot;&quot;
+	for i = LBound (aSx) to UBound (aSx)
+		fsKeyWords = fsKeyWords &amp; &quot;, &quot; &amp; aSx(i)
+	next
+	fsKeyWords = trim(fsKeyWords)
+	if len(fsKeywords) &lt;&gt; 0 then
+		fsKeyWords = right(fsKeyWords,len(fsKeyWords)-1)
+	endif
+	exit function
+	fsKeywordsErr:
+	fsKeyWords = &quot;&quot;
+end function
+
+sub zzDebugInformation
+	dim sA, CR as string
+	CR = chr$(10) &amp; chr$(10)
+	sA = sA &amp; &quot;DocumentProperties.dbg_properties&quot; &amp; CR
+	sA = sA &amp; ThisComponent.DocumentProperties.dbg_properties &amp; CR
+	sA = sA &amp;  &quot;DocumentProperties.dbg_methods&quot; &amp; CR
+	sA = sA &amp; ThisComponent.DocumentProperties.dbg_methods &amp; CR
+	sA = sA &amp;   &quot;DocumentProperties.dbg_supportedInterfaces&quot; &amp; CR
+	sA = sA &amp; ThisComponent.DocumentProperties.dbg_supportedInterfaces
+	ShowDialog (sA)
+end sub
+
+function fsDescription
+	fsDescription=ThisComponent.DocumentProperties.Description
+end function
+
+function fsPrefixZeroes (s1,n1)
+	&apos; s1 is the stringto prefix zeroes with 
+	&apos; n1 is the minimum length of the return string
+	dim s2 as string
+	if n1 &lt; 1000 and len(s1) &lt; n1 then &apos; sanity check
+		s2=String(n1,&quot;0&quot;) &amp; s1
+		fsPrefixZeroes=right(s2,n1)
+	else 
+		fsPrefixZeroes=s1
+	endif
+end function 
+
+function fb_UseEuropeanAddress (CountryName as string)
+	dim asCountries
+	dim lcCountry as string
+	dim i1 as integer
+	fb_UseEuropeanAddress = false
+	&apos;Convert CountryName to lower-case, to make comparison simpler
+	lcCountry = trim(lcase (CountryName))
+	if len(CountryName) = 0 then
+		fb_UseEuropeanAddress = false
+	elseif len(CountryName) = 2 then
+		asCountries = array(&quot;at&quot;, _
+			&quot;be&quot;, _
+			&quot;ba&quot;, _
+			&quot;hr&quot;, _
+			&quot;cy&quot;, _
+			&quot;dk&quot;, _
+			&quot;fi&quot;, _
+			&quot;fr&quot;, _
+			&quot;de&quot;, _
+			&quot;gr&quot;, _
+			&quot;is&quot;, _
+			&quot;it&quot;, _
+			&quot;li&quot;, _
+			&quot;lu&quot;, _
+			&quot;mk&quot;, _
+			&quot;me&quot;, _
+			&quot;nl&quot;, _
+			&quot;pl&quot;, _
+			&quot;ro&quot;, _
+			&quot;rs&quot;, _
+			&quot;sk&quot;, _
+			&quot;si&quot;, _
+			&quot;es&quot;, _
+			&quot;sv&quot;, _
+			&quot;ch&quot;)
+		&apos;Loop through asCountries
+		for i1 = LBound (asCountries) to UBound (asCountries)
+			&apos;Check country against element i1 of asCountries array
+			if Right (lcCountry, Len (asCountries (i1))) = asCountries (i1) then
+				&apos;Match: European style address. Set return value to true
+				fb_UseEuropeanAddress = true
+				exit for
+			endif
+		next i1
+	else
+		&apos; asCountries is an array of countries using
+		&apos; a postal code that precedes the city name 
+		&apos; country names are in English and French
+		asCountries = array(&quot;austria&quot;, _
+			&quot;belgium&quot;, _
+			&quot;bosnia&quot;, _
+			&quot;croatia&quot;, _
+			&quot;cyprus&quot;, _
+			&quot;denmark&quot;, _
+			&quot;finland&quot;, _
+			&quot;france&quot;, _
+			&quot;germany&quot;, _
+			&quot;greece&quot;, _
+			&quot;herzegovina&quot;, _
+			&quot;iceland&quot;, _
+			&quot;italy&quot;, _
+			&quot;lithuania&quot;, _
+			&quot;luxembourg&quot;, _
+			&quot;macedonia&quot;, _
+			&quot;montenegro&quot;, _
+			&quot;netherlands&quot;, _
+			&quot;poland&quot;, _
+			&quot;romania&quot;, _
+			&quot;serbia&quot;, _
+			&quot;slovakia&quot;, _
+			&quot;slovenia&quot;, _
+			&quot;spain&quot;, _
+			&quot;sweden&quot;, _
+			&quot;switzerland&quot;, _
+			&quot;the former yugoslav republic of macedonia&quot;, _
+			&quot;österreich&quot;, _
+			&quot;deutschland&quot;, _
+			&quot;die schweiz&quot;, _
+			&quot;hrvatska&quot;, _
+			&quot;danmark&quot;, _
+			&quot;ελλάδα&quot;, _
+			&quot;ísland&quot;, _
+			&quot;italia&quot;, _
+			&quot;lietuva&quot;, _
+			&quot;makedonija &quot;, _
+			&quot;nederland&quot;, _
+			&quot;polska&quot;, _
+			&quot;românia&quot;, _
+			&quot;србија&quot;, _
+			&quot;slovensko&quot;, _
+			&quot;españa&quot;, _
+			&quot;sverige&quot;, _
+			&quot;poranešna jugoslovenska republika makedonija &quot;, _
+			&quot;autriche&quot;, _
+			&quot;belgique&quot;, _
+			&quot;bosnie&quot;, _
+			&quot;croatie&quot;, _
+			&quot;chypre&quot;, _
+			&quot;danemark&quot;, _
+			&quot;finlande&quot;, _
+			&quot;france&quot;, _
+			&quot;allemagne&quot;, _
+			&quot;la grèce&quot;, _
+			&quot;herzégovine&quot;, _
+			&quot;islande&quot;, _
+			&quot;italie&quot;, _
+			&quot;lituanie&quot;, _
+			&quot;luxembourg&quot;, _
+			&quot;macédoine&quot;, _
+			&quot;monténégro&quot;, _
+			&quot;pays bas&quot;, _
+			&quot;pologne&quot;, _
+			&quot;roumanie&quot;, _
+			&quot;serbie&quot;, _
+			&quot;slovaquie&quot;, _
+			&quot;slovénie&quot;, _
+			&quot;espagne&quot;, _
+			&quot;suède&quot;, _
+			&quot;suisse&quot;, _
+			&quot;l&apos;ancienne république yougoslave de macédoine&quot;)
+	
+		&apos;Loop through asCountries
+		for i1 = LBound (asCountries) to UBound (asCountries)
+			&apos;Check country against element i1 of asCountries array
+			if Right (lcCountry, Len (asCountries (i1))) = asCountries (i1) then
+				&apos;Match: European style address. Set return value to true
+				fb_UseEuropeanAddress = true
+				exit for
+			endif
+		next i1
+	
+	endif
+	
+end function
+</script:module>

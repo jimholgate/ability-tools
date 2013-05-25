@@ -1,0 +1,837 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="modPhotoAlbum" script:language="StarBasic">&apos; The code below is derived from modPhotoAlbum 
+&apos; by Russell Phillips and Andrew Pitonyak
+
+option explicit
+
+
+&apos;Impress Photo Album: Create digital photo albums with OpenOffice.org Impress
+&apos;Copyright (c) 2003, 2005 Russell Phillips
+&apos;
+&apos;This program is free software; you can redistribute it and/or modify
+&apos;it under the terms of the GNU General Public License as published by
+&apos;the Free Software Foundation; either version 2 of the License, or
+&apos;(at your option) any later version.
+&apos;
+&apos;This program is distributed in the hope that it will be useful,
+&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;MERCHANTABILITY or FITNESS for A PARTICULAR PURPOSE.See the
+&apos;GNU General Public License for more details.
+&apos;
+&apos;You should have received a copy of the GNU General Public License
+&apos;along with this program; if not, write to the Free Software
+&apos;Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA02111-1307USA
+&apos;
+&apos;The author, Russell Phillips, can be contacted at avantman42@users.sourceforge.net
+
+sub rppPhotoAlbum (optional iLimit) 
+	dim oSlides as object, oAlbum as object
+	dim sDir as string, sFile as string
+	dim oBar, octl
+	dim iIndex,jIndex as integer
+	dim sA as string
+	&apos; if we omit a limit, then all the slides in the folder will be imported.
+	&apos; This could take a while, so we give the option of just importing some images.
+	&apos; A young student&apos;s report should be about 4 pages.
+	&apos; Most presentations have about 8 - 12 slides.
+	&apos; Picture books should have either 16 or 32 pictures.
+	&apos; Most books hsve less than 32 chapters.
+	if NOT GlobalScope.BasicLibraries.isLibraryLoaded(&quot;Tools&quot;) then 
+		GlobalScope.BasicLibraries.loadLibrary(&quot;Tools&quot;)
+	endif
+	
+	if ismissing (iLimit) then
+		iLimit = 0 &apos; NO LIMIT
+	endif
+
+	&apos;Get directory with graphics to be imported
+	sDir = rppChooseDirectory (false, true)
+	if sDir = &quot;&quot; then
+		&apos;User cancelled directory dialogue box
+		exit sub
+	endif
+
+	&apos;Create new Impress document
+	oAlbum = StarDesktop.loadComponentFromUrl (&quot;private:factory/simpress&quot;,&quot;_blank&quot;,0,dimarray())
+	
+	&apos;Count the eligible images so we can set the progress bar
+	if iLimit &lt;&gt; 0 then 
+		jIndex = iLimit
+	else
+		&apos;Get first file in directory
+		sFile = dir(sDir)
+		jIndex = 0
+		&apos;Go through all files in directory
+		while not (sFile = &quot;&quot;)
+			if rppIsGraphicFile (sFile, 2) then &apos;jpeg or png
+				&apos;Add one to count
+				jIndex = jIndex + 1
+			endif
+			&apos;Get next file
+			sFile = dir
+		wend
+	endif
+	
+	&apos;Get slides
+	oSlides = oAlbum.getDrawPages
+	octl=oAlbum.getcurrentcontroller()
+	oBar=octl.getFrame().createStatusIndicator()
+	oBar.start( getBranding( bI_SPOKEN_BRANDING ),jIndex )
+	&apos;Insert slide at end, then delete existing slides, except for the new one
+	oSlides.InsertNewByIndex (oSlides.Count)
+	
+	while oSlides.Count &gt; 1
+		oSlides.Remove (oSlides (0))
+	wend
+	&apos;Now have one blank slide, to be used as title slide
+	oSlides(0).Name = fs_SLIDE(fs_cL) &amp; &quot; 1&quot;
+
+	&apos;Get first file in directory
+	sFile = dir(sDir)
+	
+	&apos;Go through all files in directory
+	iIndex = 0
+
+	while not (sFile = &quot;&quot;)
+		oBar.Value=iIndex
+		if rppIsGraphicFile (sFile, 2) then &apos;jpeg or png
+			&apos;Add a slide for this graphic
+			oSlides.InsertNewByIndex (oSlides.Count)
+
+			&apos;Add graphic to slide
+			if AddGraphic (oAlbum, ConvertToURL (sDir &amp; sFile), oSlides.getByIndex (oSlides.Count -1)) = false then
+				exit sub
+			endif
+
+			&apos;Name slide with file name
+			oSlides (oSlides.Count - 1).Name = GetFileNameWithoutExtension( sFile,&quot;/&quot;)
+		endif
+		&apos;Get next file
+		sFile = dir
+		iIndex = iIndex +1
+		if iLimit &lt;&gt; 0 then
+			if oSlides.Count &gt; iLimit then
+				goto rppDone
+			endif
+		endif
+	wend
+	rppDone:
+	&apos; delete that blank slide
+	oSlides.Remove (oSlides (0))
+	
+	oBar.End()
+	&apos;Display message to indicate macro is finished
+	&apos; msgbox &quot;Finished. &quot; &amp; CStr (oSlides.Count - 1) &amp; &quot; graphics imported&quot;, 64, &quot;Impress Photo Album&quot;
+	sA =  fs_MINIMIZE_PRESENTATION(fs_cL)
+	sA = fsReplaceText (sA, &quot;%nn&quot;, CStr (oSlides.Count))
+	ShowDialog(sA) 
+	sA = fsSaveSchoolToolFile(fsGetSetting(&quot;ooname&quot;) &amp; &quot; &quot; &amp; fsReplaceText (fsNow , &quot;:&quot;, &quot;_&quot;), &quot;ODF Presentation (.odp)&quot;,&quot;*.odp&quot;)
+	if sA &lt;&gt; &quot;&quot; then
+		fsSaveAsPresentation(sA)
+	endif
+end sub 
+
+sub createNewImpressDoc
+	dim oAlbum
+	&apos;Create new Impress document
+	oAlbum = StarDesktop.loadComponentFromUrl (&quot;private:factory/simpress&quot;,&quot;_blank&quot;,0,dimarray())
+	
+end sub
+
+sub AddImagesToPresentation
+	dim oSlides as object, oAlbum as object
+	dim sDir as string, sFile as string
+	dim oBar, octl
+	dim iIndex as integer
+	dim sA as string
+
+	&apos;Get directory with graphics to be imported
+	sDir = rppChooseDirectory (false, true)
+	if sDir = &quot;&quot; then
+		&apos;User cancelled directory dialogue box
+		exit sub
+	endif
+
+	&apos;Insert in Impress document
+	oAlbum = ThisComponent
+	
+	&apos;Get slides
+	oSlides = oAlbum.getDrawPages
+	octl=oAlbum.getcurrentcontroller()
+	oBar=octl.getFrame().createStatusIndicator()
+	oBar.start( getBranding( bI_SPOKEN_BRANDING ), oAlbum.getdrawpages().count )
+	&apos;Get first file in directory
+	sFile = dir(sDir)
+	&apos;Go through all files in directory
+	iIndex = 0
+	
+	while not (sFile = &quot;&quot;)
+		oBar.Value=iIndex
+		if rppIsGraphicFile (sFile) then
+			&apos;Add a slide for this graphic
+			oSlides.InsertNewByIndex (oSlides.Count)
+
+			&apos;Add graphic to slide
+			if AddGraphic (oAlbum, ConvertToURL (sDir &amp; sFile), oSlides.getByIndex (oSlides.Count -1)) = false then
+				exit sub
+			endif
+
+			&apos;Name slide with file name
+			oSlides (oSlides.Count - 1).Name = GetFileNameWithoutExtension( sFile,&quot;/&quot;)
+		endif
+		&apos;Get next file
+		sFile = dir
+		iIndex = iIndex +1
+	wend
+	oBar.End()
+	&apos;Display message to indicate macro is finished
+	sA = fs_MINIMIZE_PRESENTATION(fs_cL)
+	sA = fsReplaceText (sA, &quot;%nn&quot;, CStr (oSlides.Count))
+	ShowDialog(sA) 
+end sub 
+
+function rppIsGraphicFile (FileName as string, optional iComplexity) as boolean
+&apos;function to determine if file is a graphic file
+&apos;Returns true if file is graphics file, false if not
+	dim asGraphicExt
+	dim sLFile as string
+	dim iExt as integer
+	if ismissing (iComplexity) then
+		iComplexity = 2
+	endif
+	&apos;asGraphicExt is array of graphics file extensions
+	select case iComplexity
+	case 1 
+		&apos; When the extension is targeted to kids and grandparents, we limit the choices
+		&apos; to avoid confusion. 
+		&apos; The JPEG standard was created in 1991
+		asGraphicExt = array(&quot;.jpg&quot;, &quot;.jpeg&quot;)
+	case 2 
+		&apos; When the extension is targeted to kids and grandparents, we limit the choices
+		&apos; to avoid confusion. These image formats use common industry standards.
+		&apos; Almost all eBook readers can use these two formats
+		&apos; PNG was published as an ISO/IEC standard in 2004
+		asGraphicExt = array(&quot;.jpg&quot;, &quot;.jpeg&quot;, &quot;.png&quot;)
+	case 3 
+		&apos; industry standards for ePub 2 document images. 
+		&apos; The SVG vector graphic standard was created by W3C.org in 1999.
+		&apos; ePub 2 and above officially support the SVG format, although
+		&apos; in fact, some eBook readers only support PNG and JPG graphics.
+		&apos; If you use SVG graphics, your readers need a modern browser 
+		&apos; or standards compliant ePub reader.
+		asGraphicExt = array(&quot;.jpg&quot;, &quot;.jpeg&quot;, &quot;.png&quot;, &quot;.svg&quot;)
+	case 4
+		&apos; GIF - Compuserve Graphic Format. Compact, not lossy.
+		&apos; Supports a limited palette and repetitive animation
+		&apos; Old browsers support GIFs. Not part of ePub 2 specification.
+		asGraphicExt = array(&quot;.jpg&quot;, &quot;.jpeg&quot;, &quot;.png&quot;, &quot;.gif&quot;)	
+	case else 
+		asGraphicExt = array(&quot;.bmp&quot;, &quot;.dxf&quot;, &quot;.emf&quot;, &quot;.eps&quot;, &quot;.gif&quot;, &quot;.jpg&quot;, &quot;.jpeg&quot;, &quot;.met&quot;, _
+			&quot;.pbm&quot;, &quot;.pcd&quot;, &quot;.pct&quot;, &quot;.pcx&quot;, &quot;.pgm&quot;, &quot;.png&quot;, &quot;.ppm&quot;, &quot;.psd&quot;, &quot;.ras&quot;, &quot;.sgf&quot;, _
+			&quot;.svm&quot;, &quot;.tga&quot;, &quot;.tif&quot;, &quot;.tiff&quot;, &quot;.wmf&quot;, &quot;.xbm&quot;, &quot;.xpm&quot;)
+	end select
+
+	&apos;Initialise return value to false
+	rppIsGraphicFile = false
+	
+	&apos;Convert FileName to lower-case, to make comparison simpler
+	sLFile = lcase (FileName)
+
+	&apos;Loop through asGraphicExt
+	for iExt = LBound (asGraphicExt) to UBound (asGraphicExt)
+		&apos;Check file extension against element iExt of asGraphicExt
+		if Right (sLFile, Len (asGraphicExt (iExt))) = asGraphicExt (iExt) then
+			&apos;Match: file is graphic file. Set return value to true
+			rppIsGraphicFile = true
+		endif
+	next iExt
+	
+end function
+
+function rppChooseDirectory (asURL as boolean, incSeperator as boolean) as string
+&apos;function to allow user to choose a directory via a dialogue box
+&apos;Returns path to directory, or empty stringif user cancelled
+&apos;if asURL is true, returns as a URL
+&apos;if incSeperator is true, includes seperator (\ or /) at end of string
+
+	dim dlgDirectory as object
+	dim sReturn as string
+
+	&apos;Set up FolderPicker object &amp; initialise return value
+	dlgDirectory = CreateUnoService (&quot;com.sun.star.ui.dialogs.FolderPicker&quot;)
+	sReturn = &quot;&quot;
+
+	&apos;Display dialogue box
+	if dlgDirectory.Execute () = 1 then
+		&apos;User did not cancel dialogue box. Get path to directory
+		sReturn = CStr (dlgDirectory.GetDirectory ())
+		if asURL and incSeperator then
+			&apos;Append / at end of string if not already present
+			if not (Right (sReturn, 1) = &quot;/&quot;) then
+				sReturn = sReturn &amp; &quot;/&quot;
+			endif
+		elseif not (asURL) then
+			&apos;Convert sReturn from URL format
+			sReturn = ConvertFromURL (sReturn)
+			&apos;Append seperator if not already present
+			if incSeperator then
+				if not (Right (sReturn, 1) = GetPathSeparator ()) then
+					sReturn = sReturn &amp; GetPathSeparator ()
+				endif
+			endif
+		endif
+	endif
+	
+	&apos;Set function return value
+	rppChooseDirectory = sReturn
+end function
+
+
+&apos;The code below is derived from code in Andrew Pitonyak&apos;s excellent book,
+&apos;OpenOffice.org Macros Explained (http://www.pitonyak.org/book/)	
+	
+function fsOpenMyFileDialogURI(optional iFileChoice) as string
+	if ismissing (iFileChoice) then
+		iFileChoice = I_BRANDED
+	endif
+	Dim oFileDialog as Object
+	Dim iAccept as Integer
+	Dim sPath as String
+	Dim InitPath as String
+	Dim oUcb as object
+	GlobalScope.BasicLibraries.LoadLibrary(&quot;Tools&quot;)
+	&apos;Note: The following services must be called in the following order,
+	&apos; otherwise the FileDialog Service is not removed.
+	oFileDialog = CreateUnoService(&quot;com.sun.star.ui.dialogs.FilePicker&quot;)
+	oUcb = createUnoService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
+	select case iFileChoice
+	case 105 &apos; Open a presentation template
+		Dim filterNames105(1) as String
+		filterNames105(1) = &quot;*.*&quot;
+		filterNames105(0) = &quot;*.otp&quot;
+		AddFiltersToDialog(FilterNames105(), oFileDialog)
+	case 104 &apos; Import a note - a plain text file
+		Dim filterNames104(1) as String
+		filterNames104(1) = &quot;*.*&quot;
+		filterNames104(0) = &quot;*.txt&quot;
+		AddFiltersToDialog(FilterNames104(), oFileDialog)
+	case 103 &apos; Import a note - a plain text or xhtml file
+		Dim filterNames103(3) as String
+		filterNames103(3) = &quot;*.*&quot;
+		filterNames103(2) = &quot;*.html&quot;
+		filterNames103(1) = &quot;*.txt&quot;
+		filterNames103(0) = &quot;*.xhtml&quot;
+		AddFiltersToDialog(FilterNames103(), oFileDialog)
+	case 102 &apos; Import a note - a plain text or data file
+		Dim filterNames102(6) as String
+		filterNames102(6) = &quot;*.*&quot;
+		filterNames102(5) = &quot;*.json&quot;
+		filterNames102(4) = &quot;*.smil&quot;
+		filterNames102(3) = &quot;*.ssml&quot;
+		filterNames102(2) = &quot;*.xml&quot;
+		filterNames102(1) = &quot;*.xhtml&quot;
+		filterNames102(0) = &quot;*.txt&quot;
+		AddFiltersToDialog(FilterNames102(), oFileDialog)
+	case 101 &apos; Import a note - a plain text or preformatted text file
+		Dim filterNames101(30) as String
+		filterNames101(30) = &quot;*.*&quot;
+		filterNames101(29) = &quot;*.xml&quot;
+		filterNames101(28) = &quot;*.xhtml&quot;
+		filterNames101(27) = &quot;*.xlb&quot;
+		filterNames101(26) = &quot;*.xhp&quot;
+		filterNames101(25) = &quot;*.xdl&quot;
+		filterNames101(24) = &quot;*.xcu&quot;
+		filterNames101(23) = &quot;*.xba&quot;
+		filterNames101(22) = &quot;*.wsf&quot;
+		filterNames101(21) = &quot;*.vbs&quot;
+		filterNames101(20) = &quot;*.tree&quot;
+		filterNames101(19) = &quot;*.svg&quot;
+		filterNames101(18) = &quot;*.ssml&quot;
+		filterNames101(17) = &quot;*.smil&quot;
+		filterNames101(16) = &quot;*.sh&quot;
+		filterNames101(15) = &quot;*.py&quot;
+		filterNames101(14) = &quot;*.ps1&quot;
+		filterNames101(13) = &quot;*.opf&quot;
+		filterNames101(12) = &quot;*.ncx&quot;
+		filterNames101(11) = &quot;*.log&quot;
+		filterNames101(10) = &quot;*.jsml&quot;
+		filterNames101(9) = &quot;*.js&quot;
+		filterNames101(8) = &quot;*.ini&quot;
+		filterNames101(7) = &quot;*.html&quot;
+		filterNames101(6) = &quot;*.htm&quot;
+		filterNames101(5) = &quot;*.css&quot;
+		filterNames101(4) = &quot;*.conf&quot;
+		filterNames101(3) = &quot;*.cfg&quot;
+		filterNames101(2) = &quot;*.brl&quot;
+		filterNames101(1) = &quot;*.bat&quot;
+		filterNames101(0) = &quot;*.txt&quot;
+		AddFiltersToDialog(FilterNames101(), oFileDialog)
+	case 2 , 1
+		&apos; When the extension is targeted to kids and grandparents, we limit the choices
+		&apos; to avoid confusion. These image formats use common industry standards.
+		Dim filterNames2(4) as String
+		filterNames2(4) = &quot;*.*&quot;
+		filterNames2(3) = &quot;*.svg&quot;
+		filterNames2(2) = &quot;*.png&quot;
+		filterNames2(1) = &quot;*.jpeg&quot;
+		filterNames2(0) = &quot;*.jpg&quot;
+		AddFiltersToDialog(FilterNames2(), oFileDialog)
+	case else 
+		Dim filterNames0(25) as String
+		filterNames0(25) = &quot;*.*&quot;
+		filterNames0(24) = &quot;*.xpm&quot;
+		filterNames0(23) = &quot;*.wmf&quot;
+		filterNames0(22) = &quot;*.tiff&quot;
+		filterNames0(21) = &quot;*.tif&quot;
+		filterNames0(20) = &quot;*.tga&quot;
+		filterNames0(19) = &quot;*.svg&quot;
+		filterNames0(18) = &quot;*.sgf&quot;
+		filterNames0(17) = &quot;*.ras&quot;
+		filterNames0(16) = &quot;*.psd&quot;
+		filterNames0(15) = &quot;*.ppm&quot;
+		filterNames0(14) = &quot;*.pgm&quot;
+		filterNames0(13) = &quot;*.pcx&quot;
+		filterNames0(12) = &quot;*.pct&quot;
+		filterNames0(11) = &quot;*.pcd&quot;
+		filterNames0(10) = &quot;*.pbm&quot;
+		filterNames0(9) = &quot;*.met&quot;
+		filterNames0(8) = &quot;*.jpeg&quot;
+		filterNames0(7) = &quot;*.jpg&quot;
+		filterNames0(6) = &quot;*.gif&quot;
+		filterNames0(3) = &quot;*.eps&quot;
+		filterNames0(2) = &quot;*.emf&quot;
+		filterNames0(1) = &quot;*.dxf&quot;
+		filterNames0(0) = &quot;*.bmp&quot;
+		AddFiltersToDialog(filterNames0(), oFileDialog)
+	end select
+	&apos;Set your initial path here!
+	InitPath = CreateUnoService(&quot;com.sun.star.util.PathSettings&quot;).Work
+	If oUcb.Exists(InitPath) Then
+		oFileDialog.SetDisplayDirectory(InitPath)
+	endif
+	iAccept = oFileDialog.Execute()
+	If iAccept = 1 Then
+		sPath = oFileDialog.Files(0)
+		fsOpenMyFileDialogURI = sPath
+	endif
+	oFileDialog.Dispose()
+End Function
+
+function AddGraphic (oAlbum, byval sURL, oDrawPage, optional byval bDoBreak, optional byval sOnClickURL)
+	&apos; msgBox sURL &amp; chr$(10) 
+	if ismissing (bDoBreak) then
+		bDoBreak = true
+	endif
+	if ismissing (sOnClickURL) then
+		sOnClickURL = &quot;&quot;
+	endif
+	dim oGraph &apos;The created graphics image
+	dim oNewSize As New com.sun.star.awt.Size &apos;New Image size
+	dim oBitmapSize As New com.sun.star.awt.Size &apos;Bitmap size
+	dim dImageRatio as double &apos;Ratio of the height to width
+	dim dPageRatio as double&apos;Ratio of the height to width
+	dim oPosition as new com.sun.star.awt.Point
+
+	&apos;Create a graphics object that can be inserted into the document
+	oGraph = oAlbum.createInstance(&quot;com.sun.star.drawing.GraphicObjectShape&quot;)
+
+	&apos;Add graphic placeholder
+	
+	oGraph.GraphicURL = sURL 
+	oDrawPage.add(oGraph)
+	&apos; 
+	&apos;
+	wait 2000
+	if B_DEBUG = false then
+		on error goto entryimpossible
+	endif
+	oBitmapSize = oGraph.GraphicObjectFillBitmap.GetSize
+	dImageRatio = CDbl(oBitmapSize.Height) / CDbl(oBitmapSize.Width)
+	dPageRatio = CDbl(oDrawPage.Height) / CDbl(oDrawPage.Width)
+	
+	&apos; Compare the ratios to see which is wider, relatively speaking.
+	if dPageRatio &gt; dImageRatio then
+		oNewSize.Width = oDrawPage.Width
+		oNewSize.Height = CLng(CDbl(oDrawPage.Width) * dImageRatio)
+	else
+		oNewSize.Width = CLng(CDbl(oDrawPage.Height) / dImageRatio)
+		oNewSize.Height = oDrawPage.Height
+	endif
+
+	&apos;Center the image
+	oPosition.X = (oDrawPage.Width - oNewSize.Width)/2
+	oPosition.Y = (oDrawPage.Height - oNewSize.Height)/2
+	
+	oGraph.SetSize(oNewSize)
+	oGraph.SetPosition(oPosition)
+	&apos; Activate a screen link only if it links to an online resource a that a standard desktop computer could use.
+	&apos; Leave access minimal by default for better security.
+	if sOnClickURL &lt;&gt; &quot;&quot; and (instr (sOnClickURL, &quot;http&quot;) = 1 or instr (sOnClickURL, &quot;mailto&quot;) = 1 ) then
+		oGraph.OnClick = com.sun.star.presentation.ClickAction.DOCUMENT
+		oGraph.Bookmark = sOnClickURL
+	endif
+	if bDoBreak = true then
+		breakLink (sURL, oGraph)
+	endif
+	 AddGraphic = true
+	exit function
+	entryimpossible:
+	ShowDialog(fs_NO_ACTION(fs_cL))
+	AddGraphic = false
+end function
+
+sub insertTwitterKeyword
+	insertWebCam (101, true)
+end sub
+
+sub insertIdentiCaKeyword
+	insertWebCam (102, true)
+end sub
+
+sub insertMyBusinessCard
+	insertWebCam (103, true)
+end sub
+
+sub insertWebCam (optional byval iCameraNo, optional byval bMake2D, optional byval bVerbose)
+	&apos; This allows us to quickly insert an image of whatever is in front of
+	&apos; a webcam. for example, use an Android tablet with &quot;IP Webcam&quot; and enter the 
+	&apos; address of your webcam as the URL &quot;http://xxx.xxx.x.xx:8080/shot.jpg&quot; for ip-webcam for Android
+	&apos; or http://xxx.xx.x.xx:8020/image.jpg for &quot;IP Cam&quot; for iOS
+	&apos; See: https://play.google.com/store/apps/details?id=com.pas.webcam
+	&apos; See: http://ip-webcam.appspot.com/
+	&apos; See: https://itunes.apple.com/us/app/ip-cam/id333208495?mt=8
+	&apos; See: http://www.senstic.com/iphone/ipcam/ipcam.aspx
+	&apos;on error goto insertWebCamError
+	if ismissing (iCameraNo) then
+		iCameraNo = 1
+	endif
+	if ismissing (bMake2D) then 
+		bMake2D = false
+	endif
+	
+	if ismissing (bVerbose) then
+		bVerbose = true
+	endif
+	if NOT GlobalScope.BasicLibraries.isLibraryLoaded(&quot;Tools&quot;) then 
+		GlobalScope.BasicLibraries.loadLibrary(&quot;Tools&quot;)
+	endif
+	
+	dim bQRCode
+	dim sA, sB, sC as string
+	dim sSocialSearch
+	dim sSocialBrand
+	dim sURL
+	dim sOnClickURL
+	dim oAlbum
+	dim oSlides
+	dim oDrawPage
+	dim sSettingsFile
+	sURL = &quot;&quot;
+	sA = &quot;&quot;
+	sSettingsFile = createUnoService(&quot;com.sun.star.util.PathSettings&quot;).userConfig
+	select case iCameraNo
+	case 1
+		sSettingsFile = sSettingsFile &amp; &quot;/impresstools/camera1.txt&quot;
+	case 2
+		sSettingsFile = sSettingsFile &amp; &quot;/impresstools/camera2.txt&quot;
+	case 3
+		sSettingsFile = sSettingsFile &amp; &quot;/impresstools/camera3.txt&quot;
+	case 4
+		sSettingsFile = sSettingsFile &amp; &quot;/impresstools/camera4.txt&quot;
+	case 5
+		sSettingsFile = sSettingsFile &amp; &quot;/impresstools/camera5.txt&quot;
+	case 6
+		sSettingsFile = sSettingsFile &amp; &quot;/impresstools/camera6.txt&quot;
+	case 7
+		sSettingsFile = sSettingsFile &amp; &quot;/impresstools/camera7.txt&quot;
+	case 8
+		sSettingsFile = sSettingsFile &amp; &quot;/impresstools/camera8.txt&quot;
+	case 101
+		sSettingsFile = sSettingsFile &amp; &quot;/impresstools/social101.txt&quot;
+	case 102
+		sSettingsFile = sSettingsFile &amp; &quot;/impresstools/social102.txt&quot;
+	case else 
+		sSettingsFile = &quot;&quot;
+	end select
+	
+	if len (sSettingsFile) &lt;&gt; 0 and fileexists (sSettingsFile) then 
+		sURL = getTextFromFile(sSettingsFile, &quot;UTF-8&quot;)
+		sSocialSearch = sURL &apos; Saved Twitter or identi.ca search
+		kill sSettingsFile
+	else
+		select case iCameraNo
+		case 1 &apos; random image Images cc by sa
+			&apos; The provided images are for layout purposes and each image we use for this project
+			&apos; is released under the creative commons license (CC BY-SA). For more information
+			&apos; visit http://creativecommons.org/licenses/
+			&apos; So, if you want to use the images for more than just layouts, you have to double 
+			&apos; check the license and ask the author. For this we will link to each photographer&apos;s 
+			&apos; flickr page. Furthermore, we assume no liability.
+			 sURL = &quot;http://lorempixel.com/560/420/?type=.jpg&quot;
+		case 2 &apos; Halifax harbour, Nova Scotia, CA
+			sURL = &quot;http://live.novascotiawebcams.com/boardwalk/current.jpg&quot;
+		case 3 &apos; Vancouver BC webcam
+			&apos; sURL = &quot;http://www.jericho.ca/webcam/images/webcam.jpg&quot;
+			 sURL = &quot;http://www.katkam.ca/pic.aspx?ext=.jpg&quot;
+		case 4 &apos; Bondi Beach, Sydney, New South Wales, AU
+			sURL = &quot;http://www.northbondirsl.com.au/images/netcam.jpg&quot;
+		case 5 &apos; Open MapQuest. Image provided by MapQuest.com. Map data (c) contributors to OpenStreetMaps. Creative Commons 2.0 Attribution License. 
+			sURL = &quot;http://open.mapquestapi.com/staticmap/v4/getmap?size=800,450&amp;zoom=15&amp;center=44.66922,-63.57473&amp;type=map&amp;imagestyle=.jpg&quot;
+		case 6 &apos; Weather forecast for the United States from the US National Weather Service
+			sURL = &quot;http://www.hpc.ncep.noaa.gov/noaa/noaa.gif&quot;
+		case 7 &apos; US NASA - global fire map
+			sURL = &quot;http://rapidfire.sci.gsfc.nasa.gov/imagery/firemaps/small_current_firemap.jpg&quot;
+		case 8 &apos; Canadian weather office - current conditions
+			sURL = &quot;http://www.weatheroffice.gc.ca/data/wxoimages/wocanmap0_e.jpg&quot;
+		case 101 &apos; Twitter social media
+			&apos;sURL is not set by user
+		case 102 &apos; Identi.ca social media
+			&apos;sURL is not set by user
+		case else  &apos; The extension only saves up to 8 image or web URLs, so I&apos;ll ask you what image you want.
+			sURL = fsOpenMyFileDialogURI
+		end select
+	endif
+	&apos; Set up the linked URL for social media search
+	select case iCameraNo
+	case 101
+		sURL = &quot;http://twitter.com/search?q=&quot;
+		sSocialBrand = fs_TWITTER(fs_cL)
+		bMake2D = true &apos; We are making a Google 2D Chart - show branding on second dialogue
+		if len(sSocialSearch) = 0 then
+			sSocialSearch = fs_ELEARNING(fs_cL)
+		endif
+		if bVerbose = true then
+			sA = InputBox ( fs_SEARCH_TWITTER(fs_cL) &amp; chr$(10) &amp; chr$(10) &amp; fs_POWERBYGOGLE(fs_cL),fs_TWITTER(fs_cL), sSocialSearch )
+		endif
+		if sA = &quot;&quot; then
+			exit sub
+		endif
+		sSocialSearch = sA
+		sA = fsEscapeStr(sA)
+		sA = fsReplaceText(sA, &quot;%&quot;,&quot;%25&quot;)
+		sA = fsReplaceText(sA, &quot;?&quot;,&quot;%3F&quot;)
+		sA = fsReplaceText(sA, &quot;#&quot;,&quot;%23&quot;)
+		sURL = sURL &amp; sA
+	case 102
+		sURL = &quot;http://identi.ca/search/notice?q=&quot;
+		sSocialBrand = fs_IDENTICA(fs_cL)
+		bMake2D = true &apos; We are making a Google 2D Chart - show branding on second dialogue
+		if len(sSocialSearch) = 0 then
+			sSocialSearch = fs_ELEARNING(fs_cL)
+		endif
+		if bVerbose = true then
+			sA = InputBox ( fs_SEARCH_IDENTICA(fs_cL) &amp; chr$(10) &amp; chr$(10) &amp; fs_POWERBYGOGLE(fs_cL), fs_IDENTICA(fs_cL), sSocialSearch ) 
+		endif
+		if sA = &quot;&quot; then
+			exit sub
+		endif
+		sSocialSearch = sA
+		sA = fsEscapeStr(sA)
+		sA = fsReplaceText(sA, &quot;%&quot;,&quot;%25&quot;)
+		sA = fsReplaceText(sA, &quot;?&quot;,&quot;%3F&quot;)
+		sA = fsReplaceText(sA, &quot;#&quot;,&quot;%23&quot;)
+		sURL = sURL &amp; sA
+	case else 
+		
+		sA = &quot;&quot;
+		sSocialBrand = fs_IMAGE_CREDITS(fs_cL)
+		sSocialSearch = &quot;&quot;
+		if instr (sURL, &quot;file:&quot;) &lt;&gt; 1 then
+			if bMake2D = true then
+				if bVerbose = true then
+					sURL = InputBox (fs_WEBCAM(fs_cL), fs_POWERBYGOGLE(fs_cL),sURL)
+				endif
+			else
+				if bVerbose = true then
+					sURL = InputBox (fs_WEBCAM(fs_cL), getBranding (bI_SPOKEN_BRANDING), sURL)
+				endif
+			endif
+		endif
+	end select
+
+	sOnClickURL = sURL
+	if sURL= &quot;&quot; then
+		exit sub
+	endif
+	
+	&apos; -- save the settings --
+	if len (sSettingsFile) &lt;&gt; 0 then
+		select case iCameraNo
+		case 101, 102 &apos; Social search - just record the contents of the search terms dialogue
+			CreateFile(sSettingsFile,sSocialSearch,&quot;UTF-8&quot;)
+		case else  &apos; Record the whole URL
+			CreateFile(sSettingsFile,sURL,&quot;UTF-8&quot;)
+		end select
+	endif
+	oAlbum = ThisComponent
+	oSlides = oAlbum.getDrawPages
+	oSlides.InsertNewByIndex (oSlides.Count)
+	select case rppIsGraphicFile (sURL, 4)
+	case true
+		if bMake2D = true  then
+			sC = fs_POWERBYGOGLE (fs_cL) 
+		else
+			bMake2D = false
+			sC = getBranding(bI_SPOKEN_BRANDING) &amp; &quot; - &quot; &amp; fs_IMAGE_CREDITS (fs_cL)  &amp; &quot; &quot; &amp; iCameraNo
+			sC = sC &amp; &quot; - &quot; &amp; left(fsNow(),instr(fsNow(),&quot;T&quot;) - 1)
+		endif
+	case else 
+		bMake2D = true
+		select case iCameraNo
+		case 101, 102
+			sC = sSocialSearch
+		case else
+			sC = fs_POWERBYGOGLE (fs_cL)
+		end select
+	end select
+	if instr (trim(sURL), &quot;file:&quot;) &lt;&gt; 1 then
+		&apos; You are about to connect online. I will give you a chance to bail out.
+		if fb_Online_Resource_CarteBlanche() or bVerbose = false or showdialog (sC &amp; chr$(10) &amp; chr$(10) &amp; fs_ONLINE_WARNING (fs_cL) &amp; chr$(10) &amp; sURL, true) then
+			&apos; You hit OK. I will carry on.
+			if bMake2D = true then
+				sA = &quot;http://chart.apis.google.com/chart?chs=350x350&amp;cht=qr&amp;chl=&quot;
+				sA = sA &amp; fsReplaceText (fsEscapeStr(sURL), &quot;?&quot;,&quot;%3F&quot;)
+				sC = InputBox ( fs_WEBCAMTITLE (fs_cL), fs_POWERBYGOGLE (fs_cL), sC)
+				if len(sC) = 0 then 
+					exit sub
+				endif
+				if AddGraphic (oAlbum, sA, oSlides.getByIndex (oSlides.Count -1), true, sOnClickURL) = false then
+					exit sub
+				endif				
+				sA = fsOrgMicroformatsVeventXhtml (sC, fsNow(), 2, fsCleanForXtml(sURL))					
+			else
+				sC = InputBox ( fs_WEBCAMTITLE (fs_cL), fs_TITLE(fs_cL), sC)
+				if len(sC) = 0 then 
+					exit sub
+				endif
+				sA = fsOrgMicroformatsVeventXhtml (sC, fsNow(), 2, fsCleanForXtml(sURL))
+				if AddGraphic (oAlbum, sURL, oSlides.getByIndex (oSlides.Count -1), true, sOnClickURL) = false then
+					sA =&quot;&quot;
+					exit sub
+				endif
+			endif
+			oAlbum.getcurrentcontroller().setCurrentPage(oAlbum.drawpages(oSlides.Count -1))
+			select case iCameraNo
+			case 1, 2, 3, 4, 5, 6, 7, 8
+				&apos; Webcam - label the slide with date and time if the branding is for a security application
+				sB = fs_LINK (fs_cL) &amp; &quot; &quot; &amp; iCameraNo &amp; &quot; - &quot; &amp; fsNow()
+				oSlides (oSlides.Count - 1).Name = sB
+				if I_BRANDED = 4 and (instr(sA, &quot;http://chart.apis.google.com&quot;)) = 0 and fb_Online_Resource_CarteBlanche() = false then
+					if bVerbose = true then
+						if (showdialog (sB &amp; chr$(10) &amp; fs_ADD_TIMESTAMP (fs_cL), true)) then
+						&apos; watermark the slide for research &amp; security with a visible timestamp
+							UpdateSlideTitle (sB)
+						endif
+					endif
+				else
+					oSlides (oSlides.Count - 1).Name = sC
+				endif
+			case else
+				&apos; Not a webcam
+				oSlides (oSlides.Count - 1).Name = sC
+			end select
+			
+			UpdateSlideNote (sA)
+		else
+			&apos; remove the blank slide at the end
+			oSlides.Remove (oSlides (oSlides.Count -1))
+			exit sub
+		endif
+	endif
+	exit sub
+	insertWebCamError:
+	ShowDialog(fs_NO_ACTION(fs_cL))
+end sub
+
+sub breakLink (byval oFirstFile,byval oGraph)
+	&apos;Graphic handling based on code (c) 2011 Ariel Del Valle
+	&apos;This program is free software; you can redistribute it and/or modify
+	&apos;it under the terms of the GNU General Public License as published by
+	&apos;the Free Software Foundation; either version 2 of the License, or
+	&apos;(at your option) any later version.
+	&apos;
+	&apos;This program is distributed in the hope that it will be useful,
+	&apos;but WITHOUT ANY WARRANTY; without even the implied warranty of
+	&apos;MERCHANTABILITY or FITNESS for A PARTICULAR PURPOSE.See the
+	&apos;GNU General Public License for more details.
+	&apos;
+	&apos;You should have received a copy of the GNU General Public License
+	&apos;along with this program; if not, write to the Free Software
+	&apos;Foundation, Inc., 59 Temple Place, Suite 330, Boston, MA02111-1307USA
+	on error resume next
+	dim oBitmaps
+	oBitmaps = ThisComponent.createInstance(&quot;com.sun.star.drawing.BitmapTable&quot;) 
+	oBitmaps.insertByName(&quot;Image&quot;, oFirstFile) &apos; we store the image in the bitmap holder
+    oGraph.GraphicURL = oBitmaps.getByName(&quot;Image&quot;) &apos; we give the image the location of the picture which is stored within the document
+	oBitmaps.removeByName(&quot;Image&quot;) &apos;once that we have given the image a picture we no longer need it inside of the oBitmap
+end sub
+
+
+sub fsSaveAsPresentation (sURL)
+	dim document   as object
+	dim dispatcher as object
+	document   = ThisComponent.CurrentController.Frame
+	dispatcher = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
+	dim args1(1) as new com.sun.star.beans.PropertyValue
+	args1(0).Name = &quot;URL&quot;
+	args1(0).Value = sURL
+	args1(1).Name = &quot;FilterName&quot;
+	args1(1).Value = &quot;impress8&quot;
+	dispatcher.executeDispatch(document, &quot;.uno:SaveAs&quot;, &quot;&quot;, 0, args1())
+end sub
+
+sub drawMeasureShape()
+	&apos; http://www.hentzenwerke.com/samplechapters/oome_sc15.pdf
+	&apos; OpenOffice.org Macros Explained by Andrew Douglas Pitonyak
+	dim oPage &apos;Page on which to draw
+	dim oShape &apos;Shape to insert
+	dim oStart As new com.sun.star.awt.Point
+	dim oend As new com.sun.star.awt.Point
+	oPage = createDrawPage(ThisComponent, &quot;Test Draw&quot;, true)	
+	oShape = ThisComponent.createInstance(&quot;com.sun.star.drawing.MeasureShape&quot;)
+	oPage.add(oShape)
+	REM The following values MUST be set AFTER the object is inserted
+	oStart.X = oPage.Width / 4 : oEnd.X = oPage.Width / 2
+	oStart.Y = oPage.Height/4 : oEnd.Y = oPage.Height/4
+	oShape.StartPosition = oStart
+	oShape.EndPosition = oEnd
+	&apos;oShape.setString(&quot;Width&quot;)
+	oShape.TextAnimationKind = com.sun.star.drawing.TextAnimationKind.SCROLL
+	oShape = ThisComponent.createInstance(&quot;com.sun.star.drawing.MeasureShape&quot;)
+	oPage.add(oShape)
+	oStart.X = oPage.Width / 5 : oEnd.X = oPage.Width / 5
+	oStart.Y = oPage.Height/4 : oEnd.Y = oPage.Height/2.5
+	oShape.StartPosition = oStart
+	oShape.EndPosition = oEnd
+end sub 
+
+function createDrawPage(oDoc, sName$, bForceNew As boolean) As Variant
+	&apos; http://www.hentzenwerke.com/samplechapters/oome_sc15.pdf
+	&apos; OpenOffice.org Macros Explained by Andrew Douglas Pitonyak
+	dim oPages &apos;All of the draw pages
+	dim oPage &apos;A single draw page
+	dim i% &apos;General index variable
+	oPages = oDoc.getDrawPages()
+	if oPages.hasByName(sName) then
+		REM if we require a new page then delete
+		REM the page and get out of the for loop.
+		if bForceNew then
+			oPages.remove(oPages.getByName(sName))
+		else
+			REM Did not request a new page so return the found page
+			REM and then get out of the function.
+			createDrawPage = oPages.getByName(sName)
+			exit function
+		endif
+	endif
+	REM Did not find the page, or found the page and removed it.
+	REM Create a new page, set the name, and return the page.
+	oPages.insertNewByIndex(oPages.getCount())
+	oPage = oPages.getByIndex(oPages.getCount()-1)
+	oPage.setName(sName)
+	createDrawPage = oPage
+end function
+
+
+</script:module>

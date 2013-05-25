@@ -1,0 +1,1817 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="mylanguage" script:language="StarBasic">REM  *****  BASIC  *****
+option explicit
+
+function fbWindowsHasVoiceInThisLanguage (Optional byval sLang)
+		&apos; Since Windows Vista, we can use Speech XML
+	&apos; http://www.w3.org/TR/speech-synthesis
+	&apos; Determine which SAPI voices are installed, then
+	&apos; if we have a modern voice from Windows Vista, Windows 7 or above
+	&apos; then return true, else  if no voices found, then return false
+	dim Sapi as object
+	dim n,n1 as integer
+	dim s1, s2 as string
+	if ismissing(sLang) then
+		sLang = fsGetSetting(&quot;language&quot;)
+	endif
+	sLang = lcase (sLang)
+	fbWindowsHasVoiceInThisLanguage = false
+	&apos;on Error goto VoiceTestError
+	Set Sapi=Createobject(&quot;Sapi.SpVoice&quot;)
+	s1 =lcase (isoToEnglish(sLang))
+	&apos;Let&apos;s see if we recognize the language s1
+	for n = 0 to Sapi.GetVoices.Count - 1
+		s2=lcase(Sapi.GetVoices.Item(n).GetDescription)
+		if instr(s2,s1) &lt;&gt; 0 then
+			fbWindowsHasVoiceInThisLanguage = true
+			exit for
+		endif
+	next
+		&apos; Check for a couple of Windows XP or third
+		&apos; party voices. This is just a hack for my
+		&apos; own convenience.
+		&apos; We don&apos;t detect Windows XP or third party
+		&apos; voices when the voice descriptions don&apos;t
+		&apos; include the iso code (fr-FR, de-AT etc.)
+		&apos; or the name of the language (Spanish, German).
+		&apos; You could try editing the voice description keyword
+		&apos; in the XPandThirdParty function. You&apos;re on your own.
+	if fbWindowsHasVoiceInThisLanguage = false then 
+		s1 = lcase(XPandThirdParty(sLang))
+		for n = 0 to Sapi.GetVoices.Count - 1
+			s2=lcase(Sapi.GetVoices.Item(n).GetDescription)
+			if instr(s2,s1) &lt;&gt; 0 then
+				fbWindowsHasVoiceInThisLanguage = true
+				exit for
+			endif
+		next
+	endif
+	Set Sapi = Nothing
+	exit function
+	VoiceTestError:
+	fbWindowsHasVoiceInThisLanguage = false
+	on Error resume next
+end function
+
+function canUseSpeechXML
+	&apos; We simply check for the directory used in Windows XP for TTS resources.
+	&apos; The equivalent directory for later Windows versions is TTS20
+	&apos; Later SAPI versions may rename the directory, so we check for Windows XP.
+	if fileExists (fsCommonProgramFiles &amp; &quot;SpeechEngines\Microsoft\TTS&quot;) then
+		canUseSpeechXML = false
+	elseif fileExists (fsCommonProgramFilesx86 &amp; &quot;SpeechEngines\Microsoft\TTS&quot;) then
+		canUseSpeechXML = false
+	elseif fileExists (&quot;/usr/bin/&quot;) then  &apos; Posix - don&apos;t use Speech XML
+		canUseSpeechXML = false
+	else
+		canUseSpeechXML = true
+	endif
+end function
+
+
+function AddLanguageCodes(sA, Optional byval sLang)
+	dim s1,s2,s3,QT as string
+	if ismissing(sLang) then 
+		sLang = fsGetSetting(&quot;language&quot;)
+	endif
+	s1=lcase(sLang)
+	s2=&quot;%%%SPEECH-XML-OK%%%&quot;
+	QT=Chr(34)
+	&apos; if the selected language is the same as the UI language, then we don&apos;t specify the language.
+	&apos; We assume that the default voice is correct for language and locale
+	if sLang = fsGetSetting(&quot;language&quot;) &amp; &quot;-&quot; &amp; fsGetSetting(&quot;country&quot;) then
+		AddLanguageCodes = sA
+	else
+		if canUseSpeechXML = false then
+			s2 = fsIsoToSapi5Lang (s1)
+		&apos;else
+			&apos; Most languages only have a voice for the main locale, so we need to remove the country code.
+			&apos; Windows doesn&apos;t look up close matches - only exact matches.
+			&apos; if a language is not recognized, Windows seems to try using en-US
+			&apos;select case s1
+			&apos;case &quot;en-gb&quot;,&quot;zh-hk&quot;,&quot;zh-yue&quot;,&quot;zh-mo&quot;,&quot;zh-cn&quot;
+				&apos; en-GB voice is included by default with Windows 8. Cantonese is not.
+				&apos; The zh language should have Mandarin and Cantonese voices. 
+				&apos; We use locale for Special Administrative Regions (SARs) of China; however
+				&apos; As of July 17, 2012 Windows 8 Preview does not appear to include a voice for 
+				&apos; Cantonese, just Mandarin. Windows 7 for Chinese regions does include Cantonese.
+				&apos; if your locale setting is Hong Kong or Macau, and speech synthesis is not
+				&apos; working correctly with Windows 8, you must install a voice for your region. For
+				&apos; Mandarin, you can set your selection&apos;s language to the Singapore or China locale.
+				&apos; I hope that Windows 8 sold in Chinese speaking locales includes a Cantonese voice
+				&apos; in the final release of Windows 8, because to have a fully functional system
+				&apos; in Hong Kong, you need English, Cantonese and Mandarin.
+			&apos;case else 
+			&apos;	if instr(sLang, &quot;-&quot;) = 0 then
+			&apos;		sLang = left(sLang, 2)
+			&apos;	else 
+			&apos;		sLang = left(sLang, instr(sLang, &quot;-&quot;) - 1)
+			&apos;	endif
+			&apos;end select
+		endif
+		if s2= &quot;%%%SPEECH-XML-OK%%%&quot; then
+			s3=&quot;&lt;?xml version=&quot;&quot;1.0&quot;&quot;?&gt;&quot;
+			s3=s3 &amp; &quot; &lt;speak version=&quot;&quot;1.0&quot;&quot; xmlns=&quot;&quot;http://www.w3.org/2001/10/synthesis&quot;&quot;&quot;
+			s3=s3 &amp; &quot; xmlns:xsi=&quot;&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&quot;&quot;
+			s3=s3 &amp; &quot; xsi:schemaLocation=&quot;&quot;http://www.w3.org/2001/10/synthesis&quot;
+			s3=s3 &amp; &quot; http://www.w3.org/TR/speech-synthesis/synthesis.xsd&quot;&quot; xml:lang=&quot;&quot;&quot;
+			s3=s3 &amp; sLang &amp; &quot;&quot;&quot;&gt;&quot;
+			s3=s3 &amp; sA
+			s3=s3 &amp; &quot;&lt;/speak&gt;&quot;
+		elseif s2= &quot;&quot; then
+			&apos; Compatible language not found, just return string with no language codes added. 
+			s3 = sA 
+		else 
+			&apos; Windows XP uses langid value for speech, so the language and country of the text must match the voice exactly. 
+			&apos; for example, French Canadian speakers must use fr-FR settings for Scansoft Virginie to work
+			s3=&quot;&lt;speak&gt;&lt;lang langid=&quot; &amp; QT
+			s3=s3 &amp; s2
+			s3=s3 &amp; QT &amp; &quot;&gt; &quot;
+			s3= s3 &amp; sA
+			s3=s3 &amp; &quot; &lt;/lang&gt;&lt;/speak&gt;&quot; 
+		endif
+		AddLanguageCodes=s3
+	endif
+	&apos;msgbox AddLanguageCodes &apos;debug speech markup
+end function
+
+function fsIsoToSapi5Lang (byval s1)
+	&apos; Returns SAPI5 code, or blank if no known code is found			
+	dim s2 as string
+	select case lcase (s1)
+	case &quot;en-us&quot;, &quot;en&quot;
+		s2=&quot;409&quot;
+	case &quot;en-gb&quot;,&quot;en-vg&quot;,&quot;en-io&quot;,&quot;en-gg&quot;
+		s2=&quot;809&quot;
+	case &quot;en-au&quot;
+		s2=&quot;c09&quot;
+	case &quot;en-bz&quot;
+		s2=&quot;2809&quot;
+	case &quot;en-ca&quot;
+		s2=&quot;1009&quot;
+	case &quot;en-bs&quot;
+		s2=&quot;2409&quot;
+	case &quot;en-hk&quot;
+		s2=&quot;3c09&quot;
+	case &quot;en-in&quot;
+		s2=&quot;4009&quot;
+	case &quot;en-id&quot;
+		s2=&quot;3809&quot;
+	case &quot;en-ie&quot;
+		s2=&quot;1809&quot;
+	case &quot;en-jm&quot;
+		s2=&quot;2009&quot;
+	case &quot;en-my&quot;
+		s2=&quot;4409&quot;
+	case &quot;en-nz&quot;
+		s2=&quot;1409&quot;
+	case &quot;en-ph&quot;
+		s2=&quot;3409&quot;
+	case &quot;en-sg&quot;
+		s2=&quot;4809&quot;
+	case &quot;en-za&quot;
+		s2=&quot;1c09&quot;
+	case &quot;en-tt&quot;
+		s2=&quot;2c09&quot;
+	case &quot;en-zw&quot;
+		s2=&quot;3009&quot;
+	case &quot;fr-be&quot;
+		s2=&quot;80c&quot;
+	case &quot;fr-ca&quot;
+		s2=&quot;c0c&quot;
+	case &quot;fr-cg&quot;
+		s2=&quot;240c&quot;
+	case &quot;fr-ch&quot;
+		s2=&quot;100c&quot;
+	case &quot;fr-ci&quot;
+		s2=&quot;300c&quot;
+	case &quot;fr-cm&quot;
+		s2=&quot;2c0c&quot;
+	case &quot;fr-fr&quot;,&quot;fr&quot;
+		s2=&quot;40c&quot;
+	case &quot;fr-ht&quot;
+		s2=&quot;3c0c&quot;
+	case &quot;fr-lu&quot;
+		s2=&quot;140c&quot;
+	case &quot;fr-ma&quot;
+		s2=&quot;380c&quot;
+	case &quot;fr-mc&quot;
+		s2=&quot;180c&quot;
+	case &quot;fr-ml&quot;
+		s2=&quot;340c&quot;
+	case &quot;fr-re&quot;
+		s2=&quot;200c&quot;
+	case &quot;fr-sn&quot;
+		s2=&quot;280c&quot;
+	case &quot;it&quot;,&quot;it-it&quot;
+		s2=&quot;410&quot;
+	case &quot;de-at&quot;
+		s2=&quot;c07&quot;
+	case &quot;de-ch&quot;
+		s2=&quot;807&quot;
+	case &quot;de-de&quot;,&quot;de&quot;
+		s2=&quot;407&quot;
+	case &quot;de-li&quot;
+		s2=&quot;1407&quot;
+	case &quot;de-lu&quot;
+		s2=&quot;1007&quot;
+	case &quot;es-es&quot;,&quot;es&quot;
+		s2=&quot;c0a&quot;
+	case &quot;es-ar&quot;
+		s2=&quot;2c0a&quot;
+	case &quot;es-bo&quot;
+		s2=&quot;400a&quot;
+	case &quot;es-cl&quot;
+		s2=&quot;340a&quot;
+	case &quot;es-co&quot;
+		s2=&quot;240a&quot;
+	case &quot;es-cr&quot;
+		s2=&quot;140a&quot;
+	case &quot;es-do&quot;
+		s2=&quot;1c0a&quot;
+	case &quot;es-ec&quot;
+		s2=&quot;300a&quot;
+	case &quot;es-sv&quot;
+		s2=&quot;440a&quot;
+	case &quot;es-gt&quot;
+		s2=&quot;100a&quot;
+	case &quot;es-hn&quot;
+		s2=&quot;480a&quot;
+	case &quot;es-mx&quot;
+		s2=&quot;80a&quot;
+	case &quot;es-ni&quot;
+		s2=&quot;4c0a&quot;
+	case &quot;es-pa&quot;
+		s2=&quot;180a&quot;
+	case &quot;es-py&quot;
+		s2=&quot;3c0a&quot;
+	case &quot;es-pe&quot;
+		s2=&quot;280a&quot;
+	case &quot;es-pr&quot;
+		s2=&quot;500a&quot;
+	case &quot;es-us&quot;
+		s2=&quot;540a&quot;
+	case &quot;es-uy&quot;
+		s2=&quot;380a&quot;
+	case &quot;es-ve&quot;
+		s2=&quot;200a&quot;
+	case &quot;ru&quot;,&quot;ru-ru&quot;
+		s2=&quot;419&quot; 
+	case &quot;hi&quot;,&quot;hi-in&quot;
+		s2=&quot;439&quot;
+	case &quot;af&quot;,&quot;af-za&quot;
+		s2=&quot;436&quot;
+	case &quot;ar-sa&quot;,&quot;ar&quot;
+		s2=&quot;401&quot;
+	case &quot;ar-dz&quot;
+		s2=&quot;1401&quot;
+	case &quot;ar-bh&quot;
+		s2=&quot;3c01&quot;
+	case &quot;ar-eg&quot;
+		s2=&quot;c01&quot;
+	case &quot;ar-iq&quot;
+		s2=&quot;801&quot;
+	case &quot;ar-jo&quot;
+		s2=&quot;2c01&quot;
+	case &quot;ar-kw&quot;
+		s2=&quot;3401&quot;
+	case &quot;ar-lb&quot;
+		s2=&quot;3001&quot;
+	case &quot;ar-ly&quot;
+		s2=&quot;1001&quot;
+	case &quot;ar-ma&quot;
+		s2=&quot;1801&quot;
+	case &quot;ar-om&quot;
+		s2=&quot;2001&quot;
+	case &quot;ar-qa&quot;
+		s2=&quot;4001&quot;
+	case &quot;ar-sy&quot;
+		s2=&quot;2801&quot;
+	case &quot;ar-tn&quot;
+		s2=&quot;1c01&quot;
+	case &quot;ar-ae&quot;
+		s2=&quot;3801&quot;
+	case &quot;ar-ye&quot;
+		s2=&quot;2401&quot;
+	case &quot;eu&quot;,&quot;eu-fr&quot;,&quot;eu-es&quot;
+		s2=&quot;42D&quot;
+	case &quot;bg&quot;,&quot;bg-bg&quot;
+		s2=&quot;402&quot;
+	case &quot;ca&quot;,&quot;ca-es&quot;
+		s2=&quot;403&quot;
+	case &quot;cs&quot;,&quot;cs-cz&quot;
+		s2=&quot;405&quot;
+	case &quot;cy&quot;,&quot;cy-gb&quot;
+		s2=&quot;452&quot;
+	case &quot;da&quot;,&quot;da-dk&quot;
+		s2=&quot;406&quot;
+	case &quot;et&quot;,&quot;et-ee&quot;
+		s2=&quot;425&quot;
+	case &quot;fi&quot;,&quot;fi-fi&quot;
+		s2=&quot;40b&quot;
+	case &quot;ka&quot;,&quot;ka-ge&quot;
+		s2=&quot;437&quot;
+	case &quot;hl&quot;,&quot;hl-gr&quot;
+		s2=&quot;408&quot;
+	case &quot;he&quot;,&quot;he-il&quot;
+		s2=&quot;40d&quot;
+	case &quot;hr&quot;,&quot;hr-hr&quot;
+		s2=&quot;41a&quot; 
+	case &quot;hu&quot;,&quot;hu-hu&quot;
+		s2=&quot;40e&quot;
+	case &quot;is&quot;,&quot;is-is&quot;
+		s2=&quot;40f&quot;
+	case &quot;ga&quot;,&quot;ga-ie&quot;
+		s2=&quot;83c&quot; 
+	case &quot;gd&quot;,&quot;gd-uk&quot;,&quot;gd-gb&quot;
+		s2=&quot;43c&quot;
+	case &quot;id&quot;,&quot;id-id&quot;
+		s2=&quot;421&quot;
+	case &quot;jp&quot;,&quot;jp-jp&quot;, &quot;ja&quot;, &quot;ja-jp&quot;
+		s2=&quot;411&quot;
+	case &quot;ko&quot;,&quot;ko-kp&quot;,&quot;ko-kr&quot;
+		s2=&quot;412&quot;
+	case &quot;ms&quot;,&quot;ms-sg&quot;,&quot;ms-my&quot;,&quot;ms-id&quot;,&quot;ms-bn&quot;
+		s2=&quot;43E&quot;
+	case &quot;mo-mn&quot;,&quot;mo&quot;
+		s2=&quot;850&quot;
+	case &quot;nl&quot;,&quot;nl-nl&quot;
+		s2=&quot;413&quot;
+	case &quot;nl&quot;,&quot;nl-be&quot;
+		s2=&quot;813&quot;
+	case &quot;no&quot;,&quot;no-no&quot;,&quot;nb&quot;,&quot;nb-no&quot;
+		s2=&quot;414&quot;
+	case &quot;nn&quot;,&quot;nn-no&quot;
+		s2=&quot;814&quot;
+	case &quot;pl&quot;,&quot;pl-pl&quot;
+		s2=&quot;415&quot;
+	case &quot;pt-br&quot;
+		s2=&quot;416&quot;
+	case &quot;pt-pt&quot;,&quot;pt&quot;
+		s2=&quot;816&quot;
+	case &quot;ro&quot;,&quot;ro-ro&quot;
+		s2=&quot;418&quot; 
+	case &quot;sk&quot;,&quot;sk-sk&quot;
+		s2=&quot;41b&quot;
+	case &quot;sl&quot;,&quot;sl-si&quot;
+		s2=&quot;424&quot;
+	case &quot;sv&quot;,&quot;sv-se&quot;
+		s2=&quot;41D&quot;
+	case &quot;th&quot;,&quot;th-th&quot;
+		s2=&quot;41E&quot;
+	case &quot;tl&quot;,&quot;tl-ph&quot;
+		s2=&quot;464&quot;
+	case &quot;tr&quot;,&quot;tr-tr&quot;
+		s2=&quot;41f&quot;
+	case &quot;uk&quot;,&quot;uk-ua&quot;
+		s2=&quot;422&quot;
+	case &quot;vi&quot;,&quot;vi-vn&quot;
+		s2=&quot;42a&quot;
+	case &quot;zh&quot;,&quot;zh-cn&quot;
+		s2=&quot;804&quot;
+	case &quot;zh-tw&quot;
+		s2=&quot;404&quot;
+	case &quot;zh-hk&quot;
+		s2=&quot;c04&quot;
+	case &quot;zh-sg&quot;
+		s2=&quot;1004&quot;
+	case &quot;zh-mo&quot;
+		s2=&quot;1404&quot;
+	case else  
+		s2=&quot;&quot;
+	end select
+	fsIsoToSapi5Lang = s2
+end function
+
+function SimpleWindowsSpeech(sA) as Long
+	&apos; asianComplexWindowsSpeech invokes SAPI5 directly.
+	&apos; We ask the function not to add any speech markup.
+	SimpleWindowsSpeech = asianComplexWindowsSpeech(sA, fsGetSetting(&quot;language&quot;), false)
+end function
+
+function asianComplexWindowsSpeech(sA, Optional sLang, Optional bAddCode)
+	&apos; for most Asian and Complex languages, we invoke SAPI directly 
+	&apos; to avoid errors in Windows interpretation of complex characters.
+	&apos; See: http://en.wikipedia.org/wiki/Mojibake
+	&apos; The disadvantage is that speech messages do not queue, so
+	&apos; if you invoke the speech command while another one is playing
+	&apos; then the second speech command gets lost.
+	&apos; David Lucardi  wrote an extension for OpenOffice.org writer
+	&apos; for Windows that invokes SAPI5 directly.
+	if ismissing(sLang) then 
+		sLang=fsGetSetting(&quot;language&quot;)
+	endif
+	if ismissing(bAddCode) then
+		bAddCode = true
+	endif
+	dim WinSVSFPurgeBeforeSpeak 
+	WinSVSFPurgeBeforeSpeak = 2
+	dim WinvbNullString 
+	WinvbNullString = &quot;&quot;
+	dim WinSVSFlagsAsync 
+	WinSVSFlagsAsync = 1
+	dim speech as object
+	if bAddCode = true then
+		sA = AddLanguageCodes(sA,sLang)
+	endif
+	On Error Resume next
+	Set speech = Createobject(&quot;Sapi.SpVoice&quot;)
+	speech.Speak &quot;&quot;, WinSVSFlagsAsync + WinSVSFPurgeBeforeSpeak 
+	speech.Speak sA, WinSVSFlagsAsync + WinSVSFPurgeBeforeSpeak 
+	Do 
+		&apos; Talking...
+	Loop Until speech.WaitUntilDone(1)
+	Set speech = Nothing
+	asianComplexWindowsSpeech = sA
+end function
+
+sub previewSlideShowNotes (sA, Optional sLang)
+	msgBox &quot;Stub! Under construction!&quot;
+end sub
+
+sub simpleSpeech( byval sA, Optional sLang as string, Optional nSpeechResources as boolean )
+	&apos; We use the system voice and do not write any files. This is the best option for legacy 
+	&apos; operating systems, slow computers, or installations that have scripting disabled.
+	&apos; We don&apos;t use sLang or nSpeechResources. 
+	&apos; We include the options to allow a drop in
+	&apos; replacement of this function for 
+	&apos; synthesizeSpeech
+	if ismissing(sLang) then 
+		sLang = &quot;en-US&quot;
+	endif
+	if ismissing(nSpeechResources) then 
+		nSpeechResources = ENABLE_SYSTEM_SPEECH_ONLY
+	endif
+	select case fsGetOS()
+	case &quot;WINDOWS&quot;
+		simpleWindowsSpeech(sA)		
+	case &quot;MAC&quot;,&quot;OSX&quot;
+		simpleOSXSpeech (sA)
+	case else  &apos;Linux		
+		simpleLinuxSpeech(sA)
+	end select
+end sub
+
+sub synthesizeSpeech( byval sA, Optional sLang as string, Optional byval nSpeechResources as string)
+	dim lInterval as Long
+	dim sB, sC as string
+	if ismissing(sLang) then 
+		sLang = &quot;en-US&quot;
+	endif
+	if ismissing(nSpeechResources) then
+		if fBHasGLicense = true then
+			nSpeechResources = ENABLE_ONLINE_RESOURCES
+		else
+			nSpeechResources = ENABLE_SYSTEM_LANGUAGES
+		endif
+	endif
+	sB = sLang
+	if instr (sB, &quot;-&quot;) &lt;&gt; 0 then
+		sC = left(sB, instr (sB, &quot;-&quot;) -1)
+	else
+		sC = left(sB, 2)
+	endif
+	select case nSpeechResources
+	case ENABLE_SYSTEM_SPEECH_ONLY
+		simplespeech (sA)
+	case ENABLE_ONLINE_VOICES_ONLY
+		getOnlineSpeech (sA,sC, false)
+	case else 
+		select case fsGetOS()
+		case &quot;WINDOWS&quot;
+			if fbWindowsHasVoiceInThisLanguage (sB) then
+			&apos; use language and locale
+				synthesizeWindowsSpeech(sA, sB)		
+			elseif fbWindowsHasVoiceInThisLanguage (sC) then
+			&apos; use language only
+				synthesizeWindowsSpeech(sA, sC)
+			else
+				if nSpeechResources = ENABLE_ONLINE_RESOURCES then 
+					getOnlineSpeech (sA,sC, false)
+				else
+					synthesizeWindowsSpeech(fs_NO_ONLINE_LANGUAGE(&quot;en&quot;) &amp; &quot; &quot; &amp; isoToEnglish(sC) , &quot;en-US&quot;)
+					ShowDialog (sA &amp; chr$(13) &amp; chr$(13) &amp; &quot;[&quot; &amp; sB &amp; &quot;]&quot;)
+				endif
+			endif
+		case &quot;MAC&quot;,&quot;OSX&quot;
+			synthesizeOSXSpeech (sA, sLang)
+		case else  &apos;Linux
+			if fbOKWithEspeak(sC) then
+				synthesizeLinuxSpeech(sA, sLang)
+			else
+				if nSpeechResources = ENABLE_ONLINE_RESOURCES then 
+					getOnlineSpeech (sA,sC, false)
+				else
+					synthesizeLinuxSpeech(fs_NO_ONLINE_LANGUAGE(&quot;en&quot;) &amp; &quot; &quot; &amp; isoToEnglish(sC) , &quot;en-US&quot;)
+					ShowDialog (sA &amp; chr$(13) &amp; chr$(13) &amp; &quot;[&quot; &amp; sB &amp; &quot;]&quot;)
+				endif
+			endif
+		end select
+	end select
+end sub
+
+function fsstripXMLTags (byval sA, optional bStripMore)
+	if ismissing (bStripMore) then
+		bStripMore = false
+	endif
+	sA = fsAlterMyTags (sA, &quot;&lt;&gt;&quot;, 0)
+	if bStripMore = true then
+		sA = fsReplaceText(sA, &quot;&amp;amp;&quot;, &quot;&amp;&quot;)
+		sA = fsReplaceText(sA, &quot;&amp;#160;&quot;, &quot; &quot;)
+		sA = fsReplaceText(sA, &quot;&amp;#39;&quot;, &quot;&apos;&quot;)
+	endif
+	fsstripXMLTags = sA
+end function
+
+function fsLCaseXMLTags (byval sA)
+	fsLCaseXMLTags = fsAlterMyTags (sA, &quot;&lt;&gt;&quot;, 1)
+end function
+
+function fsAlterMyTags (byval sA, optional cStringPair, optional iHowStrip )
+	&apos; This strips out the tags to leave plain text or changes the tags to use
+	&apos; lower case. Swriter-web uses upper case for all the HTML tags, so it
+	&apos; does not conform to strict XHTML. By default we strip XML tags
+	&apos; We can also strip other tags by specifying the cStringPair (like &quot;{}&quot; or &quot;()&quot;)
+	if ismissing (iHowStrip) then
+		iHowStrip = 0 &apos;Take out the tags
+	endif
+	dim sB, sC as string
+	dim sGt, sLt as string
+	dim bAddChar as boolean
+	dim i , j , k as integer
+	k = 0
+	if ismissing (cStringPair) then
+		cStringPair = &quot;&lt;&gt;&quot;
+	endif
+	sLt = left(cStringPair,1)
+	sGt = right(cStringPair,1)
+	sB = &quot;&quot;
+	sC = &quot;&quot;
+	bAddChar = true
+	j = len (sA)
+	if j= 0 then
+		fsAlterMyTags = sA
+	else
+		if instr(sA,sLt) = 0 and instr (sA, sGt) = 0 then
+			&apos; it&apos;s faster to return the same value when we know it&apos;s not XML
+			sB = sA	
+			sC = sA
+		else
+			for i = 1 to j
+				select case mid (sA, i, 1)
+				case sLt
+					bAddChar = false
+					k=k+1
+					sC = sC &amp; mid (sA, i, 1)
+				case sGt
+					bAddChar = true
+					k=k-1
+					sC = sC &amp; mid (sA, i, 1)
+				case else 
+					if bAddChar = true then
+						sB = sB &amp; mid (sA, i, 1)
+						sC = sC &amp; mid (sA, i, 1)
+					else
+						sC = sC &amp; lcase (mid (sA, i, 1))
+					endif
+				end select
+			next
+			if k &lt;&gt; 0 then &apos;the tags don&apos;t match. Maybe it&apos;s not XML. Just return the unaltered input.
+				sB = sA
+				sC = sA
+			endif
+		endif
+	endif
+	if iHowStrip = 0 then
+		fsAlterMyTags = sB
+	else 
+		fsAlterMyTags = sC
+	endif
+end function
+
+function fbtagsMatch (byval sA )
+	&apos; ***This is a quick lint. It isn&apos;t exhaustive.***
+	&apos; if the XHTML has multiple errors, the token count may be wrong, so bad code could check okay. 
+	&apos; Nor do we check for nesting errors, bad URLs, messed up quotes or a whole variety of potential problems. 
+	&apos; See http://xhtml.com/en/xhtml/serving-xhtml-as-xml/ for a discussion of common xhtml errors.
+	&apos; -----
+	sA = &quot; &quot; &amp; lcase (sA) &amp; &quot; &quot;
+	sA = fsReplaceText (sA, &quot;&lt;br/&gt;&quot;, &quot;&quot;) 
+	sA = fsReplaceText (sA, &quot;&lt;hr/&gt;&quot;, &quot;&quot;) 
+	sA = fsReplaceText (sA, &quot;&lt;p/&gt;&quot;, &quot;&quot;) 
+	sA = fsReplaceText (sA, &quot;&lt;li/&gt;&quot;, &quot;&quot;) 
+	sA = fsReplaceText (sA, &quot;&lt;br /&gt;&quot;, &quot;&quot;) 
+	sA = fsReplaceText (sA, &quot;&lt;hr /&gt;&quot;, &quot;&quot;) 
+	sA = fsReplaceText (sA, &quot;&lt;p /&gt;&quot;, &quot;&quot;) 
+	sA = fsReplaceText (sA, &quot;&lt;li /&gt;&quot;, &quot;&quot;)
+	sA = fsReplaceText (sA, &quot;&lt;img &quot;, &quot;&quot;)
+	sA = fsReplaceText (sA, &quot;/&gt;&quot;, &quot;&quot;)
+	sA = fsReplaceText (sA, &quot;&lt;?&quot;, &quot;&quot;) 
+	sA = fsReplaceText (sA, &quot;?&gt;&quot;, &quot;&quot;) 
+	sA = fsReplaceText (sA, &quot;--&gt;&quot;, &quot;--&quot;) 
+	sA = fsReplaceText (sA, &quot;&lt;!--&quot;, &quot;!--&quot;) 
+	dim sGt, sLt, cStringPair, cSlash, cOpenComment,cCloseComment as string
+	dim i , j , k, l, m, n, o as integer
+	i = 0
+	j = 0
+	k = 0
+	l = 0
+	m = 0
+	n = 0
+	o = 0
+	
+	cStringPair = &quot;&lt;&gt;&quot;
+	cSlash = &quot;/&gt;&quot;
+	cOpenComment = &quot;&lt;!--&quot;
+	cCloseComment = &quot;--&gt;&quot;
+	sLt = left(cStringPair,1)
+	sGt = right(cStringPair,1)	
+	j = len (sA)
+	if j = 0 then &apos; no errors because length is zero
+		fbtagsMatch = true
+	else
+		if instr(sA,sLt) = 0 and instr (sA, sGt) = 0 then
+			fbtagsMatch = true &apos; no errors because tags not found
+		else
+			&apos; We will find the difference between the opening delimiter count
+			&apos; and the close delimiter count. They should be equal. The XML spec says that
+			&apos; you can have a greater than sign in the text body, but we should err on
+			&apos; the side of caution and only say that well formed code is correct.
+			for i = 1 to j
+				select case mid (sA, i, 1)
+				case sLt
+					k=k+1
+				case sGt
+					k=k-1
+					l=l+1
+				case else 
+				end select
+			next
+			if len (cOpenComment) = 0 or len (cSlash) = 0 or len (cCloseComment = 0) then
+				l = l mod 2 &apos; This is not XML schema. Just check if the total number of left side delimiters is even.
+			else
+				&apos; Tags ending with /&gt; need to be counted again, because there is no closing tag 
+				&apos; (i.e. &quot;&lt;img alt = &apos;Nice image.&apos; src=&apos;../images/1.png&apos; /&gt;&quot;) 
+				m = len (cSlash)
+				for i = 1 to j
+					select case mid (sA, i, m)
+					case cSlash
+						l=l+1
+					case else 
+					end select
+				next
+				&apos; Comments need to be counted again, because there is no closing tag 
+				m = len (cOpenComment)
+				for i = 1 to j
+					select case mid (sA, i, m)
+					case cOpenComment
+						l=l+1
+					case else 
+					end select
+				next
+				l = l mod 2 &apos; returns zero if even, one if odd. Only a problem if the result is odd.
+			endif
+			if k = 0 and l = 0 then 
+				fbtagsMatch = true
+				if fbTagCountMatches (sA, &quot;&lt;b&gt;&quot;, &quot;&lt;/b&gt;&quot;) = false and fbTagCountMatches (sA, &quot;&lt;b &quot;, &quot;&lt;/b&gt;&quot;) = false then
+					fbtagsMatch = false
+					exit function
+				endif
+				if fbTagCountMatches (sA, &quot;&lt;strong&quot;, &quot;&lt;/strong&gt;&quot;) = false then
+					fbtagsMatch = false
+					exit function
+				endif
+				if fbTagCountMatches (sA, &quot;&lt;i&gt;&quot;, &quot;&lt;/i&gt;&quot;) = false and fbTagCountMatches (sA, &quot;&lt;i &quot;, &quot;&lt;/i&gt;&quot;) = false then
+					fbtagsMatch = false
+					exit function
+				endif
+				if fbTagCountMatches (sA, &quot;&lt;em&quot;, &quot;&lt;/em&gt;&quot;) = false then
+					fbtagsMatch = false
+					exit function
+				endif
+				if fbTagCountMatches (sA, &quot;&lt;center&quot;, &quot;&lt;/center&gt;&quot;) = false then
+					fbtagsMatch = false
+					exit function
+				endif
+				if fbTagCountMatches (sA, &quot;&lt;s&gt;&quot;, &quot;&lt;/s&gt;&quot;) = false and fbTagCountMatches (sA, &quot;&lt;s &quot;, &quot;&lt;/s&gt;&quot;) = false then
+					fbtagsMatch = false
+					exit function
+				endif
+				if fbTagCountMatches (sA, &quot;&lt;strike&quot;, &quot;&lt;/strike&gt;&quot;) = false then
+					fbtagsMatch = false
+					exit function
+				endif
+				if fbTagCountMatches (sA, &quot;&lt;u&gt;&quot;, &quot;&lt;/u&gt;&quot;) = false and fbTagCountMatches (sA, &quot;&lt;u &quot;, &quot;&lt;/u&gt;&quot;) = false then
+					fbtagsMatch = false
+					exit function
+				endif
+				if fbTagCountMatches (sA, &quot;&lt;sub&quot;, &quot;&lt;/sub&gt;&quot;) = false then
+					fbtagsMatch = false
+					exit function
+				endif
+				if fbTagCountMatches (sA, &quot;&lt;sup&quot;, &quot;&lt;/sup&gt;&quot;) = false then
+					fbtagsMatch = false
+					exit function
+				endif
+				if fbTagCountMatches (sA, &quot;&lt;blockquote&quot;, &quot;&lt;/blockquote&gt;&quot;) = false then
+					fbtagsMatch = false
+					exit function
+				endif
+				if fbTagCountMatches (sA, &quot;&lt;span&quot;, &quot;&lt;/span&gt;&quot;) = false then
+					fbtagsMatch = false
+					exit function
+				endif
+				if fbTagCountMatches (sA, &quot;&lt;div&quot;, &quot;&lt;/div&gt;&quot;) = false then
+					fbtagsMatch = false
+					exit function
+				endif
+				if fbTagCountMatches (sA, &quot;&lt;ol&quot;, &quot;&lt;/ol&gt;&quot;) = false then
+					fbtagsMatch = false
+					exit function
+				endif
+				if fbTagCountMatches (sA, &quot;&lt;li&quot;, &quot;&lt;/li&gt;&quot;) = false then
+					fbtagsMatch = false
+					exit function
+				endif
+				if fbTagCountMatches (sA, &quot;&lt;ul&quot;, &quot;&lt;/ul&gt;&quot;) = false then
+					fbtagsMatch = false
+					exit function
+				endif
+				if fbTagCountMatches (sA, &quot;&lt;!--&quot;, &quot;--&gt;&quot;) = false then
+					fbtagsMatch = false
+					exit function
+				endif
+				if fbTagCountMatches (sA, &quot;&lt;h1&quot;, &quot;&lt;/h1&gt;&quot;) = false then
+					fbtagsMatch = false
+					exit function
+				endif
+				if fbTagCountMatches (sA, &quot;&lt;h2&quot;, &quot;&lt;/h2&gt;&quot;) = false then
+					fbtagsMatch = false
+					exit function
+				endif
+				if fbTagCountMatches (sA, &quot;&lt;h3&quot;, &quot;&lt;/h3&gt;&quot;) = false then
+					fbtagsMatch = false
+					exit function
+				endif
+				if fbTagCountMatches (sA, &quot;&lt;h4&quot;, &quot;&lt;/h4&gt;&quot;) = false then
+					fbtagsMatch = false
+					exit function
+				endif
+				if fbTagCountMatches (sA, &quot;&lt;h5&quot;, &quot;&lt;/h5&gt;&quot;) = false then
+					fbtagsMatch = false
+					exit function
+				endif
+				if fbTagCountMatches (sA, &quot;&lt;h6&quot;, &quot;&lt;/h6&gt;&quot;) = false then
+					fbtagsMatch = false
+					exit function
+				endif
+				if fbTagCountMatches (sA, &quot;&lt;body&quot;, &quot;&lt;/body&gt;&quot;) = false then
+					fbtagsMatch = false
+					exit function
+				endif
+				if fbTagCountMatches (sA, &quot;&lt;head&quot;, &quot;&lt;/head&gt;&quot;) = false then
+					fbtagsMatch = false
+					exit function
+				endif
+				if fbTagCountMatches (sA, &quot;&lt;style&quot;, &quot;&lt;/style&gt;&quot;) =  false then
+					fbtagsMatch = false
+					exit function
+				endif
+				if fbTagCountMatches (sA, &quot;&lt;a&gt;&quot;, &quot;&lt;/a&gt;&quot;) = false  and fbTagCountMatches (sA, &quot;&lt;a &quot;, &quot;&lt;/a&gt;&quot;) = false then
+					fbtagsMatch = false
+					exit function
+				endif
+				if fbTagCountMatches (sA, &quot;&lt;caption&quot;, &quot;&lt;/caption&gt;&quot;) = false then
+					fbtagsMatch = false
+					exit function
+				endif
+				if fbTagCountMatches (sA, &quot;&lt;table&quot;, &quot;&lt;/table&gt;&quot;) = false then
+					fbtagsMatch = false
+					exit function
+				endif
+				if fbTagCountMatches (sA, &quot;&lt;th&quot;, &quot;&lt;/th&gt;&quot;) = false  then
+					fbtagsMatch = false
+					exit function
+				endif
+				if fbTagCountMatches (sA, &quot;&lt;tr&quot;, &quot;&lt;/tr&gt;&quot;) = false then
+					fbtagsMatch = false
+					exit function
+				endif
+				if fbTagCountMatches (sA, &quot;&lt;td&quot;, &quot;&lt;/td&gt;&quot;) = false then
+					fbtagsMatch = false
+					exit function
+				endif
+				if fbTagCountMatches (sA, &quot;&lt;a&gt;&quot;, &quot;&lt;/a&gt;&quot;) = false  and fbTagCountMatches (sA, &quot;&lt;a &quot;, &quot;&lt;/a&gt;&quot;) = false then
+					fbtagsMatch = false
+					exit function
+				endif
+			else &apos;something is wrong. 
+				fbtagsMatch = false
+			endif	
+		endif
+	endif
+end function
+
+function fbTagCountMatches (sA, sTag1,sTag2)
+	dim i, j, k, l, m as integer
+	j = len (sA)
+	k = 0
+	l = 0
+	m = 0
+	if j = 0 then 
+		&apos; no errors because length is zero
+		fbTagCountMatches = true
+	elseif len(sTag1) &lt;&gt; 0 and len(sTag2) &lt;&gt; 0 and instr(sA,sTag1) = 0 and instr(sA,sTag2) = 0 then
+		&apos; no errors because the tags were not found
+		fbTagCountMatches = true
+	else
+		&apos; We will find the difference between the tag1 and tag2 count. 
+		&apos; They should be equal.
+		k = len(sTag1)
+		for i = 1 to j
+			select case mid (sA, i, k)
+			case sTag1
+			l = l + 1
+			case else 
+			end select
+		next
+		k = len(sTag2)
+		for i = 1 to j
+			select case mid (sA, i, k)
+			case sTag2
+			m = m + 1
+			case else 
+			end select
+		next
+		if m = l then
+			fbTagCountMatches = true
+		else
+			fbTagCountMatches = false
+			&apos;msgBox sTag1
+		endif
+	endif
+end function
+
+sub simpleOSXSpeech( sA )
+	&apos;Short and sweet. No language selection.
+	dim  sArg , sB as string
+	dim bWait
+	dim errorCode
+	bWait = false
+	sA = fsReplaceText(sA,&quot;&apos;&quot;,&quot;’&quot;)
+	sA = fsReplaceText(sA,chr$(34),&quot;“&quot;)
+	sA = fsReplaceText(sA, chr$(13), &quot; &quot;)
+	sArg=chr$(34) &amp; sA &amp; chr$(34)
+	errorCode=Shell (&quot;say&quot;, 0, sArg, bWait)
+	exit sub
+	simpleOSXSpeechxError:
+	&apos;
+end sub
+
+sub synthesizeLinuxSpeech(sA, sLang) 
+	&apos;James Holgate wrote a way to call the python package
+	&apos;from Read Text Extension to read a text file.
+	on error goto synthesizeLinuxSpeechError
+	dim sQ as string
+	sQ = chr$(34) &apos;Double quote
+	if fileExists (fsTemporarySpeechTextURL) then
+		kill fsTemporarySpeechTextURL
+	endif
+	CreateFile(fsTemporarySpeechTextURL,sA,&quot;UTF-8&quot;)	
+	&apos; Read the temporary file with a python routine
+	if fileExists (&quot;/usr/bin/pico&quot;) and fbOKWithPico (sLang) then
+		&apos; This is the Linux speech engine I recommend for supported languages. 
+		if fileExists (&quot;/usr/bin/python3&quot;) then
+			shell (&quot;python3&quot;,0, sQ &amp; ConvertFromURL(fsMyURL &amp; &quot;/python3/pico_read_text_file.py&quot;) &amp; sQ &amp; &quot; --visible=false --language=&quot; &amp; sLang &amp; &quot; &quot; &amp; sQ &amp; ConvertFromURL(fsTemporarySpeechTextURL) &amp; sQ ,false)	
+		elseif fileExists (&quot;/usr/bin/python2&quot;) then
+			shell (&quot;python2&quot;,0, sQ &amp; ConvertFromURL(fsMyURL &amp; &quot;/python/pico_read_text_file.py&quot;) &amp; sQ &amp; &quot; --visible=false --language=&quot; &amp; sLang &amp; &quot; &quot; &amp; sQ &amp; ConvertFromURL(fsTemporarySpeechTextURL) &amp; sQ ,false)	
+		else
+			ShowDialog (fs_NO_ACTION  (fs_cL)) 
+		endif
+	elseif fileExists (Environ(&quot;HOME&quot;) &amp; &quot;/.speech-dispatcher/conf/speechd.conf&quot;) and fileExists (&quot;/usr/bin/spd-say&quot;) then
+		&apos; Note - we don&apos;t let you use speech dispatcher unless you have set it up locally.
+		&apos; 
+		&apos; for best results, set up the spd-say preferences using spd-conf
+		&apos; in terminal accepting defaults to make a local copy of the
+		&apos; configuration.You can set up spd-say to use different speech engines and voices. 
+		&apos; Open a terminal. Enter spd-conf. Accept all the defaults to set up localized 
+		&apos; settings in $HOME/.speech-dispatcher/ The directory is normally hidden in the 
+		&apos; Nautilus graphical file browser. In the terminal window, edit the main settings 
+		&apos; file with 
+
+		&apos; gedit $HOME/.speech-dispatcher/conf/speechd.conf 
+
+		&apos; # -----OUTPUT MODULES CONFIGURATION---- 
+		&apos; 
+		&apos; if you have installed an optional speech engine, then you can enable it in spd-say
+		&apos; by uncommenting it in the appropriate section. for example, to enable pico, change 
+		&apos; the line that says 
+		&apos; #AddModule &quot;pico-generic&quot; &quot;sd_generic&quot; &quot;pico-generic.conf&quot; 
+		&apos; to 
+		&apos; AddModule &quot;pico-generic&quot; &quot;sd_generic&quot; &quot;pico-generic.conf&quot;
+		&apos; 
+		&apos; The LanguageDefaultModule selects which output modules are preferred for specified 
+		&apos; languages.
+		&apos; Uncomment, edit or add languages you want to use with the optional engine you 
+		&apos; installed. for example, for pico, you would add the languages it supports:
+		&apos; 
+		&apos; LanguageDefaultModule &quot;en&quot; &quot;pico-generic&quot; 
+		&apos; LanguageDefaultModule &quot;fr&quot; &quot;pico-generic&quot; 
+		&apos; LanguageDefaultModule &quot;es&quot; &quot;pico-generic&quot; 
+		&apos; LanguageDefaultModule &quot;de&quot; &quot;pico-generic&quot; 
+		&apos; LanguageDefaultModule &quot;it&quot; &quot;pico-generic&quot; 
+		&apos; 
+		&apos; Restart the system. Test the speech in the terminal using the two letter 
+		&apos; language code (en). Codes in the form en-US are not accepted. See also:
+		&apos; man spd-say 
+		if fileExists (&quot;/usr/bin/python2&quot;) then
+			shell (&quot;python2&quot;,0, sQ &amp; ConvertFromURL(fsMyURL &amp; &quot;/python/spd_read_text_file.py&quot;) &amp; sQ &amp; &quot;--voice MALE2 --visible=false --language=&quot; &amp; left(sLang, 2) &amp; &quot; &quot; &amp; sQ &amp; ConvertFromURL(fsTemporarySpeechTextURL) &amp; sQ ,false)
+		else
+			ShowDialog (fs_NO_ACTION (fs_cL)) &apos; Python 3 doesn&apos;t work with speech-dispatcher.
+		endif
+	elseif fileExists (&quot;/usr/bin/espeak&quot;) and fbOKWithEspeak(sLang) then
+		&apos; The python script will use espeak with an mbrola voice if available.
+		&apos; Espeak is reliable and speaks with many languages. Some languages are 
+		&apos; hard to understand. Audition the voice in your language.
+		if fileExists (&quot;/usr/bin/python3&quot;) then
+			shell (&quot;python3&quot;,0, sQ &amp; ConvertFromURL(fsMyURL &amp; &quot;/python3/espeak_read_text_file.py&quot;) &amp; sQ &amp; &quot; --visible=false --language=&quot; &amp; sLang &amp; &quot; &quot; &amp; sQ &amp; ConvertFromURL(fsTemporarySpeechTextURL) &amp; sQ ,false)	
+		elseif fileExists (&quot;/usr/bin/python2&quot;) then
+			shell (&quot;python2&quot;,0, sQ &amp; ConvertFromURL(fsMyURL &amp; &quot;/python/espeak_read_text_file.py&quot;) &amp; sQ &amp; &quot; --visible=false --language=&quot; &amp; sLang &amp; &quot; &quot; &amp; sQ &amp; ConvertFromURL(fsTemporarySpeechTextURL) &amp; sQ ,false)
+		else
+			ShowDialog (fs_NO_ACTION  (fs_cL)) 
+		endif
+	endif
+	exit sub
+	synthesizeLinuxSpeechError:
+	synthesizeLinuxSpeechx(sA)
+end sub 
+
+function fbNoteLangIsOKWithPico
+	fbNoteLangIsOKWithPico= fbOKWithPico(fsLanguageOfNote1(fnCurrentCard))
+end function
+
+function fbOKWithPico (sA)
+	select case left(sA,2)
+	case &quot;en&quot;,&quot;fr&quot;,&quot;es&quot;,&quot;de&quot;,&quot;it&quot;
+		fBOKWithPico=true
+	case else 
+		fBOKWithPico=false
+	end select
+end function
+
+function fbNoteLangIsOKWithFestival
+	fbNoteLangIsOKWithFestival=fbOKWithFestival(fsLanguageOfNote1(fnCurrentCard))
+end function
+
+function fbOKWithFestival (sA)
+	&apos; English, Welsh, Spanish, Czech, Finnish, Hindi, Italian, Marathi, Polish, Russian, Telugu, Vietnamese
+	select case left(sA, 2)
+	case &quot;en&quot;,&quot;cy&quot;,&quot;es&quot;,&quot;cs&quot;,&quot;fi&quot;,&quot;hi&quot;,&quot;it&quot;,&quot;mr&quot;,&quot;pl&quot;,&quot;ru&quot;,&quot;te&quot;,&quot;vi&quot;
+		fbOKWithFestival=true
+	case else 
+		fbOKWithFestival=false
+	end select
+end function
+
+function fbNoteLangIsOKWithEspeak
+	fbNoteLangIsOKWithEspeak=fBOKWithEspeak(fsLanguageOfNote1(fnCurrentCard))
+end function
+
+function fbOKWithEspeak (sA)
+	select case left(sA, 2)
+	case &quot;af&quot;, &quot;bg&quot;, &quot;bs&quot;, &quot;ca&quot;, &quot;cs&quot;, &quot;cy&quot;, &quot;da&quot;, &quot;de&quot;, &quot;el&quot;, &quot;en&quot;, &quot;eo&quot;, &quot;es&quot;, &quot;et&quot;, &quot;fi&quot;, &quot;fr&quot;, &quot;hi&quot;, &quot;hr&quot;, &quot;hu&quot;, &quot;hy&quot;, &quot;id&quot;, &quot;is&quot;, &quot;it&quot;, &quot;ka&quot;, &quot;kn&quot;, &quot;ku&quot;, &quot;la&quot;, &quot;lv&quot;, &quot;mk&quot;, &quot;ml&quot;, &quot;nl&quot;, &quot;nb&quot;, &quot;pl&quot;, &quot;pt&quot;, &quot;ro&quot;, &quot;ru&quot;, &quot;sk&quot;, &quot;sq&quot;, &quot;sr&quot;, &quot;sv&quot;, &quot;sw&quot;, &quot;ta&quot;, &quot;tr&quot;, &quot;vi&quot;, &quot;zh&quot;
+		fbOKWithEspeak = true
+	case else 
+		fbOKWithEspeak = false
+	end select
+end function
+
+sub simpleLinuxSpeech(sA )
+	synthesizeLinuxSpeech (sA, fsGetSetting(&quot;language&quot;))
+end sub 
+
+function fsTemporaryOSXVoiceScript
+	dim sA as string
+	sA=createUnoService(&quot;com.sun.star.util.PathSettings&quot;).userConfig &amp;  &quot;/impresstools/temp.applescript&quot;
+	fsTemporaryOSXVoiceScript=ConvertFromURL(sA)
+end function
+
+function fsTemporaryVBSVoiceScript
+	dim sA as string
+	sA=createUnoService(&quot;com.sun.star.util.PathSettings&quot;).userConfig &amp;  &quot;/impresstools/temp.vbs&quot;
+	fsTemporaryVBSVoiceScript=ConvertFromURL(sA)
+end function
+
+
+
+function getTextFromFile(sFilePath, Optional sEncoding) as string
+	&apos;http://www.oooforum.org/forum/viewtopic.phtml?t=53813
+	&apos;Use simpleFileAccess instead of Basic file handling To translate encoded text
+	if ismissing(sEncoding) then 
+		select case fsGetOS()
+		case &quot;WINDOWS&quot;
+			sEncoding = &quot;iso-8859-15&quot; &apos;iso-8859-15 is Windows &quot;western&quot; encoding
+		case else 
+			sEncoding = &quot;utf-8&quot; &apos; Posix standard
+		end select
+	endif
+	dim myTextFile As object,sf As object,fileStream As object
+	dim aLineOfText as string,myFilePath as string
+	myFilePath=convertToURL(sFilePath)
+	sf=createUnoService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
+	On Error Goto fichierKO
+	fileStream=sf.openFileRead(myFilePath)
+	myTextFile=createUnoService(&quot;com.sun.star.io.TextInputStream&quot;)
+	myTextFile.InputStream=fileStream
+	myTextFile.Encoding=sEncoding
+	Do while not myTextFile.IsEOF
+		getTextFromFile=getTextFromFile &amp; myTextFile.readLine &amp; chr(13)
+	Loop 
+	fileStream.closeInput
+	myTextFile.closeInput
+	On Error Goto 0
+	exit function
+	FichierKO:
+		Resume FichierKO2
+	FichierKO2:
+	On Error Resume next
+	Msgbox(&quot;File read Error !&quot;,16)
+	fileStream.closeInput
+	myTextFile.closeInput
+	On Error Goto 0 
+end function
+
+function CreateFile(sFilePath, sWriteString, Optional sEncoding)
+	&apos; CreateFile (&quot;/tmp/sample.txt&quot;,&quot;Hello world&quot;,&quot;utf-8&quot;) &apos; Best practice
+	&apos; CreateFile (&quot;/tmp/sample.txt&quot;,&quot;Hello world&quot;) &apos; is allowed, but not best practice.
+	&apos; Windows can not write Asian languages correctly with &quot;iso-8859-15&quot;
+	&apos; Anything written for the extension&apos;s private use should be &quot;utf-8&quot;
+	&apos; This sub will create the file and all the nested directories
+	&apos; in the path in a single step.
+	if ismissing(sEncoding) then 
+		select case fsGetOS()
+		case &quot;WINDOWS&quot;
+			sEncoding = &quot;iso-8859-15&quot; &apos;iso-8859-15 is Windows &quot;western&quot; encoding
+		case else 
+			sEncoding = &quot;utf-8&quot; &apos; Posix standard
+		end select
+	endif
+	on Error goto CreateFileError
+ 	dim CR as string
+	CR = chr$(13)
+	dim oOutputAccess As object
+	dim oOutputStream As object
+	dim vOutputData, UDP, PV As Variant
+	if fileExists (sFilePath) then
+		kill sFilePath
+	endif
+	oOutputAccess = CreateUnoService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)
+	oOutputStream = CreateUnoService(&quot;com.sun.star.io.TextOutputStream&quot;)
+	vOutputData   = oOutputAccess.openFileWrite( sFilePath )
+	oOutputStream.setOutputStream(vOutputData)
+	oOutputStream.setEncoding(sEncoding)
+	oOutputStream.writeString( sWriteString )
+	oOutputStream.flush()
+	oOutputStream.closeOutput()
+	CreateFile = true
+	exit function
+	CreateFileError:
+	CreateFile = false
+end function
+
+function fsTemporarySpeechSoundURL
+	fsTemporarySpeechSoundURL=createUnoService(&quot;com.sun.star.util.PathSettings&quot;).userConfig &amp; &quot;/impresstools/said.mp3&quot;
+end function
+
+sub getOnlineSpeech (Optional byval cPhrase as string,Optional cLangLocale as string, Optional bVisible as boolean)
+	&apos; Shows a dialog and speaks using an on-line resource
+	dim bWait as boolean
+	dim iNO_SYSTEM_ERROR_MESSAGE, iIndex  as integer
+	dim errorCode
+	dim sFile,sB,sC,sQ,sD,cPhrase2, cPhrase3, CR as string
+	dim n as integer
+	dim bIsLong as boolean
+	sQ = chr$(34)
+	CR = chr$(10)
+	sFile=fsTemporarySoundURL
+		if ismissing(cPhrase) then 
+		cPhrase = Time &amp; &quot; ... &quot; &amp; getBranding(bI_SLOGAN )
+	endif
+	if ismissing(bVisible) then 
+		bVisible = false
+	endif
+	if ismissing(cLangLocale) then 
+		cLangLocale = &quot;en-US&quot;
+	endif
+	if len(cPhrase) &lt; 100 then
+		bIsLong = false
+	else
+		bIsLong = true
+	endif
+	iNO_SYSTEM_ERROR_MESSAGE=1
+	select case left(cLangLocale,2)
+	case &quot;en&quot;,&quot;fr&quot;,&quot;de&quot;,&quot;es&quot;,&quot;it&quot;,&quot;af&quot;,&quot;ar&quot;,&quot;sq&quot;,&quot;ca&quot;,&quot;zh&quot;,&quot;hr&quot;,&quot;cs&quot;,&quot;da&quot;,&quot;nl&quot;,&quot;eo&quot;,&quot;fi&quot;,&quot;el&quot;,&quot;ht&quot;,&quot;hi&quot;,&quot;hu&quot;,&quot;hy&quot;,&quot;is&quot;,&quot;id&quot;,&quot;ja&quot;,&quot;ko&quot;,&quot;la&quot;,&quot;lv&quot;,&quot;mk&quot;,&quot;no&quot;,&quot;nb&quot;,&quot;nn&quot;,&quot;pl&quot;,&quot;pt&quot;,&quot;ro&quot;,&quot;ru&quot;,&quot;sr&quot;,&quot;sk&quot;,&quot;sw&quot;,&quot;sv&quot;,&quot;ta&quot;,&quot;th&quot;,&quot;tr&quot;,&quot;cy&quot;
+		select case lcase(mid(cLangLocale,4))
+		case &quot;au&quot;
+			sC= &quot;com.au&quot;
+		case &quot;ca&quot;
+			sC= &quot;ca&quot;
+		case &quot;gb&quot;
+			sC= &quot;co.uk&quot;
+		case &quot;ie&quot;
+			sC= &quot;ie&quot;
+		case &quot;in&quot;
+			sC= &quot;co.in&quot;
+		case &quot;mx&quot;
+			sC= &quot;com.mx&quot;
+		case &quot;nz&quot;
+			sC= &quot;co.nz&quot;
+		case &quot;pk&quot;
+			sC= &quot;com.pk&quot;
+		case &quot;pt&quot;
+			sC= &quot;pt&quot;
+		case &quot;sg&quot;
+			sC= &quot;com.sg&quot;
+		case &quot;za&quot;
+			sC= &quot;co.za&quot;
+		case else
+			sC= &quot;com&quot;
+		end select
+		sC = &quot;http://translate.google.&quot; &amp; sC &amp; &quot;/translate_tts?tl=&quot;
+		if instr(sC,&quot;translate.google&quot;) &gt; 0 then 
+			&apos; &quot;Powered by Google™. Please read the terms and conditions for Google™ services in your country.&quot;
+			for n = 1 to 99 &apos; sanity check
+				iIndex = iGetBreakPoint ( cPhrase, 100 )
+				if iIndex = 0 then
+					exit for
+				endif
+				cPhrase2=left( cPhrase, iIndex )
+				sD = sC &amp; left(cLangLocale,2) &amp; &quot;&amp;q=&quot; &amp; fsEscapeStr(cPhrase2)
+				cPhrase = trim (mid (cPhrase, iIndex + 1))
+				playASoundFile(sD,bVisible)
+				if (ShowDialog ( cPhrase2 &amp; CR &amp; _
+					CR &amp; _
+					&quot;[Powered by Google™]&quot; &amp; _
+					CR &amp; CR &amp; _
+					&quot;[&quot; &amp; cLangLocale &amp; &quot;]&quot; &amp; CR &amp; CR &amp; _
+					fs_ONLINE_WARNING(fs_cL), bIsLong ) ) = false then
+						exit for
+				endif
+			next
+		endif
+	case else 
+		synthesizeSpeech fs_NO_ONLINE_LANGUAGE(fs_cL)
+		ShowDialog (cPhrase &amp; CR &amp; CR &amp; &quot;[&quot; &amp; cLangLocale &amp; &quot;]&quot;)
+	end select
+
+end sub
+
+function iGetBreakPoint ( byval cPhrase, Optional MaxLength)
+	&apos; This function returns the index of punctuation up to a maximum
+	&apos; of MaxLength. if there is no punctuation, the index is given as the
+	&apos; last non alphanumeric character in the string. This allows us
+	&apos; to parse long strings into manageable segments. 
+	&apos; Tweets have maximum  125 characters.
+	&apos; Some Google API services have a maximum of 100 characters.
+	&apos; SMS in standard text - 160 characters.
+	&apos; SMS in complex or Asian text - 70 characters.
+	dim iIndex, n as integer
+	cPhrase = trim (cPhrase)
+	for n= 1 to 5
+		if len(cPhrase) &lt;&gt; 0 and left(cPhrase,1) = &quot;.&quot; then
+			cPhrase = mid(cPhrase,2)
+		endif
+	next
+	if ismissing(MaxLength) then
+		MaxLength = 100
+	endif
+	iIndex = MaxLength
+	if len(cPhrase) &gt; maxLength then
+		if instr (cPhrase, &quot;.&quot;) &lt;&gt; 0 then
+			iIndex = instr (cPhrase, &quot;.&quot;)
+		elseif instr (cPhrase, &quot;!&quot;) &lt;&gt; 0 then
+			iIndex = instr (cPhrase, &quot;!&quot;) 
+		elseif instr (cPhrase, &quot;?&quot;) &lt;&gt; 0 then
+			iIndex =  instr (cPhrase, &quot;?&quot;) 
+		elseif instr (cPhrase, &quot;:&quot;) &lt;&gt; 0 then
+			iIndex =  instr (cPhrase, &quot;:&quot;) 
+		elseif instr (cPhrase, chr$(13) ) &lt;&gt; 0 then
+			iIndex =  instr (cPhrase, chr$(13) ) 
+		elseif instr (cPhrase, chr$(10) ) &lt;&gt; 0 then
+			iIndex =  instr (cPhrase, chr$(10) ) 
+		elseif instr (cPhrase, &quot;;&quot;) &lt;&gt; 0 then
+			iIndex =  instr (cPhrase, &quot;;&quot;) 
+		elseif instr (cPhrase, &quot;&quot;&quot;&quot;) &lt;&gt; 0 then
+			iIndex =  instr (cPhrase, &quot;&quot;&quot;&quot;) 
+		endif
+		if iIndex &gt; maxLength then
+			cPhrase = left (cPhrase, maxLength)
+			iIndex = len(cPhrase)
+			for n = 1 to maxLength
+				if rtrim(cPhrase) &lt;&gt; cPhrase then &apos;we found a space
+					iIndex = len(cPhrase) 
+					iGetBreakPoint = iIndex
+					exit for
+				else
+					cPhrase = left(cPhrase, len(cPhrase) - 1 ) &apos; Trim last word fragment	
+				endif
+			next
+		endif
+	else
+		iIndex = len(cPhrase)
+	endif
+	iGetBreakPoint = iIndex
+end function
+
+sub playASoundFile(cURL as string, Optional bVisible as boolean)
+	&apos; iOS and hidden mp3 play are enabled.
+	&apos; iOS can play sounds in the background, and can use the switch.
+	&apos; No installations are necessary.
+	&apos;
+	&apos; Enabling hidden mp3 play in Windows
+	&apos; By default, Windows will show a player, regardless of bVisible setting.
+	&apos; if this is not acceptable, download and install wget from sourceforge using the
+	&apos; file location defaults. Download and install Jim Lawless mp3 Player
+	&apos; from http://jimlawless.wordpress.com. The archive called
+	&apos; cmdmp3.zip has 25,143 bytes. Place the contents of the archive
+	&apos; in C:\opt\
+	&apos;
+	&apos; Enabling hidden mp3 play in Linux
+	&apos; Linux can only play mp3 sounds in the background and use the bVisible switch
+	&apos; if you install a background mp3 player like mpg123, mpg321 or sox using
+	&apos; a package manager like apt-get or synaptic. You may need to enable the 
+	&apos; non-free, universe, or multiverse repository to play mp3 sounds.
+	dim iNO_SYSTEM_ERROR_MESSAGE  as integer
+	dim sFile,sA,sB,sQ as string
+	dim oSvc, oSvc2 as object
+	dim bWait as boolean
+	dim errorCode
+	dim sUA as string
+	&apos; Sites may check the User Agent to determine what format to deliver content in.
+	&apos; We want to use the user agent of a popular and stable browser that can handle audio files.
+	&apos; sUA = &quot; --user-agent &quot;&quot;Mozilla/5.0 (Windows; U; Windows NT 6.1; rv:2.2) Gecko/20110201&quot;&quot; &quot;
+	sUA = &quot; --user-agent &quot;&quot;Mozilla/5.0 (compatible; MSIE 10.0; Windows NT 6.2; WOW64; Trident/6.0)&quot;&quot; &quot;
+	&apos;sUA = &quot; --user-agent &quot;&quot;Mozilla/5.0 (compatible; MSIE 9.0; Windows NT 6.1; WOW64; Trident/5.0)&quot;&quot; &quot;
+	iNO_SYSTEM_ERROR_MESSAGE = 1
+	sQ = chr$(34)
+	if ismissing(bVisible) then 
+		bVisible = true
+	endif
+	sFile=convertFromURL(fsTemporarySoundURL)
+	if fileExists (sFile) then
+		kill sFile 
+	endif
+	if bvisible then	
+		oSvc = createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
+		oSvc.execute(cURL,&quot;&quot;,iNO_SYSTEM_ERROR_MESSAGE)
+	else &apos; Sites may check the User Agent to determine what format to deliver content in.
+		if fileExists (&quot;/usr/bin/curl&quot;) then
+			sA=&quot;curl&quot;
+			sB=&quot;--output &quot; &amp; sQ &amp; sFile &amp; sQ &amp; _
+				sUA &amp; _
+				cURL
+		elseif fileExists (&quot;/usr/bin/wget&quot;) then
+			sA=&quot;wget&quot;
+			sB=&quot;-O &quot; &amp; sQ &amp; sFile &amp; sQ &amp; _
+				sUA &amp; _
+				cURL
+		elseif fileExists (fsProgramDirectoryx86 &amp; &quot;GnuWin32\bin\wget.exe&quot;) then
+			sA=fsProgramDirectoryx86 &amp; &quot;GnuWin32\bin\wget.exe&quot;
+			sB=&quot;-O &quot; &amp; sQ &amp; sFile &amp; sQ &amp; _
+				sUA &amp; _
+				cURL
+		elseif fileExists (fsProgramDirectory &amp; &quot;GnuWin32\bin\wget.exe&quot;) then
+			sA=fsProgramDirectory &amp; &quot;GnuWin32\bin\wget.exe&quot;
+			sB=&quot;-O &quot; &amp; sQ &amp; sFile &amp; sQ &amp; _
+				sUA &amp; _
+				cURL
+		elseif fileExists (fsProgramDirectory &amp; &quot;GnuWin\bin\wget.exe&quot;) then
+			sA=fsProgramDirectory &amp; &quot;GnuWin\bin\wget.exe&quot;
+			sB=&quot;-O &quot; &amp; sQ &amp; sFile &amp; sQ &amp; _
+				sUA &amp; _
+				cURL
+&apos;		elseif fsGetOS() = &quot;WINDOWS&quot; then
+&apos;			&apos; todo: replace shell to bitsadmin with basic or python code
+&apos;			bWinDownLoad (cURL, sFile)
+		else
+			&apos; We couldn&apos;t find a non-interactive browser, so we must use a visible browser.
+			oSvc = createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
+			oSvc.execute(cURL,&quot;&quot;,iNO_SYSTEM_ERROR_MESSAGE)
+			exit sub
+		endif
+		bWait=true
+		errorCode=Shell (sA, 0, sB , bWait)
+		if fileExists (sFile) then
+			wait 50
+		else
+			wait 1500
+			errorCode=Shell (sA, 0, sB , bWait)
+		endif
+		if fileExists (sFile) then
+			if fileExists (&quot;/usr/bin/afplay&quot;) then &apos;OSX Audio Player
+				sA=&quot;afplay&quot;
+			&apos;elseif fileExists (&quot;/usr/bin/play&quot;) then &apos; Sox Player
+			&apos; In Ubuntu, Sox no longer supports mp3  http://ubuntuforums.org/showthread.php?t=1668646
+			&apos;	sA=&quot;play&quot;
+			elseif fileExists (&quot;/usr/bin/mpg123&quot;) then &apos; Linux mp3 Player
+				sA=&quot;mpg123&quot;
+			elseif fileExists (&quot;/usr/bin/mpg321&quot;) then &apos; Libre Linux mp3 Player
+				sA=&quot;mpg321&quot;
+			elseif fileExists (&quot;/usr/bin/mp3-decoder&quot;) then &apos;Linux mp3 Player
+				sA=&quot;mp3-decoder&quot;
+			elseif fileExists (&quot;/usr/bin/totem&quot;) then &apos;Linux visual mp3 Player
+				sA=&quot;totem&quot;
+			elseif fileExists (&quot;/usr/bin/sensible-browser&quot;) then &apos;Points to web browser
+				sA=&quot;sensible-browser&quot;
+			elseif fileExists (&quot;C:\opt\cmdmp3.exe&quot;) then &apos; Jim Lawless mp3 Player
+				&apos; http://jimlawless.wordpress.com
+				&apos; cmdmp3.zip is 25,143 bytes. Place cmdmp3.exe in C:\opt
+				sA=&quot;C:\opt\cmdmp3.exe&quot;
+			else &apos; Use the system&apos;s default program to open file.
+				oSvc2 = createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
+				oSvc2.execute(sFile,&quot;&quot;,iNO_SYSTEM_ERROR_MESSAGE)
+				exit sub
+			endif
+			bWait=false
+			errorCode=Shell (sA, 0, sQ &amp; sFile &amp; sQ, bWait)
+		else
+			ShowDialog(fs_DOWNLOAD_FAILED(fs_cL)) 
+		endif
+	endif
+end sub
+
+function fsTemporarySoundURL
+	fsTemporarySoundURL=createUnoService(&quot;com.sun.star.util.PathSettings&quot;).userConfig &amp; &quot;/impresstools/said.mp3&quot;
+end function
+
+sub synthesizeOSXSpeech (sA, sLangLocale)
+	dim sQ as string
+	dim sLang as string
+	dim CR,sB,sFile,sEncoding as string
+	dim errorCode
+	dim bWait as boolean
+	sQ = chr$(34) &apos;Double quote
+	if fileExists (fsTemporarySpeechTextURL) then
+		kill fsTemporarySpeechTextURL
+	endif
+	if fileExists (fsTemporaryOSXVoiceScript) then
+		kill fsTemporaryOSXVoiceScript
+	endif
+	if sLangLocale = fsGetSetting(&quot;language&quot;) &amp; &quot;-&quot; &amp; fsGetSetting(&quot;country&quot;) then
+		&apos; if the selected language and locale is the same as the UI language 
+		&apos; and locale, then we don&apos;t specify the language. We assume that the 
+		&apos; default language is correct for language and locale. The extension respects 
+		&apos; your choice of voice except when using another language or locale.
+		&apos; By default, OSX may not include the languages you need. Audition and 
+		&apos; download additional voices using:
+		&apos; Apple - System Preferences - Speech - Text to Speech - System Voice - Customize 
+		CreateFile(fsTemporarySpeechTextURL,sA,&quot;UTF-8&quot;)	
+		errorCode = shell (&quot;say&quot;,0, &quot;-f &quot; &amp; sQ &amp; ConvertFromURL(fsTemporarySpeechTextURL) &amp; sQ,false)
+	else
+		sA = fsReplaceText(sA,&quot;&apos;&quot;,&quot;’&quot;)
+		sA = fsReplaceText(sA,chr$(34),&quot;’’&quot;)
+		sA = fsReplaceText(sA, chr$(13), &quot; &quot;)
+		bWait=false
+		sLangLocale=fsReplaceText(sLangLocale,&quot;-&quot;,&quot;_&quot;)
+		sLang=left(sLangLocale,instr(sLangLocale,&quot;_&quot;) )
+		CR = chr$(13)
+		sQ = chr$(34)
+		sB=&quot;#/usr/osascript&quot; &amp; CR
+		sB=sB &amp; &quot;-- &quot; &amp; getBranding(bI_SPOKEN_BRANDING) &amp; &quot; created this osascript&quot; &amp; CR
+		sB=sB &amp; &quot;-- using &quot; &amp; fsGetSetting(&quot;ooname&quot;)&amp; &quot; &quot; &amp; fsNow &amp; CR
+		sB=sB &amp; &quot;set myLang to &quot;&quot;&quot; &amp; sLangLocale &amp; sQ &amp; CR
+		sB=sB &amp; &quot;try&quot;  &amp; CR
+		sB=sB &amp; &quot;set str0 to (do shell script &quot;&quot;say --voice ? | grep &quot;&quot; &amp; myLang)&quot;  &amp; CR
+		sB=sB &amp; &quot;on error&quot;  &amp; CR
+		sB=sB &amp; &quot;set myLang to &quot;&quot;&quot; &amp; sLang &amp; &quot;&quot; &amp; sQ &amp; CR
+		sB=sB &amp; &quot;end try&quot;  &amp; CR
+		sB=sB &amp; &quot;try&quot;  &amp; CR
+		sB=sB &amp; &quot;set str0 to (do shell script &quot;&quot;say --voice ? | grep &quot;&quot; &amp; myLang)&quot;  &amp; CR
+		sB=sB &amp; &quot;on error&quot;  &amp; CR
+		sB=sB &amp; &quot;set myVoice to &quot;&quot;Alex&quot;&quot; -- en_US&quot;  &amp; CR
+		sB=sB &amp; &quot;end try&quot;  &amp; CR
+		sB=sB &amp; &quot;set iIndex to offset of &quot;&quot;  &quot;&quot; in str0&quot;  &amp; CR
+		sB=sB &amp; &quot;set myVoice to characters 1 thru (iIndex - 1) of str0 as text&quot;  &amp; CR
+		sB=sB &amp; &quot;if myVoice is &quot;&quot;Agnes&quot;&quot; or myVoice is &quot;&quot;Albert&quot;&quot; or myVoice is &quot;&quot;&quot;&quot; then&quot;  &amp; CR
+		sB=sB &amp; &quot;set myVoice to &quot;&quot;Alex&quot; &amp; sQ &amp; CR
+		sB=sB &amp; &quot;end if&quot;  &amp; CR
+		sB=sB &amp; &quot;say &quot; &amp; sQ &amp; sA &amp; sQ &amp; &quot; using myVoice&quot; &amp; CR
+		sFile=fsTemporaryOSXVoiceScript
+		CreateFile(sFile,sB,&quot;utf-8&quot;)
+		errorCode=Shell (&quot;osascript&quot;, 0, sQ &amp; sFile &amp; sQ, bWait)
+	endif
+end sub
+
+function synthesizeWindowsSpeech(sB, Optional sLang )
+	&apos; This function can queue the voice commands if the language can
+	&apos; be encoded with native Windows encoding - &quot;iso-8859-15&quot;
+	&apos; otherwise, we call SAPI directly within starbasic so that
+	&apos; we can use UTF-8 compatible languages like Chinese Mandarin.
+	&apos; if you are using a language that is not compatible with iso-8859-15
+	&apos; be sure to wait until speech is finished completely before initiating
+	&apos; the next speech command, or else  the extension will skip some speech.
+	select case left(sLang, 2)
+	case &quot;en&quot;,&quot;af&quot;,&quot;sq&quot;,&quot;br&quot;,&quot;ca&quot;,&quot;da&quot;,&quot;et&quot;,&quot;fo&quot;,&quot;fi&quot;,&quot;fr&quot;,&quot;gl&quot;,&quot;de&quot;,&quot;is&quot;,&quot;ga&quot;,&quot;it&quot;,&quot;ku&quot;,&quot;la&quot;,&quot;lb&quot;,&quot;ms&quot;,&quot;nb&quot;,&quot;nl&quot;,&quot;no&quot;,&quot;nn&quot;,&quot;oc&quot;,&quot;pt&quot;,&quot;gd&quot;,&quot;es&quot;,&quot;sw&quot;,&quot;sv&quot;,&quot;tl&quot;,&quot;wa&quot;
+		dim CR, sA , sQ, LF, WF as string
+		dim bWait as boolean
+		bWait=false
+		dim errorCode
+		CR = chr$(13)
+		sQ = chr$(34) &apos;Double Quote
+		LF = chr$(10) &apos;Line Feed
+		WF= CR &amp; LF
+		dim lStartTime as Long
+		lStartTime = Timer
+		dim lEndTime as Long
+		lEndTime = 0
+		dim ElapsedTime as Long
+		ElapsedTime = 0
+		if ismissing(sLang) then 
+			sLang=fsGetSetting(&quot;language&quot;)
+		endif
+		if fileExists (fsTemporarySpeechTextURL) then
+			kill fsTemporarySpeechTextURL
+		endif
+		if fileExists (fsTemporaryVBSVoiceScript) then
+			kill fsTemporaryVBSVoiceScript
+		endif
+		sB = AddLanguageCodes(sB, sLang)
+		&apos; We can&apos;t escape the text because LibreOffice escapes to UTF-8
+		&apos; and Windows wScript unescapes from iso-8859-15. 
+        sB = fsReplaceText(sB, sQ, sQ &amp; &quot; &amp; chr(34) &amp; &quot; &amp; sQ )
+        sB = fsReplaceText(sB, CR, sQ &amp; &quot; &amp; chr(13) &amp; &quot; &amp; sQ )
+        sB = fsReplaceText(sB, LF, sQ &amp; &quot; &amp; chr(10) &amp; &quot; &amp; sQ )
+		sA = &quot;&apos; &quot; &amp; getBranding(bI_SPOKEN_BRANDING) &amp; &quot; created this script&quot; &amp; WF
+		sA = sA &amp; &quot;&apos; using &quot; &amp; fsGetSetting(&quot;ooname&quot;)&amp; &quot; on &quot; &amp; fsNow &amp; WF
+		sA = sA &amp; &quot;sub SayIt(s1)&quot;&amp; WF 
+		sA = sA &amp; &quot;  On Error Resume next&quot;&amp; WF
+		sA = sA &amp; &quot;  Set Sapi=Wscript.Createobject(&quot;&quot;SAPI.SpVoice&quot;&quot;)&quot;&amp; WF
+		sA = sA &amp; &quot;  if Sapi Is Nothing then&quot;&amp; WF 
+		sA = sA &amp; &quot;    &apos;&quot;&amp; WF
+		sA = sA &amp; &quot;  else &quot;&amp; WF
+		sA = sA &amp; &quot;    Sapi.Speak &quot;&quot;&quot;&quot;,1&quot;&amp; WF 
+		sA = sA &amp; &quot;    Sapi.Speak s1,3&quot;&amp; WF 
+		sA = sA &amp; &quot;    Do&quot;&amp; WF
+		sA = sA &amp; &quot;    Loop Until Sapi.WaitUntilDone(1)&quot;&amp; WF
+		sA = sA &amp; &quot;    Set Sapi=Nothing&quot;&amp; WF
+		sA = sA &amp; &quot;  end if&quot;&amp; WF
+		sA = sA &amp; &quot;end sub &quot;&amp; WF 
+		sA = sA &amp; &quot;&apos;&quot;&amp; WF
+		sA = sA &amp; &quot;sub main()&quot;&amp; WF
+		sA = sA &amp; &quot;  s1 = &quot;&quot;&quot; &amp; sB &amp; &quot;&quot;&quot; &quot;&amp; WF
+		sA = sA &amp; &quot;  sayIt(s1)&quot;&amp; WF
+		sA = sA &amp; &quot;end sub &quot;&amp; WF
+		sA = sA &amp; &quot;main&quot; &amp; WF
+		CreateFile(fsTemporaryVBSVoiceScript,sA,&quot;iso-8859-15&quot;)
+		errorCode=Shell (&quot;wscript&quot;, 0, sQ &amp; fsTemporaryVBSVoiceScript &amp; sQ, bWait)
+		synthesizeWindowsSpeech = sA
+	case else  
+		synthesizeWindowsSpeech = asianComplexWindowsSpeech(sB, sLang)
+	end select
+end function
+
+function isoToEnglish (s1)
+	&apos; Returns name of language, if known			
+	dim S2 as string
+	select case lcase (S1)
+	case &quot;en-us&quot;
+		S2=&quot;English (United States)&quot;
+	case &quot;en-gb&quot;
+		S2= &quot;English (Great Britain)&quot;
+	case &quot;en-vg&quot;
+		S2= &quot;English (British Virgin Islands)&quot;
+	case &quot;en-io&quot;
+		S2= &quot;English (Great Britain)&quot;
+	case &quot;en-gg&quot;
+		S2=&quot;English (Guernsey)&quot;
+	case &quot;en-au&quot;
+		S2=&quot;English (Australia)&quot;
+	case &quot;en-bz&quot;
+		S2=&quot;English (Belize)&quot;
+	case &quot;en-ca&quot;
+		S2=&quot;English (Canada)&quot;
+	case &quot;en-bs&quot;
+		S2=&quot;English (Bahamas)&quot;
+	case &quot;en-hk&quot;
+		S2=&quot;English (Hong Kong)&quot;
+	case &quot;en-in&quot;
+		S2=&quot;English (India)&quot;
+	case &quot;en-id&quot;
+		S2=&quot;English (Indonesia)&quot;
+	case &quot;en-ie&quot;
+		S2=&quot;English (Ireland)&quot;
+	case &quot;en-jm&quot;
+		S2=&quot;English (Jamaica)&quot;
+	case &quot;en-my&quot;
+		S2=&quot;English (Malaysia)&quot;
+	case &quot;en-nz&quot;
+		S2=&quot;English (New Zealand)&quot;
+	case &quot;en-ph&quot;
+		S2=&quot;English (Philippines)&quot;
+	case &quot;en-sg&quot;
+		S2=&quot;English (Singapore)&quot;
+	case &quot;en-za&quot;
+		S2=&quot;English (South Africa)&quot;
+	case &quot;en-tt&quot;
+		S2=&quot;English (Trinidad &quot; &apos;sic
+	case &quot;en-zw&quot;
+		S2=&quot;English (Zimbabwe)&quot;
+	case &quot;en&quot;
+		S2=&quot;English&quot;
+	case &quot;fr-be&quot;
+		S2=&quot;French (Belgium)&quot;
+	case &quot;fr-ca&quot;
+		S2=&quot;French (Canada)&quot;
+	case &quot;fr-cg&quot;
+		S2=&quot;French (Congo)&quot;
+	case &quot;fr-ch&quot;
+		S2=&quot;French (Switzerland)&quot;
+	case &quot;fr-ci&quot;
+		S2=&quot;French (Ivory Coast)&quot;
+	case &quot;fr-cm&quot;
+		S2=&quot;French (Cameroon)&quot; 
+	case &quot;fr-fr&quot;
+		S2=&quot;French (France)&quot;
+	case &quot;fr-ht&quot;
+		S2=&quot;French (Haiti)&quot;
+	case &quot;fr-lu&quot;
+		S2=&quot;French (Luxembourg)&quot;
+	case &quot;fr-ma&quot;
+		S2=&quot;French (Morocco)&quot;
+	case &quot;fr-mc&quot;
+		S2=&quot;French (Monaco)&quot;
+	case &quot;fr-ml&quot;
+		S2=&quot;French (Mali)&quot;
+	case &quot;fr-re&quot;
+		S2=&quot;French (Reunion)&quot;
+	case &quot;fr-sn&quot;
+		S2=&quot;French (Senegal)&quot;
+	case &quot;fr&quot;
+		S2=&quot;French&quot;
+	case &quot;it&quot;,&quot;it-it&quot;
+		S2=&quot;Italian&quot;
+	case &quot;de-at&quot;
+		S2=&quot;German (Austria)&quot;
+	case &quot;de-ch&quot;
+		S2=&quot;German (Switzerland)&quot;
+	case &quot;de-de&quot;
+		S2=&quot;German (Germany)&quot;
+	case &quot;de-li&quot;
+		S2=&quot;German (Lithuania)&quot;
+	case &quot;de-lu&quot;
+		S2=&quot;German (Luxembourg)&quot;
+	case &quot;de&quot;
+		S2=&quot;German&quot;
+	case &quot;es-es&quot;
+		S2=&quot;Spanish (Spain)&quot;
+	case &quot;es-ar&quot;
+		S2=&quot;Spanish (Argentina)&quot;
+	case &quot;es-bo&quot;
+		S2=&quot;Spanish (Bolivia)&quot;
+	case &quot;es-cl&quot;
+		S2=&quot;Spanish (Chile)&quot;
+	case &quot;es-co&quot;
+		S2=&quot;Spanish (Colombia)&quot;
+	case &quot;es-cr&quot;
+		S2=&quot;Spanish (Costa Rica)&quot;
+	case &quot;es-do&quot;
+		S2=&quot;Spanish (Dominican Republic)&quot;
+	case &quot;es-ec&quot;
+		S2=&quot;Spanish (Ecuador)&quot;
+	case &quot;es-sv&quot;
+		S2=&quot;Spanish (Svalbard) &quot;
+	case &quot;es-gt&quot;
+		S2=&quot;Spanish (Guatemala)&quot;
+	case &quot;es-hn&quot;
+		S2=&quot;Spanish (Honduras)&quot;
+	case &quot;es-mx&quot;
+		S2=&quot;Spanish (Mexico)&quot;
+	case &quot;es-ni&quot;
+		S2=&quot;Spanish (Nicaragua)&quot;
+	case &quot;es-pa&quot;
+		S2=&quot;Spanish (Panama)&quot;
+	case &quot;es-py&quot;
+		S2=&quot;Spanish (Paraguay)&quot;
+	case &quot;es-pe&quot;
+		S2=&quot;Spanish (Peru)&quot;
+	case &quot;es-pr&quot;
+		S2=&quot;Spanish (Puerto Rico)&quot;
+	case &quot;es-us&quot;
+		S2=&quot;Spanish (United States)&quot;
+	case &quot;es-uy&quot;
+		S2=&quot;Spanish (Uraguay)&quot;
+	case &quot;es-ve&quot;
+		S2=&quot;Spanish (Venezuela)&quot;
+	case &quot;es&quot;
+		S2=&quot;Spanish&quot;
+	case &quot;ru&quot;,&quot;ru-ru&quot;
+		S2=&quot;Russian&quot;
+	case &quot;hi&quot;,&quot;hi-in&quot;
+		S2=&quot;Hindi&quot;
+	case &quot;af&quot;,&quot;af-za&quot;
+		S2=&quot;Afrikaans&quot;
+	case &quot;ar-sa&quot;
+		S2=&quot;Arabic (Saudi Arabia)&quot;
+	case &quot;ar-dz&quot;
+		S2=&quot;Arabic (Algeria)&quot;
+	case &quot;ar-bh&quot;
+		S2=&quot;Arabic (Bhutan)&quot;
+	case &quot;ar-eg&quot;
+		S2=&quot;Arabic (Egypt)&quot;
+	case &quot;ar-iq&quot;
+		S2=&quot;Arabic (Iraq)&quot;
+	case &quot;ar-jo&quot;
+		S2=&quot;Arabic (Jordan)&quot;
+	case &quot;ar-kw&quot;
+		S2=&quot;Arabic (Kuwait)&quot;
+	case &quot;ar-lb&quot;
+		S2=&quot;Arabic (Lebanon)&quot;
+	case &quot;ar-ly&quot;
+		S2=&quot;Arabic (Libya)&quot;
+	case &quot;ar-om&quot;
+		S2=&quot;Arabic (Oman)&quot;
+	case &quot;ar-qa&quot;
+		S2=&quot;Arabic (Qatar)&quot;
+	case &quot;ar-sy&quot;
+		S2=&quot;Arabic (Syria)&quot;
+	case &quot;ar-tn&quot;
+		S2=&quot;Arabic (Tunisia)&quot;
+	case &quot;ar-ae&quot;
+		S2=&quot;Arabic (United Arab Emirates)&quot;
+	case &quot;ar-ye&quot;
+		S2=&quot;Arabic (Yemen)&quot;
+	case &quot;ar&quot;
+		S2=&quot;Arabic&quot;
+	case &quot;eu&quot;,&quot;eu-fr&quot;,&quot;eu-es&quot;
+		S2=&quot;Basque&quot;
+	case &quot;bg&quot;,&quot;bg-bg&quot;
+		S2=&quot;Bulgarian&quot;
+	case &quot;ca&quot;,&quot;ca-es&quot;
+		S2=&quot;Catalan&quot;
+	case &quot;cs&quot;,&quot;cs-cz&quot;
+		S2=&quot;Czech&quot;
+	case &quot;cy&quot;,&quot;cy-gb&quot;
+		S2=&quot;Welsh&quot;
+	case &quot;da&quot;,&quot;da-dk&quot;
+		S2=&quot;Danish&quot;
+	case &quot;et&quot;,&quot;et-ee&quot;
+		S2=&quot;Estonian&quot;
+	case &quot;fi&quot;,&quot;fi-fi&quot;
+		S2=&quot;Finnish&quot;
+	case &quot;ka&quot;,&quot;ka-ge&quot;
+		S2=&quot;Georgian&quot;
+	case &quot;hl&quot;,&quot;hl-gr&quot;
+		S2=&quot;Greek&quot;
+	case &quot;he&quot;,&quot;he-il&quot;
+		S2=&quot;Hebrew&quot;
+	case &quot;hr&quot;,&quot;hr-hr&quot;
+		S2=&quot;Croatian&quot; 
+	case &quot;hu&quot;,&quot;hu-hu&quot;
+		S2=&quot;Hungarian&quot;
+	case &quot;is&quot;,&quot;is-is&quot;
+		S2=&quot;Icelandic&quot;
+	case &quot;ga&quot;,&quot;ga-ie&quot;
+		S2=&quot;Irish&quot; 
+	case &quot;gd&quot;,&quot;gd-gb&quot;
+		S2=&quot;Gaelic&quot;
+	case &quot;id&quot;,&quot;id-id&quot;
+		S2=&quot;Indonesian&quot;
+	case &quot;jp&quot;,&quot;jp-jp&quot; , &quot;ja&quot;, &quot;ja-jp&quot;
+		S2=&quot;Japanese&quot;
+	case &quot;ko&quot;,&quot;ko-kp&quot;,&quot;ko-kr&quot;
+		S2=&quot;Korean&quot;
+	case &quot;la&quot;,&quot;la-va&quot;
+		S2=&quot;Latin&quot;
+	case &quot;ms&quot;,&quot;ms-sg&quot;,&quot;ms-my&quot;,&quot;ms-id&quot;,&quot;ms-bn&quot;
+		S2=&quot;Malay&quot;
+	case &quot;mo-mn&quot;,&quot;mo&quot;
+		S2=&quot;Moldavian&quot;
+	case &quot;nl&quot;,&quot;nl-nl&quot;,&quot;nl-be&quot;
+		S2=&quot;Dutch&quot;
+	case &quot;nn&quot;,&quot;nn-no&quot;
+		S2=&quot;Norwegian Norsk&quot; 
+	case &quot;nb&quot;,&quot;nb-no&quot;
+		S2=&quot;Norwegian Bokmal&quot;
+	case &quot;no&quot;,&quot;no-no&quot;
+		S2=&quot;Norwegian&quot;
+	case &quot;pl&quot;,&quot;pl-pl&quot;
+		S2=&quot;Polish&quot;
+	case &quot;pt-br&quot;
+		S2=&quot;Portuguese (Brazil)&quot;
+	case &quot;pt-pt&quot;
+		S2=&quot;Portuguese (Portugal)&quot;
+	case &quot;pt&quot;
+		S2=&quot;Portuguese&quot;
+	case &quot;ro&quot;,&quot;ro-ro&quot;
+		S2=&quot;Romanian&quot; 
+	case &quot;sk&quot;,&quot;sk-sk&quot;
+		S2=&quot;Slovak&quot;
+	case &quot;sl&quot;,&quot;sl-si&quot;
+		S2=&quot;Slovene&quot;
+	case &quot;sv&quot;,&quot;sv-se&quot;
+		S2=&quot;Swedish&quot;
+	case &quot;th&quot;,&quot;th-th&quot;
+		S2=&quot;Thai&quot;
+	case &quot;tl&quot;,&quot;tl-ph&quot;
+		S2=&quot;Tagalog&quot;
+	case &quot;tr&quot;,&quot;tr-tr&quot;
+		S2=&quot;Turkish&quot;
+	case &quot;uk&quot;,&quot;uk-ua&quot;
+		S2=&quot;Ukranian&quot;
+	case &quot;vi&quot;,&quot;vi-vn&quot;
+		S2=&quot;Vietnamese&quot;
+	case &quot;zh-cn&quot;
+		S2=&quot;Chinese (Simplified)&quot;
+	case &quot;zh-tw&quot;
+		S2=&quot;Chinese (Traditional)&quot;
+	case &quot;zh-hk&quot;
+		S2=&quot;Chinese (Hong Kong)&quot;
+	case &quot;zh-sg&quot;
+		S2=&quot;Chinese (Singapore)&quot;
+	case &quot;zh-mo&quot;
+		S2=&quot;Chinese (Macau)&quot;
+	case &quot;zh-yue&quot;,&quot;zh-yu&quot;
+		S2=&quot;Chinese (Yue)&quot;
+	case &quot;zh&quot;
+		S2 = &quot;Chinese&quot;
+	case &quot;zxx&quot;
+		S2 = &quot;Ambiguous Or Missing Language&quot;
+	case else  
+		S2=S1 &apos; Not Found, So We Return Iso Language Code.
+	end select
+	Isotoenglish = S2	
+end function
+
+function XPandThirdParty (s1)
+	&apos; Returns search term for a voice when the voice descriptions omit the language or language code
+	&apos; in iso format (en-GB, fr-BE etc.) This list is not complete, nor are any voices listed here
+	&apos; recommended over competitor&apos;s products. The languages are listed purely as a convenience.	
+	&apos; AS-IS. No warranty...		
+	dim s2 as string
+	select case lcase(s1)
+			case &quot;en-gb&quot;
+				s2=&quot;Emily&quot;
+			case &quot;en-us&quot;, &quot;en&quot;
+				s2=&quot;Microsoft Sam&quot;
+			&apos;case &quot;fr-ca&quot;
+			&apos;	s2=&quot;julie&quot;
+			case &quot;fr-fr&quot;, &quot;fr&quot;
+				s2=&quot;Virginie&quot;
+			case &quot;de-de&quot;, &quot;de&quot;
+				s2=&quot;Steffi&quot;
+			case &quot;es-es&quot;, &quot;es&quot;
+				s2=&quot;Isabel&quot;
+			case &quot;it-it&quot;, &quot;it&quot;
+				s2=&quot;Paolo&quot;
+			case &quot;hi-in&quot;, &quot;hi&quot;
+				s2=&quot;Lehka&quot;
+			case &quot;zh-cn&quot;, &quot;zh-tw&quot;, &quot;zh&quot;
+				s2=&quot;Li-Li&quot;
+			case &quot;zh-hk&quot;, &quot;zh-mo&quot;, &quot;zh-yu&quot;,&quot;zh-yue&quot;
+				s2=&quot;Sin-Ji&quot;
+			&apos; Add your own ...
+			&apos;case &quot;xx-xx&quot;, &quot;xx&quot;
+				&apos;s2=&quot;voice&quot;
+			case else  
+				s2=s1 &apos; not found, so we return iso language code.
+			end select
+	XPandThirdParty = s2	
+end function
+
+function fsDocLanguage
+	on error goto fsDocLanguageErr
+	fsDocLanguage = ThisComponent.CharLocale.Language
+	exit function
+	fsDocLanguageErr: &apos; No document open! Use interface language.
+	fsDocLanguage = fsGetSetting(&quot;language&quot;)
+end function
+
+function fsDocCountry
+	on error goto fsDocCountryErr
+	fsDocCountry = ThisComponent.CharLocale.Country
+	exit function
+	fsDocCountryErr: &apos; No document open! Use interface country.
+	fsDocCountry = fsGetSetting(&quot;country&quot;)
+end function
+
+function fbHasGLicense (Optional b1) as boolean
+	dim sA as string
+	sA = CreateUnoService(&quot;com.sun.star.util.PathSettings&quot;).Work &amp; &quot;/Policies%20&amp;%20Principles%20%E2%80%93%20Google.html&quot;
+	if ismissing (b1) then
+		fbHasGLicense = fileExists (sA) 
+	else 
+		fbHasGLicense = b1
+	endif
+end function
+
+function fbHasATicense (Optional b1) as boolean
+	dim sA as string
+	sA = CreateUnoService(&quot;com.sun.star.util.PathSettings&quot;).Work &amp; &quot;/&quot; &amp; getBranding(bI_BRANDING) &amp;&quot;.html&quot;
+	if ismissing (b1) then
+		fbHasATicense = fileExists (sA) 
+	else 
+		fbHasATicense = b1
+	endif
+end function
+</script:module>

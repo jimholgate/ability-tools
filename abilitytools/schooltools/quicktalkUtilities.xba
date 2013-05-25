@@ -1,0 +1,214 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="quicktalkUtilities" script:language="StarBasic">REM  *****  BASIC  *****
+sub textMagnifierButton
+	dim sA, sB as string
+	dim oAlbum
+	sB = fsMyURL &amp; &quot;/templates/narrow.otp&quot;
+	sA = fsGetTextSelection()
+	sA = fsSchoolToolsInputBox(fs_EXPORT_SELECTION (fs_cL), getBranding (bI_SPOKEN_BRANDING), sA)
+	if len (sA) &lt;&gt; 0 then
+		oAlbum = StarDesktop.loadComponentFromUrl (sB,&quot;_blank&quot;,0,dimarray())
+		UpdateSlideNote (sA)
+		if f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Enabled then
+			setNoteLanguage (f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Text)
+		endif
+		sB = fsSaveSchoolToolFile(getBranding( bI_SPOKEN_BRANDING ), &quot;ODF Presentation (.odp)&quot;,&quot;*.odp&quot;)
+		if len (sB) &lt;&gt; 0 then
+			fsSaveAsPresentation(sB)
+		endif
+	endif
+end sub
+
+
+Function fsGetTextSelection() As String
+	Dim oDoc   As Object
+	Dim oSelection As Object
+	Dim sSelectedText As String
+	Dim n As Integer
+	On Error Goto TEXTSELECTERROR
+	oDoc=thisComponent
+	If oDoc.SupportsService(&quot;com.sun.star.sheet.SpreadsheetDocument&quot;) Then	
+		fsGetSelectionAndCopy()
+		sSelectedText=fsRetrieveCalcActiveCellProperty(&quot;text&quot;)
+	Elseif oDoc.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) or oDoc.supportsService(&quot;com.sun.star.drawing.DrawingDocument&quot;) Then
+		fsGetSelectionAndCopy()
+		sSelectedText=fsDrawProperty(&quot;text&quot;)
+	Elseif oDoc.supportsService(&quot;com.sun.star.text.TextDocument&quot;) or oDoc.supportsService(&quot;com.sun.star.text.WebDocument&quot;) or oDoc.supportsService(&quot;com.sun.star.text.GlobalDocument&quot;) Then
+		oSelection=oDoc.getCurrentSelection()
+		sSelectedText=&quot;&quot; 	 
+		If oSelection.supportsService(&quot;com.sun.star.text.TextRanges&quot;) Then
+			fsGetSelectionAndCopy()
+			For n=0 To(oSelection.getCount() - 1)
+				sSelectedText=sSelectedText &amp; &quot; &quot; &amp; oSelection.getByIndex(n).getString()
+			Next
+		Else 
+			&apos;sSelectedText=oSelection.getByIndex(0).getString(
+			sSelectedText=fsGetSelectionAndCopy()
+		End If
+		If sSelectedText=&quot; &quot; Then 
+			sSelectedText=fsgetCursortoEnd()
+		End If
+	Else &apos;unsupported document format
+		sSelectedText=&quot;&quot;
+	End If
+	fsGetTextSelection=Trim(sSelectedText)
+	Exit Function
+	TEXTSELECTERROR:
+	fsGetTextSelection=&quot;&quot;
+End Function
+
+Function fsRetrieveCalcActiveCellProperty(strA) As String
+	&apos; Modified from Sub from: Paolo Mantovani 
+	&apos; email: mantovani.paolo@tin.it 
+	&apos; published at http://sourceforge.net/projects/ooomacros/files/Andrew%20Pitonyak_s%20Macro%20Doc/2006-01-25/AndrewMacro_2006-01-25.zip/download
+	&apos; Gets property of the active cell.
+	Dim oOldSelection &apos;The original selection of cell ranges
+	Dim oRanges       &apos;A blank range created by the document
+	Dim oActiveCell   &apos;The current active cell
+	Dim sCellContent As String
+	
+	REM store the current selection
+	oOldSelection=ThisComponent.CurrentSelection
+	oRanges=ThisComponent.createInstance(&quot;com.sun.star.sheet.SheetCellRanges&quot;)
+	ThisComponent.CurrentController.Select(oRanges)
+	&apos;get the active cell!
+	oActiveCell=ThisComponent.CurrentSelection
+	Select Case strA
+	Case &quot;country&quot;
+		sCellContent=oActiveCell.CharLocale.Country  
+	Case &quot;language&quot;
+		sCellContent=oActiveCell.CharLocale.Language
+	Case &quot;asian-language&quot;
+		sCellContent=oActiveCell.CharLocaleAsian.Language
+	Case &quot;complex-language&quot;
+		sCellContent=oActiveCell.CharLocaleComplex.Language
+	Case Else
+		 sCellContent=oActiveCell.getString()
+	End Select
+	&apos;restore the old selection (but loosing the previous active cell)
+	ThisComponent.CurrentController.Select(oOldSelection)
+		fsRetrieveCalcActiveCellProperty=sCellContent
+End Function 
+
+Function fsGetClipBoard as String
+	&apos;Based On listing Listing 5.64: View the clipboard As text.
+	&apos;by Andrew Pitonyak at http://www.pitonyak.org/AndrewMacro.odt 
+	&apos;October 28,2010
+	Dim oClip,oClipContents,oTypes
+	Dim oConverter,convertedString$
+	Dim i%,iPlainLoc%
+	iPlainLoc=-1
+	Dim s$ : s$=&quot;com.sun.star.datatransfer.clipboard.SystemClipboard&quot;
+	oClip=createUnoService(s$)
+	oConverter=createUnoService(&quot;com.sun.star.script.Converter&quot;) 
+	&apos;Print &quot;Clipboard name=&quot; &amp; oClip.getName()fsGetClipBoard
+	&apos;Print &quot;Implemantation name=&quot; &amp; oClip.getImplementationName()
+	oClipContents=oClip.getContents()
+	oTypes=oClipContents.getTransferDataFlavors()
+	Dim msg$,iLoc%,outS
+	msg=&quot;&quot;
+	iLoc=-1
+	For i=LBound(oTypes) To UBound(oTypes)
+		 If oTypes(i).MimeType=&quot;text/plain;charset=utf-16&quot; Then 
+			iPlainLoc=i
+			Exit For
+		 End If
+		 &apos;msg=msg &amp; &quot;Mime type=&quot; &amp; x(ii).MimeType &amp; &quot; normal=&quot; &amp; _
+		 &apos;      x(ii).HumanPresentableName &amp; Chr$(10)
+	Next
+	If (iPlainLoc &gt;=0) Then
+		 convertedString=oConverter.convertToSimpleType( _
+			   oClipContents.getTransferData(oTypes(iPlainLoc)),_
+			   com.sun.star.uno.TypeClass.STRING)
+		 fsGetClipBoard=convertedString
+	Else
+		 fsGetClipBoard=&quot;&quot;
+	End If
+End Function
+
+Function fsDrawProperty(strA) As String
+	Dim oDoc As Object
+	Dim oController As Object
+	Dim oSelection As Object
+	Dim s1r As String
+	s1r=&quot;&quot;
+	oDoc=ThisComponent
+	oController=oDoc.getCurrentController()
+	oSelection=oController.getSelection() 
+	If oSelection.supportsService(&quot;com.sun.star.text.TextCursor&quot;) Then
+	Select Case strA
+	Case &quot;country&quot;
+		s1r=oSelection.CharLocale.Country  
+	Case &quot;language&quot;
+		s1r=oSelection.CharLocale.Language
+	Case &quot;asian-language&quot;
+		s1r=oSelection.CharLocaleAsian.Language
+	Case &quot;complex-language&quot;
+		s1r=oSelection.CharLocaleComplex.Language
+	Case Else
+	s1r=oSelection.getString()
+		End Select
+	End If
+	fsDrawProperty=s1r
+End Function
+
+Function fsgetCursortoEnd As String
+	selecttoEnd()
+	fsgetCursortoEnd=fsGetSelectionAndCopy
+End Function
+
+Function fsgetCursorWord As String
+	&apos; Function To get a word under the current cursor position.
+	&apos; Adapted from code contributed On 2009-04-25  by JohnV To 
+	&apos; http://www.oooforum.org/forum/viewtopic.phtml?t=83411&amp;highlight=
+	Dim oDoc,oVC,oTCtring
+	oDoc=ThisComponent
+	oVC=oDoc.getCurrentController.getViewCursor
+	oTC=oDoc.getText.createTextCursorByRange(oVC,False)
+	oTC.gotoEndOfWord(False)
+	oTC.gotoStartOfWord(True)
+	fsgetCursorWord=oTC.String 
+	selectAWord()
+End Function
+
+Function fsReplaceText(sA As String,sFind As String,sReplace As String) As String
+	&apos;This Function replaces each instance of the sFind String in the sA String with the sReplace String
+	While Instr(sA,sFind) &lt;&gt; 0 
+		fsReplaceText=Left(sA,Instr(sA,sFind)-1) &amp; _
+			sReplace &amp; _
+			Mid(sA,Instr(sA,sFind)+Len(sFind),Len(sA)-Instr(sA,sFind)+Len(sFind)
+		sA=fsReplaceText
+	Wend
+	fsReplaceText=sA
+End Function
+
+Sub selecttoEnd
+	dim document   as object
+	dim dispatcher as object
+	document   = ThisComponent.CurrentController.Frame
+	dispatcher = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
+	dispatcher.executeDispatch(document, &quot;.uno:GoToPrevWord&quot;, &quot;&quot;, 0, Array())
+	dispatcher.executeDispatch(document, &quot;.uno:EndOfDocumentSel&quot;, &quot;&quot;, 0, Array())
+End Sub
+
+Sub selectAWord
+	dim document   as object
+	dim dispatcher as object
+	document   = ThisComponent.CurrentController.Frame
+	dispatcher = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
+	dispatcher.executeDispatch(document,&quot;.uno:SelectWord&quot;, &quot;&quot;, 0, Array())
+End Sub
+
+Function fsGetSelectionAndCopy()
+	&apos;We copy to the clipboard, then return the clipboard contents as text. 
+	&apos;The clipboard contents can be used for external tools for the disabled that use
+	&apos;the clipboard. Examples include Braille pads or pictographic symbol displays.
+	dim document   as object
+	dim dispatcher as object
+	document   = ThisComponent.CurrentController.Frame
+	dispatcher = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
+	dispatcher.executeDispatch(document, &quot;.uno:Copy&quot;, &quot;&quot;, 0, Array())
+	fsGetSelectionAndCopy=fsGetClipBoard
+End Function
+</script:module>

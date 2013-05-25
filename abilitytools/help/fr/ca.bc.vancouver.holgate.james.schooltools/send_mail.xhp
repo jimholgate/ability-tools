@@ -1,0 +1,64 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+    <meta>
+        <topic id="aplusschooltools/ca.bc.vancouver.holgate.james.schooltools/send_mail.xhp" indexer="include" status="PUBLISH">
+            <title id="send_mail" xml-lang="fr-FR">
+                Envoi des présentations</title>
+            <filename>/ca.bc.vancouver.holgate.james.schooltools/send_mail.xhp</filename>
+        </topic>
+        <history>
+            <created date="2012-04-25T00:00:00">
+                James Holgate</created>
+            <lastedited date="2012-12-23T17:14:00">
+            </lastedited>
+        </history>
+    </meta>
+    <body>
+        <paragraph role="heading" id="send_mail1" xml-lang="fr-FR" level="1">
+            La utilisation des Outils d'habilité</paragraph>
+        <paragraph role="heading" id="send_mail1.1" xml-lang="fr-FR" level="2">
+            Envoi des présentations
+        </paragraph>
+        <list>
+            <listitem>
+                Une fois que vous avez ajouté des notes à vos diapositives de la présentation, enregistrez votre document dans le format %PRODUCTNAME  normale (.odp).
+            </listitem>
+            <listitem>
+                Utilisez un nom significatif pour le document, parce que l'extension va utiliser le nom pour le titre des documents.
+            </listitem>
+            <listitem>
+                Cliquez sur le bouton 
+                <emph>
+                    Exporter le diaporama</emph>
+                sur la barre de menu
+            </listitem>
+            <listitem>
+                Utilisez votre programme de messageries pour envoyer la présentation.
+            </listitem>
+        </list>
+        <paragraph role="heading" id="send_mail1.2" xml-lang="fr-FR" level="2">
+            Destination 
+        </paragraph>
+        <list>
+            <listitem>
+                L'adresse email.
+            </listitem>
+            <listitem>
+                Vous pouvez envoyer un courriel à un service de stockage pour partager les fichiers sur vos ordinateurs et vos appareils mobiles.
+            </listitem>
+        </list>
+        <paragraph role="heading" id="send_mail1.3" xml-lang="fr-FR" level="2">
+            Options
+        </paragraph>
+        <list>
+            <listitem>Les options affichées dans le menu Options de la boîte de dialogue principale décrire ce que les outils faire. Les outils qui sont à votre disposition dépendent de quels outils sont disponibles sur votre plate-forme et quels autres programmes et fichiers de support que vous avez installé.
+            </listitem>
+            <listitem>
+                Les versions alternatives peuvent avoir des options qui sont plus ou moins complète que la version standard. Par exemple, un distributeur peut ajouter un format d'exportation pour leur produit, ou supprimer des fonctionnalités qui ne sont pas utiles dans le contexte ou l'extension est utilisé. Le logiciel est sous licence plusieurs licences ouvertes, et les distributeurs peuvent modifier le logiciel sans autorisation de l’auteur.
+            </listitem>
+        </list>
+<section id="relatedtopics">
+<embed href="text/shared/guide/accessibility.xhp#accessibility"/>
+</section>
+    </body>
+</helpdocument>

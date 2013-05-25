@@ -1,0 +1,173 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+    <meta>
+        <topic id="aplusschooltools/ca.bc.vancouver.holgate.james.schooltools/write_notes.xhp" indexer="include" status="PUBLISH">
+            <title id="write_notes" xml-lang="fr-FR">
+                Ecrire les notes</title>
+            <filename>/ca.bc.vancouver.holgate.james.schooltools/write_notes.xhp</filename>
+        </topic>
+        <history>
+            <created date="2012-04-25T00:00:00">
+                James Holgate</created>
+            <lastedited date="2012-12-14T11:20:00">
+            </lastedited>
+        </history>
+    </meta>
+    <body>
+        <paragraph role="heading" id="write_notes1" xml-lang="fr-FR" level="1">
+            La utilisation d’Outils d’Habilité</paragraph>
+        <paragraph role="heading" id="write_notes1.0" xml-lang="fr-FR" level="2">
+            Apropos
+        </paragraph>
+        <list>
+            <listitem>
+                Lire une présentation à haut voix. Publier une présentation dans un format qu’on peut utiliser sur les appareils mobiles.
+            </listitem>
+            <listitem>
+                Exporter comme un document html, zip ou ePub.
+            </listitem>
+            <listitem>
+                Cliquer sur 
+                <emph>
+                    Notepad</emph>
+                 et rédiger les notes et les questions.
+            </listitem>
+            <listitem>
+                L’extension produit les livres electroniques qui sont optimisés pour la lecture de textes à haute voix. L’extension utilise le texte dans la diapositive comme texte alternatif pour l’image de la diapositive dans le livre.
+            </listitem>
+        </list>
+        <paragraph role="heading" id="write_notes1.3" xml-lang="fr-FR" level="2">
+            Écrire une note
+        </paragraph>
+        <list>
+            <listitem>
+                Dans l’éditeur de Impress, cliquez sur le bouton 
+                <emph>
+                    Notepad</emph>
+                dans la barre de menu.
+            </listitem>
+            <listitem>
+		Taper du texte. Pour agrandir la vue, cliquez sur le bouton 
+                <emph>
+                    Apparence</emph>. Pour lire le texte à haute voix, cliquez sur le bouton 
+		<emph>
+                    Lire la note</emph>. Lorsque vous avez terminé, cliquez sur le bouton 
+                <emph>
+                    OK</emph>.
+            </listitem>
+            <listitem>
+                Si vous n’entrez pas de texte dans une note, l’extension vont vous inviter à ecrire du texte lorsque vous écoutez le diaporama. Si vous désirez une note blanc, entrez un espace unique dans la note.
+            </listitem>
+        </list>
+        <paragraph role="heading" id="write_notes1.1" xml-lang="fr-FR" level="2">
+            Audition d’un diaporama
+        </paragraph>
+        <list>
+            <listitem>
+                Utiliser le bouton 
+                <emph>
+                    Lire le diaporama</emph>.
+            </listitem>
+            <listitem>
+                Pour afficher une présentation en utilisant d’autres langues ou ressources Web, cliquez sur 
+		<emph>
+			Outils du Diaporama</emph>
+		et choisir une option du dialogue. Attention. Vous allez peut-être permettre à l’extension « Outil d’Habilité » d’envoyer du texte en clair à un programme ou service en ligne. Vous pouvez être responsable pour les frais de raccordement et de service. Vous affirmez que vous avez lu les conditions de service pour le prestataire de services en ligne, et s’engagent à les respecter. Vous comprenez que les conditions de service peuvent changer de temps en temps, et il est de votre responsabilité de veiller à la conformité. Les services en ligne peuvent être indisponibles. Ne comptez pas sur eux pour les services essentiels. Vérifiez les ressources Web avant de les utiliser devant un auditoire.   
+            </listitem>
+        </list>
+        <paragraph role="heading" id="write_notes1.2" xml-lang="fr-FR" level="2">
+            Comment lire un document ePub
+        </paragraph>
+  	 <list>
+            <listitem>
+                Sur le bureau, utilisez <link href="http://www.readium.org/" name="http://www.readium.org/">Readium</link> Extension pour Chrome ou Chromium ou <link href="https://addons.mozilla.org/en-US/firefox/addon/epubreader/" name="https://addons.mozilla.org/en-US/firefox/addon/epubreader/">ePub Reader</link> Extension pour Firefox. Alternativement, vous pouvez ouvrir <link href="http://www.magicscroll.net/" name="http://www.magicscroll.net/">MagicScroll</link> dans un navigateur comme Internet Explorer ou Safari.
+            </listitem>
+            <listitem>
+                Pour la plupart des utilisateurs d’Apple iOS, <link href="https://itunes.apple.com/fr/app/ibooks/id364709193?mt=8" name="https://itunes.apple.com/fr/app/ibooks/id364709193?mt=8">iBooks</link> est un bon choix. Sur les versions actuelles de l’iOS, vous pouvez lire le texte à haute voix en sélectionnant un texte. Utiliser <emph>Réglages - Général - Accessibilité - Énoncer la sélection</emph>. Activer le support pour les lecteurs aveugles avec VoiceOver. Utiliser <emph>Réglages - Général - Accessibilité - Triple clic - VoiceOver</emph>. Avec VoiceOver activé, appuyez sur une image pour entendre le texte de remplacement. Pour lire le texte à haute voix en continu, appuyez sur le centre de l’écran, puis balayez vers le bas avec deux doigts. Pour mettre en pause la lecture, appuyez avec deux doigts. Pour parcourir un livre, appuyez sur le centre de l’écran, puis faites glisser horizontalement avec trois doigts.
+            </listitem>
+            <listitem>
+                Le magasin Android a plusieurs options pour livres ePub. Le programme <link href="http://www.fbreader.org/" name="http://www.fbreader.org/">FBReader</link> peut lire à haute voix des livres ePub avec un plug-in optionnel. Le navigateur <link href="http://dolphin-browser.com/" name="http://dolphin-browser.com/">Dolphin</link> a une ePub plug-in pour ePub. Vous pouvez sélectionner du texte, puis utiliser l’application <link href="https://play.google.com/store/apps/details?id=com.ideedle.software.talkadroidpro" name="https://play.google.com/store/apps/details?id=com.ideedle.software.talkadroidpro">Talkadroid</link> pour lire la sélection à haute voix. Si vous n’avez pas besoin de synthèse vocale, le lecteur <link href="http://www.bluefirereader.com/bluefire-reader.html" name="http://www.bluefirereader.com/bluefire-reader.html">BlueFire</link> est un bon choix.
+            </listitem>
+            <listitem>
+                Vous pouvez transférer des livres électroniques aux appareils mobiles via e-mail, blog, ou un service « nuage » .
+            </listitem>
+            <listitem>
+                Le <link href="http://www.calibre-ebook.com" name="http://www.calibre-ebook.com">calibre-ebook</link> programme peut modifier les métadonnées et convertir des documents dans d’autres formats. Pour les appareils Kindle, utilisez calibre-ebook pour exporter une publication ePub au format mobi.
+            </listitem>
+        </list>
+        <paragraph role="heading" id="write_notes1.4" xml-lang="fr-FR" level="2">
+            Notepad boutons
+        </paragraph>
+  	 <list>
+            <listitem>
+                <emph>
+                    Annuler</emph>
+                 Fermer Notepad sans enregistrer les modifications à la note dans la présentation.
+            </listitem>
+            <listitem>
+                <emph>
+                    Aperçu de la note...</emph>
+                 Aperçu de la note dans un visualiseur externe. Utilisez cette fonction pour vérifier si le code xhtml est correcte. Chrome, Firefox et Safari peuvent montre la position d’une erreur.
+            </listitem>
+            <listitem>
+                <emph>
+                    Apparence</emph>
+                Voir la note avec texte agrandi.
+            </listitem>
+            <listitem>
+                <emph>
+                    Coller le message</emph>
+                 Coller le message de la présentation.
+            </listitem>
+            <listitem>
+                <emph>
+                    Encode</emph>
+                 Utiliser xhtml. La plupart du temps, vous devriez simplement utiliser du texte brut. Le xhtml est seulement nécessaire si vous voulez ecrire les textes avec des mots en italiques, en gras ou en hyperliens.
+            </listitem>
+            <listitem>
+                <emph>
+                    Enregistrer</emph>
+                 Enregistrer la note.
+            </listitem>
+            <listitem>
+                <emph>
+                    Enregistrer sous...</emph>
+                 Enregistrer la note avec un nom différent
+            </listitem>
+            <listitem>
+                <emph>
+                    Joindre à un messagerie...</emph>
+		Enregistrer la note, puis l’envoyer par e-mail. Pour modifier l’adresse de messagerie par défaut, cliquez sur le bouton
+                <emph>
+                    Exporter le Diaporama...</emph>
+                 en mode présentation normale.
+            </listitem>
+         	<listitem>
+                <emph>
+                    Langue</emph>
+                 Définissez la langue du texte.
+            </listitem>
+          <listitem>
+                <emph>
+                     Lire la note</emph>
+                 Si vous avez sélectionné du texte, l’ordinateur lit la sélection. Sinon, l’ordinateur lit la note entière. Si votre ordinateur est capable de lire dans une autre langue, vous pouvez utiliser le bouton
+                <emph>
+                    Langue</emph> 
+                 pour sélectionner la langue et la région.
+            </listitem>
+            <listitem>
+                <emph>
+                    OK</emph>
+                 Enregistrer les modifications à la note dans la présentation..
+            </listitem>
+            <listitem>
+                <emph>
+                    Ouvrir...</emph>
+                 Importer texte brut ou xhtml.
+            </listitem>
+        </list>
+<section id="relatedtopics">
+<embed href="text/shared/guide/accessibility.xhp#accessibility"/>
+</section>
+    </body>
+</helpdocument>

@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?> 
+<tree_view version="24-Aug-2004">
+    <help_section application="aplusschooltools" id="aplusschooltools01" title="AbilityTools">
+        <node id="aplusschooltools0101" title="Setting up Ability Tools">
+            <topic id="aplusschooltools/ca.bc.vancouver.holgate.james.schooltools/install.xhp">Install</topic>
+        </node>
+        <node id="aplusschooltools0102" title="Using Ability Tools">
+            <topic id="aplusschooltools/ca.bc.vancouver.holgate.james.schooltools/write_notes.xhp">Writing notes</topic>
+            <topic id="aplusschooltools/ca.bc.vancouver.holgate.james.schooltools/assistant.xhp">Assistant</topic>
+            <topic id="aplusschooltools/ca.bc.vancouver.holgate.james.schooltools/send_mail.xhp">Sending presentations</topic>
+        </node>
+        <node id="aplusschooltools0103" title="Ability Tools On-line">
+            <topic id="aplusschooltools/ca.bc.vancouver.holgate.james.schooltools/online.xhp">On-line Information</topic>
+        </node>
+    </help_section>
+</tree_view>

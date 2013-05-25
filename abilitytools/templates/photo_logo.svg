@@ -1,0 +1,126 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<!-- Created with Inkscape (http://www.inkscape.org/) -->
+
+<svg
+   xmlns:dc="http://purl.org/dc/elements/1.1/"
+   xmlns:cc="http://creativecommons.org/ns#"
+   xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
+   xmlns:svg="http://www.w3.org/2000/svg"
+   xmlns="http://www.w3.org/2000/svg"
+   version="1.1"
+   width="269.62964"
+   height="269.62964"
+   id="svg2">
+  <defs
+     id="defs49" />
+  <metadata
+     id="metadata7">image/svg+xml<rdf:RDF>
+  <cc:Work
+     rdf:about="">
+    <dc:format>image/svg+xml</dc:format>
+    <dc:type
+       rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
+    <dc:title></dc:title>
+  </cc:Work>
+</rdf:RDF>
+</metadata>
+  <filter
+     height="1.3"
+     color-interpolation-filters="sRGB"
+     id="dropshadow">
+    <feGaussianBlur
+       id="feGaussianBlur6"
+       stdDeviation="3"
+       in="SourceAlpha" />
+    <feOffset
+       id="feOffset8"
+       result="offsetblur"
+       dy="3"
+       dx="0" />
+    <feMerge
+       id="feMerge10">
+      <feMergeNode
+         id="feMergeNode12" />
+      <feMergeNode
+         id="feMergeNode14"
+         in="SourceGraphic" />
+      <!-- this contains the element that the filter is applied to -->
+    </feMerge>
+  </filter>
+  <filter
+     color-interpolation-filters="sRGB"
+     id="inner-shadow">
+    <feOffset
+       id="feOffset17"
+       dy="5"
+       dx="0" />
+    <feGaussianBlur
+       id="feGaussianBlur19"
+       result="offset-blur"
+       stdDeviation="3" />
+    <feComposite
+       in2="offset-blur"
+       operator="out"
+       in="SourceGraphic"
+       result="inverse"
+       id="feComposite21" />
+    <feFlood
+       id="feFlood23"
+       result="color"
+       flood-opacity="0.75"
+       flood-color="black" />
+    <feComposite
+       in2="inverse"
+       operator="in"
+       in="color"
+       result="shadow"
+       id="feComposite25" />
+    <feComposite
+       in2="SourceGraphic"
+       operator="over"
+       in="shadow"
+       id="feComposite27" />
+  </filter>
+  <g
+     transform="matrix(0.77777778,0,0,0.77777778,-20.740741,-32.407407)"
+     id="g29">
+    <title
+       id="title31">(TITLE)</title>
+    <g
+       id="layer1">
+      <rect
+         width="300"
+         height="300"
+         x="50"
+         y="65"
+         id="rect3618"
+         style="fill:greY;filter:url(#inner-shadow)" />
+    </g>
+  </g>
+  <g
+     transform="matrix(0.77777778,0,0,0.77777778,-20.740741,-32.407407)"
+     id="g35">
+    <title
+       id="title37">(AUTHOR)</title>
+    <g
+       id="layer2">
+      <path
+         d="m 58.00191,308.69727 10.29656,-14.83893 17.93333,-8.48969 14.82777,-3.53192 7.49118,-18.99121 20.93892,-10.41077 22.69804,-4.26837 27.46262,-0.0473 20.77222,-5.34956 9.92963,-3.70427 9.28369,-13.86108 6.01109,-3.84216 -5.71095,-5.26807 9.79619,0.34473 12.25589,-14.76996 5.87767,0.20679 15.06128,-10.61755 1.79242,5.13017 0.71216,8.13239 7.87024,-0.7365 -2.19272,7.01677 -13.40219,19.79668 -0.39999,12.14682 -2.35947,12.07794 -9.38373,16.89786 -9.38362,16.89783 -4.15201,6.94781 -11.00929,6.70654 -2.39293,13.09012 -4.78584,26.18039 -1.14644,5.02686 3.68506,7.22336 5.87764,0.20691 -30.36818,-1.06857 3.95183,-0.87442 3.70619,-23.17801 0.63414,-19.23239 1.14632,-5.02673 -4.86467,-1.18457 -17.63315,-0.62042 -5.91104,0.80542 -17.46631,-5.68167 -9.89636,2.69202 -12.32245,16.79434 -11.00941,6.70648 -9.25018,12.84888 -2.97231,0.90881 2.57201,11.2381 10.5423,7.46484 -20.57198,-0.72388 -3.55161,-11.27252 4.18542,-7.96008 -4.9982,2.86438 -3.10564,4.95776 6.49043,11.37604 -13.58129,-4.53149 0.26665,-8.09796 -0.44553,-16.23035 16.00748,-9.57092 9.18351,-10.82428 -4.59789,-9.28256 -18.97971,10.47958 -4.99821,2.86444 -4.7646,-4.22125 -15.94081,7.54633 -5.71104,-5.26758 -2e-5,-6e-5 -2e-5,-6e-5 2e-5,-3e-5 0,-3e-5 -1e-5,-3e-5 -2e-5,-3e-5 -10e-6,-3e-5 -3e-5,-3e-5 0,-3e-5 -3e-5,-3e-5 z"
+         id="path3050-1"
+         style="fill:white;stroke:white;stroke-width:1px;filter:url(#dropshadow)" />
+    </g>
+  </g>
+  <g
+     transform="matrix(0.77777778,0,0,0.77777778,-20.740741,-32.407407)"
+     id="g41">
+    <title
+       id="title43">(DATE)</title>
+    <g
+       id="layer3">
+      <path
+         d="m 292.85883,150.52319 c 0,12.82889 10.21637,23.22879 22.81891,23.22879 12.60254,0 22.81891,-10.3999 22.81891,-23.22879 0,-12.82895 -10.21637,-23.22885 -22.81891,-23.22885 -12.60254,0 -22.81891,10.3999 -22.81891,23.22885 z"
+         id="path2825"
+         style="fill:lightgreY;filter:url(#dropshadow)" />
+    </g>
+  </g>
+</svg>

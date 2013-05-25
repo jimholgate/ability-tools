@@ -1,0 +1,1223 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="branding" script:language="StarBasic">REM  *****  BASIC  *****
+&apos; AbilityTools and the associated marks, slogans, images and icons are 
+&apos; (c) 2012 James Holgate, Vancouver, BC, Canada.
+&apos; All rights reserved. Tous droits reservés. 
+&apos; The other code in this project is governed by the license of the original 
+&apos; author as stated in the license agreement and in the notes of the code. 
+&apos; if you have contributed open source or public domain code, and would like
+&apos; us to acknowledge your contribution, please drop us a line. 
+&apos; http://sites.google.com/site/abilitytools/
+option explicit
+
+sub reviewBrandingStrings
+&apos;Shows all the strings using the dialog. Be sure that the last item in the array
+&apos;is blank, so that sub closes without the array index going out of bounds.
+	dim n as integer
+	dim s as string
+	n=0
+	s=&quot;&quot;
+	do
+		s=getBranding(n)
+		select case s
+		case &quot;&quot;
+			exit sub
+		case else 
+			ShowDialog(s)
+			n=n+1
+		end select
+	loop
+end sub
+
+function fsMyID
+	fsMyID = &quot;ca.bc.vancouver.holgate.james.schooltools&quot;
+end function
+
+function bI_BRANDING &apos; This is used in determining file locations - one word in English ASCII - AbilityTools or PuppetMaster etc.
+	bI_BRANDING  = 0
+end function
+function bI_EMAIL &apos; Default destination for mailing attachments. not service or personal address!
+	bI_EMAIL  = 1
+end function
+function bI_HOMEPAGE &apos; Blog or product landing page
+	bI_HOMEPAGE = 2
+end function
+function bI_SLOGAN &apos; Keep it short! This could be annoying when spoken.
+	bI_SLOGAN  = 3
+end function
+function bI_LOGO_PNG &apos; logo in extension images directory shown on dialog
+	bI_LOGO_PNG = 4
+end function
+function bI_ABOUT_TEXT &apos; 
+	bI_ABOUT_TEXT = 5
+end function
+function bI_SPOKEN_BRANDING &apos; This is used in speaking the name of the brand. Use normal word breaks and common spelling in target language
+	bI_SPOKEN_BRANDING = 6
+end function
+function bI_SMALL_LOGO_PNG &apos; logo shown in Extension Manager
+	bI_SMALL_LOGO_PNG = 7
+end function
+function bI_QR_PNG 
+	bI_QR_PNG = 8
+end function
+
+function bI_IMPORT_PNG 
+	bI_IMPORT_PNG = 9
+end function
+
+function bI_TOOLS_PNG 
+	bI_TOOLS_PNG = 10
+end function
+
+function hI_ABOUT_HTML &apos; full text of info page included with zipped packages
+	hI_ABOUT_HTML = 1
+end function
+
+function hI_LOGO_HTML &apos; URL of online logo
+	hI_ABOUT_LOGO = 2
+end function
+
+function getBranding(i as integer, optional sLanguage ) as string
+
+&apos;Note to translator: Please translate from the English strings.
+&apos;This function looks up a string by integer and language.
+	dim sA as string
+	if ismissing(sLanguage) then 
+		sLanguage=fsGetSetting(&quot;language&quot;)
+	endif
+	dim sBranding(15) as string
+	select case left(sLanguage,2)
+	case &quot;fr&quot; &apos;French
+		if I_BRANDED=4 then &apos; Webcam Client
+			sBranding(0) = &quot;shackleton&quot; &apos; This is used in determining file locations - one word in English
+			sBranding(1) = &quot;shackleton.0pmoa@m.evarnota.com&quot;
+			sBranding(2) = &quot;http://code.google.com/p/ability-tools/&quot;
+			sBranding(3) = &quot;Outil webcaméra pour Shackleton &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp;&quot;!&quot;
+			sBranding(4) = &quot;my-webcam.png&quot;
+			sBranding(5) = &quot;Outil webcaméra pour Shackleton peut enregistre vos webcams.&quot;
+			sBranding(6) = &quot;Outil webcaméra pour Shackleton&quot;
+			sBranding(7) = &quot;brand-preview.png&quot;
+			sBranding(8) = &quot;googl-code-ability-tools.png&quot;
+			sBranding(9) = &quot;my-webcam.png&quot;
+			sBranding(10) = &quot;my-webcam.png&quot;
+			sBranding(11) = &quot;&quot;
+			sBranding(12) = &quot;&quot;
+			sBranding(13) = &quot;&quot;
+			sBranding(14) = &quot;&quot;
+			sBranding(15) = &quot;&quot;
+		elseif I_BRANDED=3 then &apos; TTS publisher client
+			sBranding(0) = &quot;shackleton&quot; &apos; This is used in determining file locations - one word in English
+			sBranding(1) = &quot;convert@shackleton.com&quot;
+			sBranding(2) = &quot;http://code.google.com/p/ability-tools/&quot;
+			sBranding(3) = &quot;Outil d&apos;habilité pour Shackleton &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp;&quot;!&quot;
+			sBranding(4) = &quot;my-publisher.png&quot;
+			sBranding(5) = &quot;Outil d&apos;habilité pour Shackleton peut produire les présentations parlantes.&quot;
+			sBranding(6) = &quot;Outil d&apos;habilité pour Shackleton&quot;
+			sBranding(7) = &quot;brand-preview.png&quot;
+			sBranding(8) = &quot;googl-code-ability-tools.png&quot;
+			sBranding(9) = &quot;my-publisher.png&quot;
+			sBranding(10) = &quot;my-publisher.png&quot;
+			sBranding(11) = &quot;&quot;
+			sBranding(12) = &quot;&quot;
+			sBranding(13) = &quot;&quot;
+			sBranding(14) = &quot;&quot;
+			sBranding(15) = &quot;&quot;
+		elseif I_BRANDED=2 then &apos; pour enfants
+			sBranding(0) = &quot;AbilityTools&quot; &apos; This is used in determining file locations - one word in English
+			sBranding(1) = &quot;prof@mon-ecole.&quot; &amp; lcase (fsDocCountry)
+			sBranding(2) = &quot;http://code.google.com/p/ability-tools/&quot;
+			sBranding(3) = &quot;Outil d&apos;habilité édition d&apos;essai &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp;&quot;!&quot;
+			sBranding(4) = &quot;brand-preview.png&quot;
+			sBranding(5) = &quot;Outil d&apos;habilité édition d&apos;essai peut produire les documents accessibles.&quot;
+			sBranding(6) = &quot;Outil d&apos;habilité édition d&apos;essai&quot;
+			sBranding(7) = &quot;brand_42.png&quot;
+			sBranding(8) = &quot;googl-code-ability-tools.png&quot;
+			sBranding(9) = &quot;brand-import-preview.png&quot;
+			sBranding(10) = &quot;brand-tools-preview.png&quot;
+			sBranding(11) = &quot;&quot;
+			sBranding(12) = &quot;&quot;
+			sBranding(13) = &quot;&quot;
+			sBranding(14) = &quot;&quot;
+			sBranding(15) = &quot;&quot;
+		elseif I_BRANDED=1 then
+			sBranding(0) = &quot;AbilityTools&quot; &apos; This is used in determining file locations - one word in English
+			sBranding(1) = &quot;prof@mon-ecole.&quot; &amp; lcase (fsDocCountry)
+			sBranding(2) = &quot;http://code.google.com/p/ability-tools/&quot;
+			sBranding(3) = &quot;Outil d&apos;Habilité pour &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp;&quot;!&quot;
+			sBranding(4) = &quot;brand.png&quot;
+			sBranding(5) = &quot;L&apos;Outil d&apos;Habilité peut produire les documents accessibles.&quot;
+			sBranding(6) = &quot;Outil d&apos;Habilité&quot;
+			sBranding(7) = &quot;brand_42.png&quot;
+			sBranding(8) = &quot;googl-code-ability-tools.png&quot;
+			sBranding(9) = &quot;brand-import.png&quot;
+			sBranding(10) = &quot;brand-tools.png&quot;
+			sBranding(11) = &quot;&quot;
+			sBranding(12) = &quot;&quot;
+			sBranding(13) = &quot;&quot;
+			sBranding(14) = &quot;&quot;
+			sBranding(15) = &quot;&quot;
+		endif		
+	case else  &apos; &quot;en&quot; &apos; English default. &quot;zxx-&quot; is LibreOffice code for undefined language
+		if I_BRANDED=4 then &apos; Webcam client
+			sBranding(0) = &quot;shackleton&quot; &apos; This is used in determining file locations - one word in English
+			sBranding(1) = &quot;shackleton.0pmoa@m.evarnota.com&quot;
+			sBranding(2) = &quot;http://code.google.com/p/ability-tools/&quot;
+			sBranding(3) = &quot;Powered by &quot;&quot;Camera Tools for Shackleton&quot;&quot;&quot;
+			sBranding(4) = &quot;my-webcam.png&quot;
+			sBranding(5) = &quot;Camera Tools for Shackleton can record images from your webcams.&quot;
+			sBranding(6) = &quot;Camera Tools for Shackleton&quot;
+			sBranding(7) = &quot;brand_42.png&quot;
+			sBranding(8) = &quot;googl-code-ability-tools.png&quot;
+			sBranding(9) = &quot;my-webcam.png&quot;
+			sBranding(10) = &quot;my-webcam.png&quot;
+			sBranding(11) = &quot;&quot;
+			sBranding(12) = &quot;&quot;
+			sBranding(13) = &quot;&quot;
+			sBranding(14) = &quot;&quot;
+			sBranding(15) = &quot;&quot;
+		elseif I_BRANDED=3 then &apos; TTS publisher client
+			sBranding(0) = &quot;shackleton&quot; &apos; This is used in determining file locations - one word in English
+			sBranding(1) = &quot;convert@shackleton.com&quot;
+			sBranding(2) = &quot;http://code.google.com/p/ability-tools/&quot;
+			sBranding(3) = &quot;Powered by &quot;&quot;Ability Tools for Shackleton&quot;&quot;&quot;
+			sBranding(4) = &quot;my-publisher.png&quot;
+			sBranding(5) = &quot;Ability Tools for Shackleton can create and publish talking presentations.&quot;
+			sBranding(6) = &quot;Ability Tools for Shackleton&quot;
+			sBranding(7) = &quot;brand_42.png&quot;
+			sBranding(8) = &quot;googl-code-ability-tools.png&quot;
+			sBranding(9) = &quot;my-publisher.png&quot;
+			sBranding(10) = &quot;my-publisher.png&quot;
+			sBranding(11) = &quot;&quot;
+			sBranding(12) = &quot;&quot;
+			sBranding(13) = &quot;&quot;
+			sBranding(14) = &quot;&quot;
+			sBranding(15) = &quot;&quot;
+		elseif I_BRANDED=2 then &apos;This is a simplified release for kids
+			sBranding(0) = &quot;AbilityTools&quot; &apos; This is used in determining file locations - one word in English
+			sBranding(1) = &quot;teacher@my-school.&quot; &amp; lcase (fsDocCountry)
+			sBranding(2) = &quot;http://code.google.com/p/ability-tools/&quot;
+			sBranding(3) = &quot;Powered by &quot;&quot;Ability Tools Preview Edition&quot;&quot; for &quot; &amp; fsGetSetting(&quot;ooname&quot;)
+			sBranding(4) = &quot;brand-preview.png&quot;
+			sBranding(5) = &quot;Ability Tools Preview Edition can create and publish open and accessible electronic books.&quot;
+			sBranding(6) = &quot;Ability Tools Preview Edition&quot;
+			sBranding(7) = &quot;brand_42.png&quot;
+			sBranding(8) = &quot;googl-code-ability-tools.png&quot;
+			sBranding(9) = &quot;brand-import-preview.png&quot;
+			sBranding(10) = &quot;brand-tools-preview.png&quot;
+			sBranding(11) = &quot;&quot;
+			sBranding(12) = &quot;&quot;
+			sBranding(13) = &quot;&quot;
+			sBranding(14) = &quot;&quot;
+			sBranding(15) = &quot;&quot;
+		else &apos;  I_BRANDED=1 or unknown
+			sBranding(0) = &quot;AbilityTools&quot; &apos; This is used in determining file locations - one word in English
+			sBranding(1) = &quot;teacher@my-school.&quot; &amp; lcase (fsDocCountry)
+			sBranding(2) = &quot;http://code.google.com/p/ability-tools/&quot;
+			sBranding(3) = &quot;Powered by &quot;&quot;Ability Tools&quot;&quot; for &quot; &amp; fsGetSetting(&quot;ooname&quot;)
+			sBranding(4) = &quot;brand.png&quot;
+			sBranding(5) = &quot;Ability Tools can create and publish open and accessible electronic books.&quot;
+			sBranding(6) = &quot;Ability Tools&quot;
+			sBranding(7) = &quot;brand_42.png&quot;
+			sBranding(8) = &quot;googl-code-ability-tools.png&quot;
+			sBranding(9) = &quot;brand-import.png&quot;
+			sBranding(10) = &quot;brand-tools.png&quot;
+			sBranding(11) = &quot;&quot;
+			sBranding(12) = &quot;&quot;
+			sBranding(13) = &quot;&quot;
+			sBranding(14) = &quot;&quot;
+			sBranding(15) = &quot;&quot;
+		endif 
+	end select	
+	getBranding = sBranding(i)
+end function
+
+function getAboutBrand(i as integer, optional sLanguage ) as string
+
+&apos;Note to translator: Please translate from the English strings.
+&apos;This function choses document content  by integer and language.
+	dim sA as string
+	if ismissing(sLanguage) then 
+		sLanguage=fsGetSetting(&quot;language&quot;)
+	endif
+	dim sBranding(5) as string
+	select case left(sLanguage,2)
+	case &quot;fr&quot; &apos;French
+		if I_BRANDED=1 or I_BRANDED=2 then
+			sBranding(1) = fsAboutSchoolToolsFrench
+			sBranding(2) = &quot;https://sites.google.com/site/abilitytools/_/rsrc/1347215129769/config/customLogo.gif&quot;
+			sBranding(3) = &quot;&quot;
+			sBranding(4) = &quot;&quot;
+			sBranding(5) = &quot;&quot;
+		
+			&apos; for the moment, third party brands use the defaults, which don&apos;t use my logo or brand.
+		else
+			sBranding(1) = fsAboutFrench
+			sBranding(2) = &quot;https://sites.google.com/site/abilitytools/_/rsrc/1341683364610/config/customLogo.gif&quot;
+			sBranding(3) = &quot;&quot;
+			sBranding(4) = &quot;&quot;
+			sBranding(5) = &quot;&quot;
+		endif		
+	case else  &apos; &quot;en&quot; &apos; English default. &quot;zxx-&quot; is LibreOffice code for undefined language
+		if I_BRANDED=1 or I_BRANDED=2 then
+			sBranding(1) = fsAboutSchoolToolsEnglish
+			sBranding(2) = &quot;https://sites.google.com/site/abilitytools/_/rsrc/1341683364610/config/customLogo.gif&quot;
+			sBranding(3) = &quot;&quot;
+			sBranding(4) = &quot;&quot;
+			sBranding(5) = &quot;&quot;
+		
+			&apos; for the moment, third party brands use the defaults, which don&apos;t use my logo or brand.
+		else
+			sBranding(1) = fsAboutEnglish
+			sBranding(2) = &quot;https://sites.google.com/site/abilitytools/_/rsrc/1341683364610/config/customLogo.gif&quot;
+			sBranding(3) = &quot;&quot;
+			sBranding(4) = &quot;&quot;
+			sBranding(5) = &quot;&quot;
+		endif 
+	end select	
+	getAboutBrand = sBranding(i)
+end function
+
+function fsAboutSchoolToolsEnglish
+	dim s1 as string
+	s1 = s1 &amp; &quot;&lt;!DOCTYPE HTML PUBLIC &quot;&quot;-//W3C//DTD HTML 4.0 Transitional//EN&quot;&quot;&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;html&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;head&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;meta http-equiv=&quot;&quot;content-type&quot;&quot; content=&quot;&quot;text/html; charset=utf-8&quot;&quot; /&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;meta name=viewport content=&quot;&quot;initial-scale=1, minimum-scale=1, width=device-width&quot;&quot; /&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;meta name=&quot;&quot;created&quot;&quot; content=&quot;&quot;&quot; &amp; fsNow &amp; &quot;&quot;&quot; /&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; fsAbilityMeta &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;title&gt;&quot; &amp; fsshortfilename() &amp; &quot;&lt;/title&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;style type=&quot;&quot;text/css&quot;&quot;&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;!--&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;p { font-family: &quot;&quot;arial&quot;&quot;, sans-serif }&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;p.western { font-family: &quot;&quot;arial&quot;&quot;, sans-serif }&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;h1.western { font-family: &quot;&quot;arial&quot;&quot;, sans-serif }&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;p.cjk { font-size: 10pt; font-weight: normal }&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;--&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;/style&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;/head&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;body lang=&quot;&quot;en-ca&quot;&quot; dir=&quot;&quot;ltr&quot;&quot;&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;p class=&quot;&quot;western&quot;&quot; align=center&gt;&lt;img src=&quot;&quot;https://sites.google.com/site/abilitytools/_/rsrc/1347215129769/config/customLogo.gif&quot;&quot; &quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;name=&quot;&quot;graphics1&quot;&quot; align=bottom border=0&gt;&lt;/p&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;h1 class=&quot;&quot;western&quot;&quot; align=center&gt;&lt;a href=&quot;&quot;http://code.google.com/p/ability-tools/&quot;&quot;&gt;abilitytools&lt;/a&gt;&lt;/h1&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;p class=&quot;&quot;western&quot;&quot; align=left&gt;&lt;b&gt;Ability&lt;font size=1 style=&quot;&quot;font-size: 2pt&quot;&quot;&gt;&quot; &amp; chr$(10)	
+	s1 = s1 &amp; &quot;&lt;/font&gt;Tools&lt;/b&gt; can use &quot; &amp; fsgetsetting(&quot;ooname&quot;) &amp; &quot; to create talking presentations. enter text in the &quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;speaker notes. compatible &lt;b&gt;Ability&lt;font size=1 style=&quot;&quot;font-size: 2pt&quot;&quot;&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;/font&gt;Tools&lt;/b&gt; applications for mobile devices read your notes aloud &quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;using built-in speech synthesis. &quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;/p&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;p class=&quot;&quot;western&quot;&quot; align=left&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;The &lt;B&gt;&quot; &amp; fsShortFileName() &amp; &quot;&lt;/B&gt; presentation is stored in contents.pdf in the CONTENTS folder. The slide &quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;notes are stored in the slide-notes.xml document in the CONTENTS folder. &quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;The META-INF folder contains a list of files in the manifest.xml document.&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;/p&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;p class=&quot;&quot;western&quot;&quot; align=left&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;Thank you for using Ability Tools.&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;/p&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; fsNotesListHTML()		
+	s1 = s1 &amp; &quot;&lt;/body&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;/html&gt;&quot; &amp; chr$(10)
+	fsAboutSchoolToolsEnglish= s1
+end function
+
+function fsAboutSchoolToolsFrench
+	dim s1 as string
+	s1 = s1 &amp; &quot;&lt;!DOCTYPE HTML PUBLIC &quot;&quot;-//W3C//DTD HTML 4.0 Transitional//EN&quot;&quot;&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;html&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;head&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;meta http-equiv=&quot;&quot;content-TYPE&quot;&quot; content=&quot;&quot;text/html; charset=utf-8&quot;&quot; /&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;meta name=viewport content=&quot;&quot;initial-scale=1, minimum-scale=1, width=device-width&quot;&quot; /&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;meta name=&quot;&quot;created&quot;&quot; content=&quot;&quot;&quot; &amp; fsNow &amp; &quot;&quot;&quot; /&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; fsAbilityMeta &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;title&gt;&quot; &amp; fsshortfilename() &amp; &quot;&lt;/title&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;style type=&quot;&quot;text/css&quot;&quot;&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;!--&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;h1.western { font-family: &quot;&quot;arial&quot;&quot;, sans-serif }&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;p { font-family: &quot;&quot;arial&quot;&quot;, sans-serif }&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;p.western { font-family: &quot;&quot;arial&quot;&quot;, sans-serif }&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;p.cjk { font-size: 10pt; font-weight: normal }&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;--&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;/style&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;/head&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;body lang=&quot;&quot;fr-fr&quot;&quot; dir=&quot;&quot;ltr&quot;&quot;&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;h1 class=&quot;&quot;western&quot;&quot; align=center&gt;&lt;img src=&quot;&quot;https://sites.google.com/site/abilitytools/_/rsrc/1347215129769/config/customLogo.gif&quot;&quot; &quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;name=&quot;&quot;graphics1&quot;&quot; align=bottom border=0&gt;&lt;/p&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;h1 class=&quot;&quot;western&quot;&quot; align=center&gt;&lt;a href=&quot;&quot;http://code.google.com/p/ability-tools/&quot;&quot;&gt;http://code.google.com/p/ability-tools/&lt;/a&gt;&lt;/h1&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;p class=&quot;&quot;western&quot;&quot; align=left&gt;&lt;b&gt;Outils d&apos;Habilité&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;/b&gt; peuvent utiliser &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp; &quot; pour la création des présentations qui parlent. &quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;Entrez le texte dans les notes de la présentation. &quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;Avec une application compatible, appareils mobiles peuvent lire vos notes avec la synthèse de la parole intégrée. &quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;/p&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;p class=&quot;&quot;western&quot;&quot; align=left&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;b&gt;&quot; &amp; fsshortfilename() &amp; &quot;&lt;/b&gt; - La présentation « contents.pdf » est dans le directoire CONTENTS. &quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;Les notes sont dans le document « slide-notes.xml » dans le directoire CONTENTS. &quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;Le directoire META-INF contient une liste de fichiers dans le document « manifest.xml » . &quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;/p&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;p class=&quot;&quot;western&quot;&quot; align=left&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;Merci d&apos;utiliser Outils d&apos;Habilité.&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;/p&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; fsNotesListHTML()		
+	s1 = s1 &amp; &quot;&lt;/body&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;/html&gt;&quot; &amp; chr$(10)
+	fsAboutSchoolToolsFrench = s1
+end function
+
+function fsAboutEnglish
+	dim s1 as string
+	s1 = s1 &amp; &quot;&lt;!DOCTYPE HTML PUBLIC &quot;&quot;-//W3C//DTD HTML 4.0 Transitional//EN&quot;&quot; /&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;html&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;head&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;meta http-equiv=&quot;&quot;content-type&quot;&quot; content=&quot;&quot;text/html; charset=utf-8&quot;&quot; /&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;meta name=viewport content=&quot;&quot;initial-scale=1, minimum-scale=1, width=device-width&quot;&quot; /&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;meta name=&quot;&quot;created&quot;&quot; content=&quot;&quot;&quot; &amp; fsNow &amp; &quot;&quot;&quot; /&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; fsAbilityMeta &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;title&gt;&quot; &amp; fsshortfilename() &amp; &quot;&lt;/title&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;style type=&quot;&quot;text/css&quot;&quot;&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;!--&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;p { font-family: &quot;&quot;arial&quot;&quot;, sans-serif }&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;p.western { font-family: &quot;&quot;arial&quot;&quot;, sans-serif }&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;p.cjk { font-size: 10pt; font-weight: normal }&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;--&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;/style&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;/head&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;body lang=&quot;&quot;en-ca&quot;&quot; dir=&quot;&quot;ltr&quot;&quot;&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;p class=&quot;&quot;western&quot;&quot; align=center&gt;&quot;
+	s1 = s1 &amp; &quot;&lt;b&gt;&quot; &amp; fsshortfilename() &amp; &quot;&lt;/b&gt;&lt;/p&gt;&lt;hr&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;p class=&quot;&quot;western&quot;&quot; align=left&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;The &lt;b&gt;&quot; &amp; fsShortFileName() &amp; &quot;&lt;/b&gt; presentation is stored in contents.pdf in the CONTENTS folder. The slide &quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;notes are stored in the slide-notes.xml document in the CONTENTS folder. &quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;The META-INF folder contains a list of files in the manifest.xml document.&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;/p&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; fsNotesListHTML()		
+	select case I_DEMO
+		case  1 
+			&apos;We could get the field to talk... we would need to provide additional languages though...
+		case 2
+			&apos;We could include a feedback form...
+			&apos;https://docs.google.com/spreadsheet/viewform?formkey=dDdra2padnFqRWpjQnZyOTF6bkpvMlE6MA
+			s1 = s1 &amp; &quot;&lt;hr /&gt;&quot; &amp; chr$(10)
+			s1 = s1 &amp; &quot;&lt;form action=&quot;&quot;https://docs.google.com/spreadsheet/formResponse&quot;&quot; method=&quot;&quot;post&quot;&quot; id=&quot;&quot;ss-form&quot;&quot; target=&quot;&quot;_blank&quot;&quot; rel=&quot;&quot;noreferrer&quot;&quot; class=&quot;&quot;noeffect&quot;&quot;&gt;&quot; &amp; chr$(10)
+			s1 = s1 &amp; &quot;&lt;input type=&quot;&quot;hidden&quot;&quot; name=&quot;&quot;hl&quot;&quot; value=&quot;&quot;en&quot;&quot;&gt;&quot; &amp; chr$(10)
+			s1 = s1 &amp; &quot;&lt;input type=&quot;&quot;hidden&quot;&quot; name=&quot;&quot;formkey&quot;&quot; value=&quot;&quot;dDdra2padnFqRWpjQnZyOTF6bkpvMlE6MA&quot;&quot;&gt;&quot; &amp; chr$(10)
+			s1 = s1 &amp; &quot;&lt;p class=&quot;&quot;western&quot;&quot; align=left&gt;&quot; &amp; chr$(10)
+			s1 = s1 &amp; &quot;&lt;b&gt;name&lt;/b&gt;&quot; &amp; chr$(10)
+			s1 = s1 &amp; &quot;&lt;br /&gt;&quot; &amp; chr$(10)
+			s1 = s1 &amp; &quot;&lt;input type=&quot;&quot;text&quot;&quot; name=&quot;&quot;entry.0.single&quot;&quot; id=&quot;&quot;entry_0&quot;&quot; size=&quot;&quot;33&quot;&quot; maxlength=&quot;&quot;33&quot;&quot; value=&quot;&quot;&quot; &amp; ThisComponent.DocumentProperties.ModifiedBy &amp; &quot;&quot;&quot;/&gt;&quot; &amp; chr$(10)
+			s1 = s1 &amp; &quot;&lt;/p&gt;&quot; &amp; chr$(10)
+			s1 = s1 &amp; &quot;&lt;p class=&quot;&quot;western&quot;&quot; align=left&gt;&quot; &amp; chr$(10)
+			s1 = s1 &amp; &quot;&lt;b&gt;Comment&lt;/b&gt;&quot; &amp; chr$(10)
+			s1 = s1 &amp; &quot;&lt;br /&gt;&quot; &amp; chr$(10)
+			s1 = s1 &amp; &quot;&lt;input type=&quot;&quot;text&quot;&quot; name=&quot;&quot;entry.1.single&quot;&quot; id=&quot;&quot;entry_1&quot;&quot; size=&quot;&quot;100&quot;&quot; maxlength=&quot;&quot;500&quot;&quot; value=&quot;&quot;&quot;&quot; speech=&quot;&quot;speech&quot;&quot; x-webkit-speech=&quot;&quot;x-webkit-speech&quot;&quot; placeholder=&quot;&quot;Enter your comment&quot;&quot; autocomplete=&quot;&quot;off&quot;&quot; autofocus=&quot;&quot;autofocus&quot;&quot; /&gt;&quot; &amp; chr$(10)
+			&apos; Job ticket is a random sequence that is different than the User Key. It appears in the code of about.html only.
+			&apos; This database should not contain the actual user key, because that could reduce the user&apos;s security.
+			&apos; A job ticket is unique for every submission. The visible key is unique for every user.
+			s1 = s1 &amp; &quot;&lt;input type=&quot;&quot;hidden&quot;&quot; name=&quot;&quot;entry.2.single&quot;&quot; id=&quot;&quot;entry_2&quot;&quot; value=&quot;&quot;JOB-5F02455A-&quot; &amp; UUIDv4() &amp; &quot;&quot;&quot;&gt;&quot; &amp; chr$(10)
+			&apos; Date the user&apos;s file was last updated. This helps sort the data so that old issues that have been solved 
+			&apos; can be sorted so they are farther down  on the list.
+			s1 = s1 &amp; &quot;&lt;input type=&quot;&quot;hidden&quot;&quot; name=&quot;&quot;entry.4.single&quot;&quot; id=&quot;&quot;entry_4&quot;&quot; value=&quot;&quot;&quot; &amp; fsWhenMade (ThisComponent.getURL()) &amp; &quot;&quot;&quot;&gt;&quot; &amp; chr$(10)
+			s1 = s1 &amp; &quot;&lt;/p&gt;&quot; &amp; chr$(10)
+			s1 = s1 &amp; &quot;&lt;p class=&quot;&quot;western&quot;&quot; align=left&gt;	&quot; &amp; chr$(10)
+			s1 = s1 &amp; &quot;&lt;input value=&quot;&quot;Send&quot;&quot; type=&quot;&quot;submit&quot;&quot; id=&quot;&quot;indicator&quot;&quot;&gt;&quot; &amp; chr$(10)
+			s1 = s1 &amp; &quot;&lt;/p&gt;&quot; &amp; chr$(10)
+			s1 = s1 &amp; &quot;&lt;/form&gt;&quot; &amp; chr$(10)
+		case else 
+	end select
+	s1 = s1 &amp; &quot;&lt;/body&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;/html&gt;&quot; &amp; chr$(10)
+	fsAboutEnglish= s1
+end function
+
+function fsAboutFrench
+	dim s1 as string
+	s1 = s1 &amp; &quot;&lt;!DOCTYPE HTML PUBLIC &quot;&quot;-//W3C//DTD HTML 4.0 Transitional//EN&quot;&quot;&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;html&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;head&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;meta http-equiv=&quot;&quot;content-type&quot;&quot; content=&quot;&quot;text/html; charset=utf-8&quot;&quot; /&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;meta name=viewport content=&quot;&quot;initial-scale=1, minimum-scale=1, width=device-width&quot;&quot; /&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;meta name=&quot;&quot;created&quot;&quot; content=&quot;&quot;&quot; &amp; fsNow &amp; &quot;&quot;&quot; /&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; fsAbilityMeta &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;title&gt;&quot; &amp; fsShortFileName() &amp; &quot;&lt;/title&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;style type=&quot;&quot;text/css&quot;&quot;&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;!--&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;p { font-family: &quot;&quot;arial&quot;&quot;, sans-serif }&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;p.western { font-family: &quot;&quot;arial&quot;&quot;, sans-serif }&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;p.cjk { font-size: 10pt; font-weight: normal }&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;--&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;/style&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;/head&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;body lang=&quot;&quot;fr-fr&quot;&quot; dir=&quot;&quot;ltr&quot;&quot;&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;b&gt;&quot; &amp; fsshortfilename() &amp; &quot;&lt;/b&gt;&lt;/p&gt;&lt;hr&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;p class=&quot;&quot;western&quot;&quot; align=left&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;b&gt;&quot; &amp; fsShortFileName() &amp; &quot;&lt;/b&gt; - La présentation « contents.pdf » est dans le directoire CONTENTS. &quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;Les notes sont dans le document « slide-notes.xml » dans le directoire CONTENTS. &quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;Le directoire META-INF contient une liste de fichiers dans le document « manifest.xml » . &quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;/p&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; fsNotesListHTML()
+	select case I_DEMO
+	case 2
+		&apos;We could include a feedback form...
+		&apos;https://docs.google.com/spreadsheet/viewform?formkey=dDdra2padnFqRWpjQnZyOTF6bkpvMlE6MA
+		s1 = s1 &amp; &quot;&lt;hr /&gt;&quot; &amp; chr$(10)
+		s1 = s1 &amp; &quot;&lt;form action=&quot;&quot;https://docs.google.com/spreadsheet/formResponse&quot;&quot; method=&quot;&quot;POST&quot;&quot; id=&quot;&quot;ss-form&quot;&quot; target=&quot;&quot;_blank&quot;&quot; rel=&quot;&quot;noreferrer&quot;&quot; class=&quot;&quot;noeffect&quot;&quot;&gt;&quot; &amp; chr$(10)
+		s1 = s1 &amp; &quot;&lt;input type=&quot;&quot;hidden&quot;&quot; name=&quot;&quot;hl&quot;&quot; value=&quot;&quot;fr&quot;&quot;&gt;&quot; &amp; chr$(10)
+		s1 = s1 &amp; &quot;&lt;input type=&quot;&quot;hidden&quot;&quot; name=&quot;&quot;formkey&quot;&quot; value=&quot;&quot;dDdra2padnFqRWpjQnZyOTF6bkpvMlE6MA&quot;&quot;&gt;&quot; &amp; chr$(10)
+		s1 = s1 &amp; &quot;&lt;p class=&quot;&quot;western&quot;&quot; align=left&gt;&quot; &amp; chr$(10)
+		s1 = s1 &amp; &quot;&lt;b&gt;Nom&lt;/b&gt;&quot; &amp; chr$(10)
+		s1 = s1 &amp; &quot;&lt;br /&gt;&quot; &amp; chr$(10)
+		s1 = s1 &amp; &quot;&lt;input type=&quot;&quot;text&quot;&quot; name=&quot;&quot;entry.0.single&quot;&quot; id=&quot;&quot;entry_0&quot;&quot; size=&quot;&quot;33&quot;&quot; maxlength=&quot;&quot;33&quot;&quot; value=&quot;&quot;&quot; &amp; ThisComponent.DocumentProperties.ModifiedBy &amp; &quot;&quot;&quot;/&gt;&quot; &amp; chr$(10)
+		s1 = s1 &amp; &quot;&lt;/p&gt;&quot; &amp; chr$(10)
+		s1 = s1 &amp; &quot;&lt;p class=&quot;&quot;western&quot;&quot; align=left&gt;&quot; &amp; chr$(10)
+		s1 = s1 &amp; &quot;&lt;b&gt;Commentaires&lt;/b&gt;&quot; &amp; chr$(10)
+		s1 = s1 &amp; &quot;&lt;br /&gt;&quot; &amp; chr$(10)
+		s1 = s1 &amp; &quot;&lt;input type=&quot;&quot;text&quot;&quot; name=&quot;&quot;entry.1.single&quot;&quot; id=&quot;&quot;entry_1&quot;&quot; size=&quot;&quot;100&quot;&quot; maxlength=&quot;&quot;500&quot;&quot; value=&quot;&quot;&quot;&quot; speech=&quot;&quot;speech&quot;&quot; x-webkit-speech=&quot;&quot;x-webkit-speech&quot;&quot; placeholder=&quot;&quot;Enter your comment&quot;&quot; autocomplete=&quot;&quot;off&quot;&quot; autofocus=&quot;&quot;autofocus&quot;&quot; /&gt;&quot; &amp; chr$(10)
+		&apos; Job ticket is a random sequence that is different than the User Key. It appears in the code of about.html only.
+		&apos; This database should not contain the actual user key, because that could reduce the user&apos;s security.
+		&apos; A job ticket is unique for every submission. The visible key is unique for every user.
+		s1 = s1 &amp; &quot;&lt;input type=&quot;&quot;hidden&quot;&quot; name=&quot;&quot;entry.2.single&quot;&quot; id=&quot;&quot;entry_2&quot;&quot; value=&quot;&quot;JOB-5F02455A-&quot; &amp; UUIDv4() &amp; &quot;&quot;&quot;&gt;&quot; &amp; chr$(10)
+		&apos; Date the user&apos;s file was last updated. This helps sort the data so that old issues that have been solved 
+		&apos; can be sorted so they are farther down  on the list.
+		s1 = s1 &amp; &quot;&lt;input type=&quot;&quot;hidden&quot;&quot; name=&quot;&quot;entry.4.single&quot;&quot; id=&quot;&quot;entry_4&quot;&quot; value=&quot;&quot;&quot; &amp; fsWhenMade (ThisComponent.getURL()) &amp; &quot;&quot;&quot;&gt;&quot; &amp; chr$(10)
+		s1 = s1 &amp; &quot;&lt;/p&gt;&quot; &amp; chr$(10)
+		s1 = s1 &amp; &quot;&lt;p class=&quot;&quot;western&quot;&quot; align=left&gt;	&quot; &amp; chr$(10)
+		s1 = s1 &amp; &quot;&lt;input value=&quot;&quot;Soumettre&quot;&quot; type=&quot;&quot;submit&quot;&quot; id=&quot;&quot;indicator&quot;&quot;&gt;&quot; &amp; chr$(10)
+		s1 = s1 &amp; &quot;&lt;/p&gt;&quot; &amp; chr$(10)
+		s1 = s1 &amp; &quot;&lt;/form&gt;&quot; &amp; chr$(10)
+	case else 
+	end select
+	s1 = s1 &amp; &quot;&lt;/body&gt;&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;/html&gt;&quot; &amp; chr$(10)
+	fsAboutFrench = s1
+end function
+
+function fiCountNewCommands
+	dim sA as string
+	dim i as integer
+	sA = fsNewCommands(0, &quot;en&quot;,0, 1 )
+	for i = 0 to 100
+		sA = fsNewCommands(i, &quot;en&quot;,0, 1)
+		if len ( sA ) = 0 then
+			exit for
+		endif
+	next
+	fiCountNewCommands = i - 1
+end function
+
+function fiCountCommands
+	dim sA as string
+	dim i as integer
+	sA = fsGetCommands(0, &quot;en&quot;,0, 2 )
+	for i = 0 to 100
+		sA = fsGetCommands(i, &quot;en&quot;,0, 2)
+		if len ( sA ) = 0 then
+			exit for
+		endif
+	next
+	fiCountCommands = i - 1
+end function
+
+function fiCountExportCommands
+	dim sA as string
+	dim i as integer
+	sA = fsExportCommands(0, &quot;en&quot;,0, 3)
+	for i = 0 to 100
+		sA = fsExportCommands(i, &quot;en&quot;,0, 3)
+		if len ( sA ) = 0 then
+			exit for
+		endif
+	next
+	fiCountExportCommands = i - 1
+end function
+
+function fsUserPhraseToProgramPhrase (byval sC, optional iBrand)
+	dim i as integer
+	dim sA as string
+	if ismissing (iBrand) then
+		iBrand = I_BRANDED
+	endif
+	fsUserPhraseToProgramPhrase = sC
+	for i = 0 to fiCountCommands
+		sA = fsGetCommands(i, fsGetSetting(&quot;language&quot;) , iBrand) &apos; Human phrase
+		if sA = sC then
+			fsUserPhraseToProgramPhrase = fsGetCommands(i, &quot;en&quot; ,0 ) &apos; Computer phrase
+			exit function
+		endif
+	next
+		
+	for i = 0 to fiCountExportCommands 
+		sA = fsGetCommands(i, fsGetSetting(&quot;language&quot;) , iBrand) &apos; Human phrase
+		if sA = sC then
+			fsUserPhraseToProgramPhrase = fsExportCommands(i, &quot;en&quot; ,0 ) &apos; Computer phrase
+			exit function
+		endif
+	next
+	
+end function
+
+function fsNewPhraseToProgramPhrase (byval sC, optional iBrand)
+	dim i as integer
+	dim sA as string
+	if ismissing (iBrand) then
+		iBrand = I_BRANDED
+	endif
+	fsNewPhraseToProgramPhrase = sC
+	for i = 0 to fiCountNewCommands
+		sA = fsNewCommands(i, fsGetSetting(&quot;language&quot;) , iBrand, 1) &apos; Human phrase
+		if sA = sC then
+			fsNewPhraseToProgramPhrase = fsNewCommands(i, &quot;en&quot; ,0 , 1) &apos; Computer phrase
+			exit function
+		endif
+	next
+		
+	for i = 0 to fiCountExportCommands 
+		sA = fsNewCommands(i, fsGetSetting(&quot;language&quot;) , iBrand, 1) &apos; Human phrase
+		if sA = sC then
+			fsNewPhraseToProgramPhrase = fsNewCommands(i, &quot;en&quot; ,0 ) &apos; Computer phrase
+			exit function
+		endif
+	next
+end function
+
+function fsExportPhraseToProgramPhrase (byval sC, optional iBrand)
+	dim i as integer
+	dim sA as string
+	if ismissing (iBrand) then
+		iBrand = I_BRANDED
+	endif
+	fsExportPhraseToProgramPhrase = sC
+	for i = 0 to fiCountExportCommands 
+		sA = fsExportCommands(i, fsGetSetting(&quot;language&quot;) , iBrand) &apos; Human phrase
+		if sA = sC then
+			fsExportPhraseToProgramPhrase = fsExportCommands(i, &quot;en&quot; ,0 ) &apos; Computer phrase
+			exit function
+		endif
+	next
+end function
+
+function fsProgramPhraseToUserPhrase (byval sC, byval iBrand, byval iButton)
+	dim i as integer
+	dim sA as string
+	if ismissing (iBrand) then
+		iBrand = I_BRANDED
+	endif
+	if ismissing (iButton) then
+		iButton = 2
+	endif
+	fsProgramPhraseToUserPhrase = sC
+	select case iButton
+	case 1
+		for i = 0 to fiCountNewCommands 
+			sA = fsNewCommands(i, &quot;en&quot; ,0 ) &apos; Computer phrase
+				if sA = sC then
+					fsProgramPhraseToUserPhrase = fsNewCommands(i, fsGetSetting(&quot;language&quot;) , iBrand) &apos; Human phrase
+					exit for
+				endif
+			next
+	case 3
+		for i = 0 to fiCountExportCommands
+		sA = fsExportCommands(i, &quot;en&quot; ,0 ) &apos; Computer phrase
+		if sA = sC then
+			fsProgramPhraseToUserPhrase = fsExportCommands(i, fsGetSetting(&quot;language&quot;) , iBrand) &apos; Human phrase
+			exit for
+		endif
+	next
+	case else 
+		for i = 0 to fiCountCommands
+			sA = fsGetCommands(i, &quot;en&quot; ,0 ) &apos; Computer phrase
+			if sA = sC then
+				fsProgramPhraseToUserPhrase = fsGetCommands(i, fsGetSetting(&quot;language&quot;) , iBrand) &apos; Human phrase
+				exit for
+			endif
+		next
+	end select
+end function
+
+function fiIndexOfMatchingCommand(byval sA, optional byval sLang, optional byval ibrand)
+	dim i as integer
+	dim j as integer
+	j = -1
+	if ismissing (sLang) then
+		sLang =fsGetSetting(&quot;language&quot;)
+	endif
+	if ismissing (ibrand) then
+		ibrand = I_BRANDED
+	endif
+	for i = 0 to fiCountCommands
+		if len (fsGetCommands(i, sLang, ibrand)) &lt;&gt; 0 and instr ( sA , fsGetCommands(i, sLang,  I_BRANDED)) = 1 then
+			j = i
+			exit for
+		endif
+	next
+	fiIndexOfMatchingCommand = j
+end function
+
+function fsExportCommands(i as integer, optional sLanguage, optional iBrand ) as string
+	&apos; Note to translator: Please translate from the English strings.
+	&apos; This function returns readable computer commands for the export dialog.
+	&apos; set iBrand = 0 for a complete inventory of available functions. Most
+	&apos; brands will only need to use functions that facilitate use of their
+	&apos; product. 
+	if ismissing(sLanguage) then 
+		sLanguage=fsGetSetting(&quot;language&quot;)
+	endif
+	if ismissing (iBrand) then
+		iBrand = I_BRANDED
+	endif
+	dim j as integer
+	dim iCount as integer
+	iCount = 25
+	dim sA(iCount) as string
+	&apos;for j = 0 to iCount
+	&apos;	sA (j) = &quot;&quot;
+	&apos;next
+	select case iBrand
+		case 4
+		&apos; Webcam Client
+		select case sLanguage
+		case &quot;fr&quot; &apos;French
+			sA (00) = &quot;Enregistrer et envoyer la présentation (.odp)&quot; &apos; la plupart des marques vont utiliser cette fonctionnalité.
+			sA (07) = &quot;Envoyer un livre de poche (.epub)&quot;
+			sA (08) = &quot;Envoyer un document pdf mobile (.zip)&quot;
+		case else 
+			sA (00) = &quot;Save and send the presentation (.odp)&quot;
+			sA (07) = &quot;Send pocket book (.epub)&quot;
+			sA (08) = &quot;Send pdf mobile (.zip)&quot;
+		end select
+	case 3
+		&apos; TTS publisher client - no ePub
+		select case sLanguage
+		case &quot;fr&quot; &apos;French 
+			sA (00) = &quot;Enregistrer et envoyer la présentation (.odp)&quot; &apos; la plupart des marques vont utiliser cette fonctionnalité.
+			sA (08) = &quot;Envoyer un document pdf mobile (.zip)&quot;
+			sA (12) = &quot;Créer un document(.htm)&quot;
+		case else 
+			sA (00) = &quot;Save and send the presentation (.odp)&quot;
+			sA (08) = &quot;Send pdf mobile (.zip)&quot;
+			sA (12) = &quot;Create document (.htm)&quot;
+		end select
+	case 2
+		&apos; Preview. Simplified choices.
+		select case sLanguage
+		case &quot;fr&quot; &apos;French
+			sA (00) = &quot;Enregistrer et envoyer la présentation (.odp)&quot; &apos; la plupart des marques vont utiliser cette fonctionnalité.
+			sA (03) = &quot;Envoyer un document  (.htm)&quot;
+			sA (07) = &quot;Envoyer un livre de poche (.epub)&quot;
+			sA (12) = &quot;Créer un document(.htm)&quot;
+			sA (16) = &quot;Créer un livre de poche (.epub)&quot;
+		case else 
+			sA (00) = &quot;Save and send the presentation (.odp)&quot;
+			sA (03) = &quot;Send document  (.htm)&quot;
+			sA (07) = &quot;Send pocket book (.epub)&quot;
+			sA (12) = &quot;Create document (.htm)&quot;
+			sA (16) = &quot;Create pocket book (.epub)&quot; 
+		end select
+	case 1 &apos; Ability Tools - My default brand - French and English
+	select case sLanguage
+		case &quot;fr&quot; &apos;French
+			sA (00) = &quot;Enregistrer et envoyer la présentation (.odp)&quot; &apos; la plupart des marques vont utiliser cette fonctionnalité.
+			sA (01) = &quot;Envoyer Unicode Braille sans compression [en-US] (.htm)&quot;
+			sA (02) = &quot;Envoyer Braille sans compression [en-US] (.htm)&quot;
+			sA (03) = &quot;Envoyer un document  (.htm)&quot;
+			sA (04) = &quot;Envoyer un document à contraste élevé (.htm)&quot;
+			sA (05) = &quot;Envoyer un document json mobile (.zip)&quot;
+			sA (06) = &quot;Envoyer un livre de tablette (.epub)&quot;
+			sA (07) = &quot;Envoyer un livre de poche (.epub)&quot;
+			sA (08) = &quot;Envoyer un document pdf mobile (.zip)&quot;
+			sA (09) = &quot;Envoyer un document pdf archive (.zip)&quot;
+			sA (10) = &quot;Créer Unicode Braille [en-US] (.htm)&quot;
+			sA (11) = &quot;Créer Braille [en-US] (.htm)&quot;
+			sA (12) = &quot;Créer un document(.htm)&quot;
+			sA (13) = &quot;Créer un document de contraste élevé (.htm)&quot;
+			sA (14) = &quot;Créer un fichier json mobile (.zip)&quot;
+			sA (15) = &quot;Créer un livre de tablette (.epub)&quot;
+			sA (16) = &quot;Créer un livre de poche (.epub)&quot;
+			sA (17) = &quot;Créer un document pdf mobile (.zip)&quot;
+			sA (18) = &quot;Créer un document pdf archive (.zip)&quot;
+		case else  &apos;en
+			sA (00) = &quot;Save and send the presentation (.odp)&quot; &apos; most brands will use this.
+			sA (01) = &quot;Send uncompressed Unicode Braille [en-US] (.htm)&quot;
+			sA (02) = &quot;Send uncompressed Braille [en-US] (.htm)&quot;
+			sA (03) = &quot;Send document (.htm)&quot; 
+			sA (04) = &quot;Send high contrast document (.htm)&quot;
+			sA (05) = &quot;Send json mobile document (.zip)&quot;
+			sA (06) = &quot;Send tablet book (.epub)&quot; 
+			sA (07) = &quot;Send pocket book (.epub)&quot;
+			sA (08) = &quot;Send pdf mobile (.zip)&quot;
+			sA (09) = &quot;Send pdf archive (.zip)&quot;
+			sA (10) = &quot;Create uncompressed Unicode Braille [en-US] (.htm)&quot;
+			sA (11) = &quot;Create uncompressed Braille [en-US] (.htm)&quot;
+			sA (12) = &quot;Create document (.htm)&quot; 
+			sA (13) = &quot;Create high contrast document (.htm)&quot;
+			sA (14) = &quot;Create json mobile file (.zip)&quot;
+			sA (15) = &quot;Create tablet book (.epub)&quot; 
+			sA (16) = &quot;Create pocket book (.epub)&quot; 		
+			sA (17) = &quot;Create pdf mobile (.zip)&quot;
+			sA (18) = &quot;Create pdf archive (.zip)&quot;
+		end select
+	case else  
+		&apos; The developer&apos;s strings. Parenthesis, English Uppercase, no spaces.
+		&apos; Last item must be &quot;&quot;.
+		sA(00) = &quot;(SEND_THIS_DOCUMENT_PATH)&quot; &apos; Most brands will use this.
+		sA(01) = &quot;(SEND_UNICODE_BRAILLE_HTM)&quot;
+		sA(02) = &quot;(SEND_BRAILLE_HTM)&quot;
+		sA(03) = &quot;(SEND_DOCUMENT_HTM)&quot; 
+		sA(04) = &quot;(SEND_HIGH_CONTRAST_HTM)&quot;
+		sA(05) = &quot;(SEND_JSON_MOBILE_ZIP)&quot;
+		sA(06) = &quot;(SEND_TABLET_EPUB)&quot; 
+		sA(07) = &quot;(SEND_HANDHELD_EPUB)&quot;
+		sA(08) = &quot;(SEND_PDF_MOBILE_ZIP)&quot;
+		sA(09) = &quot;(SEND_PDF_ARCHIVE_ZIP)&quot;
+		sA(10) = &quot;(CREATE_UNICODE_BRAILLE_HTM)&quot;
+		sA(11) = &quot;(CREATE_BRAILLE_HTM)&quot;
+		sA(12) = &quot;(CREATE_DOCUMENT_HTM)&quot; 
+		sA(13) = &quot;(CREATE_HIGH_CONTRAST_HTM)&quot;
+		sA(14) = &quot;(CREATE_JSON_MOBILE_ZIP)&quot;
+		sA(15) = &quot;(CREATE_TABLET_EPUB)&quot; 
+		sA(16) = &quot;(CREATE_HANDHELD_EPUB)&quot;
+		sA(17) = &quot;(CREATE_PDF_MOBILE_ZIP)&quot;
+		sA(18) = &quot;(CREATE_PDF_ARCHIVE_ZIP)&quot;
+		&apos; sA(iCount) = &quot;&quot; &apos; last item must be blank!
+	end select
+	fsExportCommands = sA(i)
+end function
+
+function fsGetCommands(i as integer, optional sLanguage, optional iBrand, optional iButton) as string
+&apos; Note to translator: Please translate from the English strings.
+&apos; This function returns readable computer commands for the settings dialog.
+&apos; set iBrand = 0 for a complete inventory of available functions. Most
+&apos; brands will only need to use functions that facilitate use of their
+&apos; product.
+	dim j as integer
+	dim icount as integer
+	if ismissing(sLanguage) then 
+		sLanguage=fsGetSetting(&quot;language&quot;)
+	endif
+    if ismissing (iBrand) then
+        iBrand = I_BRANDED
+    endif
+        if ismissing (iButton) then
+        iButton = 2
+    endif
+    &apos;msgBox iBrand
+    select case iButton
+    case 3 
+    	fsGetCommands = fsExportCommands (i, sLanguage, iBrand)
+    case 2
+    	iCount = 40
+		dim sA(iCount) as string 
+	    select case iBrand
+	   	case 4 &apos; Webcam client
+	    	select case sLanguage
+			case &quot;fr&quot; &apos;French
+				sA(1) = &quot;Aperçu de la transcription&quot;
+				sA(5) = &quot;Lisez les notes avec la voix du système (Recommandé!)&quot;
+				sA(10) = &quot;Ajouter une image locale à la fin de ce projet&quot;	
+				sA(12) = &quot;Ajouter URL 8 à la fin de ce projet&quot;
+				sA(13) = &quot;Ajouter URL 7 à la fin de ce projet&quot;
+				sA(14) = &quot;Ajouter URL 6 à la fin de ce projet&quot;
+				sA(15) = &quot;Ajouter URL 5 à la fin de ce projet&quot;
+				sA(16) = &quot;Ajouter URL 4 à la fin de ce projet&quot;
+				sA(17) = &quot;Ajouter URL 3 à la fin de ce projet&quot;
+				sA(18) = &quot;Ajouter URL 2 à la fin de ce projet&quot;
+				sA(19) = &quot;Ajouter URL 1 à la fin de ce projet&quot;
+				sA(20) = &quot;Ajouter 2D code 8 à la fin de ce projet&quot;
+				sA(21) = &quot;Ajouter 2D code 7 à la fin de ce projet&quot;
+				sA(22) = &quot;Ajouter 2D code 6 à la fin de ce projet&quot;
+				sA(23) = &quot;Ajouter 2D code 5 à la fin de ce projet&quot;
+				sA(24) = &quot;Ajouter 2D code 4 à la fin de ce projet&quot;
+				sA(25) = &quot;Ajouter 2D code 3 à la fin de ce projet&quot;
+				sA(26) = &quot;Ajouter 2D code 2 à la fin de ce projet&quot;
+				sA(27) = &quot;Ajouter 2D code 1 à la fin de ce projet&quot;
+				sA(36) = &quot;Ajouter une carte d&apos;appel Mecard à une présentation&quot;
+			case else  &apos;en
+				sA(1) = &quot;Show a transcript&quot; 
+				sA(5) = &quot;Read notes aloud with the system voice (Recommended!)&quot;
+				sA(10) = &quot;Add an image with a title and a date&quot;
+				sA(12) = &quot;Add URL 8 to project&quot;
+				sA(13) = &quot;Add URL 7 to project&quot;
+				sA(14) = &quot;Add URL 6 to project&quot;
+				sA(15) = &quot;Add URL 5 to project&quot;
+				sA(16) = &quot;Add URL 4 to project&quot;
+				sA(17) = &quot;Add URL 3 to project&quot;
+				sA(18) = &quot;Add URL 2 to project&quot;
+				sA(19) = &quot;Add URL 1 to project&quot;
+				sA(20) = &quot;Add 2D scan code 8 to project&quot;
+				sA(21) = &quot;Add 2D scan code 7 to project&quot;
+				sA(22) = &quot;Add 2D scan code 6 to project&quot;
+				sA(23) = &quot;Add 2D scan code 5 to project&quot;
+				sA(24) = &quot;Add 2D scan code 4 to project&quot;
+				sA(25) = &quot;Add 2D scan code 3 to project&quot;
+				sA(26) = &quot;Add 2D scan code 2 to project&quot;
+				sA(27) = &quot;Add 2D scan code 1 to project&quot;
+				sA(36) = &quot;Add an electronic scanner card to a project&quot;
+			end select
+		case 3 &apos; TTS publisher client - no ePub
+	    	select case sLanguage
+			case &quot;fr&quot; &apos;French
+				sA(1) = &quot;Aperçu de la transcription&quot;
+				sA(5) = &quot;Lisez les notes avec la voix du système (Recommandé!)&quot;
+				sA(10) = &quot;Ajouter une image avec un titre et un date&quot;
+				sA(27) = &quot;Ajouter 2D code à la fin de ce projet&quot;
+			case else  &apos;en
+				sA(1) = &quot;Show a transcript&quot; 
+				sA(5) = &quot;Read notes aloud with the system voice (Recommended!)&quot;
+				sA(10) = &quot;Add an image with a title and a date&quot;
+				sA(27) = &quot;Add 2D scan code to project&quot;
+			end select
+		case 2 &apos; Preview - only common choices for a simplified interface
+	    	select case sLanguage
+			case &quot;fr&quot; &apos;French
+				sA(1) = &quot;Aperçu de la transcription&quot;
+				sA(3) = &quot;Lisez les notes et les textes alternatifs pour les aveugles&quot;
+				sA(5) = &quot;Lisez les notes avec la voix du système (Recommandé!)&quot;
+				sA(8) = &quot;Ajouter “&lt;ask&gt;” au debut et “&lt;/ask&gt;” à la fin de cette note.&quot;
+				sA(10) = &quot;Ajouter une image à la fin de ce projet&quot;
+				sA(27) = &quot;Ajouter 2D code 1 à la fin de ce projet&quot;
+			case else  &apos;en
+				sA(1) = &quot;Show a transcript&quot; 
+				sA(3) = &quot;Read notes and alternative text for the blind.&quot; 
+				sA(5) = &quot;Read notes aloud with the system voice (Recommended!)&quot;
+				sA(8) = &quot;Add “&lt;ask&gt;” to the start and “&lt;/ask&gt;” to the end of this note.&quot;
+				sA(10) = &quot;Add an image with a title and a date&quot;
+				sA(27) = &quot;Add 2D scan code 1 to project&quot;
+			end select		
+	    case 1 &apos; Ability Tools - complete toolkit in French and English...
+	    	&apos; Includes tools that work best on up to date computers, mobile devices 
+	    	&apos; and ePub reading programs that fully comply with the current ePub 2 standards.
+	    	&apos; Adobe Digital editions on Windows doesn&apos;t render Unicode well - especially Hindi
+	    	&apos; Use 
+	    	select case sLanguage
+			case &quot;fr&quot; &apos;French
+				sA(0) = &quot;Enregistrer l&apos;écran&quot;
+				sA(1) = &quot;Aperçu de la transcription&quot;
+				sA(2) = &quot;Aperçu de cette note en code Braille sans compression (en-US)&quot;
+				sA(3) = &quot;Lisez les notes et les textes alternatifs pour les aveugles&quot;
+				sA(4) = &quot;Lisez les notes avec des voix multilingues et des ressources en-ligne (Attention!)&quot;
+				sA(5) = &quot;Lisez les notes avec la voix du système (Recommandé!)&quot;
+				sA(6) = &quot;Lisez les notes multilingues (Expert!)&quot;
+				&apos; Crée pour verification. Voir la note anglaise.
+				sA(7) = &quot;&quot;
+				sA(8) = &quot;Ajouter “&lt;ask&gt;” au debut et “&lt;/ask&gt;” à la note.&quot;
+				sA(9) = &quot;Importer des images à partir d&apos;un dossier au projet&quot;
+				sA(10) = &quot;Ajouter une image avec un titre et un date au projet&quot;
+				sA(11) = &quot;Ajouter une image avec un titre, un date et une adresse au projet&quot;
+				sA(12) = &quot;Ajouter URL 8 au projet&quot;
+				sA(13) = &quot;Ajouter URL 7 au projet&quot;
+				sA(14) = &quot;Ajouter URL 6 au projet&quot;
+				sA(15) = &quot;Ajouter URL 5 au projet&quot;
+				sA(16) = &quot;Ajouter URL 4 au projet&quot;
+				sA(17) = &quot;Ajouter URL 3 au projet&quot;
+				sA(18) = &quot;Ajouter URL 2 au projet&quot;
+				sA(19) = &quot;Ajouter URL 1 au projet&quot;
+				sA(20) = &quot;Ajouter 2D code pour URL 8 au projet&quot;
+				sA(21) = &quot;Ajouter 2D code pour URL 7 au projet&quot;
+				sA(22) = &quot;Ajouter 2D code pour URL 6 au projet&quot;
+				sA(23) = &quot;Ajouter 2D code pour URL 5 au projet&quot;
+				sA(24) = &quot;Ajouter 2D code pour URL 4 au projet&quot;
+				sA(25) = &quot;Ajouter 2D code pour URL 3 au projet&quot;
+				sA(26) = &quot;Ajouter 2D code pour URL 2 au projet&quot;
+				sA(27) = &quot;Ajouter 2D code pour URL 1 au projet&quot;
+				sA(28) = &quot;Ajouter 2D code pour Twitter au projet&quot;
+				sA(29) = &quot;Ajouter 2D code pour Identi.ca au projet&quot;
+				&apos; Nous avons ces fonctions dans l&apos;outil bloc-notes.
+				&apos;sA(30) = &quot;Ajouter l&apos;XHTML pour les paragraphes à la note&quot;
+				&apos;sA(31) = &quot;Ajouter l&apos;XHTML pour les puces à la note&quot;
+				&apos;sA(32) = &quot;Ajouter l&apos;XHTML pour une liste ordonnée à la note&quot;
+				&apos;sA(33) = &quot;Ajouter l&apos;XHTML pour code informatique à la note&quot;
+				sA(34) = &quot;Effacer l&apos;XHTML de la note&quot;
+				sA(35) = &quot;Modifier la note de cette diapositive&quot;
+				sA(36) = &quot;Ajouter une carte d&apos;appel Mecard au projet&quot;
+			case else  &apos;en
+				sA(0) = &quot;Record the desktop&quot;
+				sA(1) = &quot;Read the transcript&quot; 
+				sA(2) = &quot;Read this note aloud and show uncompressed Braille code (en-US)&quot;
+				sA(3) = &quot;Read notes and alternative text for the blind.&quot;
+				sA(4) = &quot;Read notes aloud with on-line resources (Caution!)&quot; 
+				sA(5) = &quot;Read notes aloud with the system voice (Recommended!)&quot;
+				sA(6) = &quot;Read notes aloud using different languages (Expert!)&quot;
+				&apos; Developers can access this using the &quot;secret&quot; developer command below
+				sA(7) = &quot;&quot;
+				sA(8) = &quot;Add “&lt;ask&gt;” to the start and “&lt;/ask&gt;” to the end of this note.&quot;
+				sA(9) = &quot;Add the images from a folder to the end of this project&quot;
+				sA(10) = &quot;Add an image with a title and a date&quot;
+				sA(11) = &quot;Add an image with an address, a title and a date.&quot;				
+				sA(12) = &quot;Add URL 8 to project&quot;
+				sA(13) = &quot;Add URL 7 to project&quot;
+				sA(14) = &quot;Add URL 6 to project&quot;
+				sA(15) = &quot;Add URL 5 to project&quot;
+				sA(16) = &quot;Add URL 4 to project&quot;
+				sA(17) = &quot;Add URL 3 to project&quot;
+				sA(18) = &quot;Add URL 2 to project&quot;
+				sA(19) = &quot;Add URL 1 to project&quot;
+				sA(20) = &quot;Add 2D scan code for URL 8 to project&quot;
+				sA(21) = &quot;Add 2D scan code for URL 7 to project&quot;
+				sA(22) = &quot;Add 2D scan code for URL 6 to project&quot;
+				sA(23) = &quot;Add 2D scan code for URL 5 to project&quot;
+				sA(24) = &quot;Add 2D scan code for URL 4 to project&quot;
+				sA(25) = &quot;Add 2D scan code for URL 3 to project&quot;
+				sA(26) = &quot;Add 2D scan code for URL 2 to project&quot;
+				sA(27) = &quot;Add 2D scan code for URL 1 to project&quot;
+				sA(28) = &quot;Add 2D scan code for Twitter to project&quot;
+				sA(29) = &quot;Add 2D scan code for Identi.ca to project&quot;
+				&apos; These are in notepad
+				&apos;sA(30) = &quot;Format note as paragraphs in XHTML&quot;
+				&apos;sA(31) = &quot;Format note as a bullet list in XHTML&quot;
+				&apos;sA(32) = &quot;Format note as a numbered list in XHTML&quot;
+				&apos;sA(33) = &quot;Format note as computer code in XHTML&quot; 
+				sA(34) = &quot;Convert the slide note’s XHTML to plain text&quot;
+				sA(35) = &quot;Edit this slide’s notes&quot;
+				sA(36) = &quot;Add an electronic calling card to a project&quot;
+			end select		
+		case else  
+	    &apos; The developer&apos;s strings. Parenthesis, English Uppercase, no spaces.
+	    &apos; Last item must be &quot;&quot;.
+			sA(0) = &quot;(START_RECORDING_DESKTOP)&quot; &apos; Simply start a desktop recording program if available
+			sA(1) = &quot;(PREVIEW_TRANSCRIPT)&quot; &apos; handy for finding duplicate content 
+			sA(2) = &quot;(PREVIEW_AS_AUDIBLE_BRAILLE)&quot; &apos; .
+			sA(3) = &quot;(PLAY_PRESENTATION_VERBOSE)&quot; &apos; This reads item by item, pausing at end of each item. Tap return to continue. This is here to preview content as it will appear to  blind people. It doesn&apos;t have to look good...
+			sA(4) = &quot;(PLAY_PRESENTATION_ALOUD)&quot; &apos; This lets you open web urls by entering the url in the note. Enables language switching OSX Mountain Lion, Windows 8, Ubuntu 12.04
+			sA(5) = &quot;(PLAY_PRESENTATION_ALOUD_SYSTEM_VOICE)&quot; &apos;Uses system voice only. Safe default for legacy platforms
+			sA(6) = &quot;(PLAY_PRESENTATION_ALOUD_OFFLINE)&quot; &apos; Enables language switching OSX Mountain Lion, Windows 8, Ubuntu 12.04. Legacy systems may work as well, but they are not supported.
+			sA(7) = &quot;(PLAY_PRESENTATION_ALOUD_ONLINE_VOICE)&quot;&apos; Developer or licensed users only
+			sA(8) = &quot;(ADD_ASK_TAGS_TO_THIS_SLIDE_NOTE)&quot; &apos;&apos; Convert current note to plain text and add &lt;ask&gt; to beginning and &lt;/ask&gt; to end of note
+			sA(9) = &quot;(ADD_IMAGE_DIRECTORY_TO_PRESENTATION)&quot; &apos;Imports images in a folder to the end of this slideshow. You should minimize the slideshow before exporting.
+			sA(10) = &quot;(ADD_IMAGE_TO_PRESENTATION)&quot; &apos;Imports a maximized image to the end of this slideshow.
+			sA(11) = &quot;(ADD_EVENT_TO_PRESENTATION)&quot;
+			sA(12) = &quot;(ADD_WEBCAM_8_TO_PRESENTATION)&quot;
+			sA(13) = &quot;(ADD_WEBCAM_7_TO_PRESENTATION)&quot;
+			sA(14) = &quot;(ADD_WEBCAM_6_TO_PRESENTATION)&quot;
+			sA(15) = &quot;(ADD_WEBCAM_5_TO_PRESENTATION)&quot;
+			sA(16) = &quot;(ADD_WEBCAM_4_TO_PRESENTATION)&quot;
+			sA(17) = &quot;(ADD_WEBCAM_3_TO_PRESENTATION)&quot;
+			sA(18) = &quot;(ADD_WEBCAM_2_TO_PRESENTATION)&quot;
+			sA(19) = &quot;(ADD_WEBCAM_1_TO_PRESENTATION)&quot;
+			sA(20) = &quot;(ADD_2DCODE_8_TO_PRESENTATION)&quot;
+			sA(21) = &quot;(ADD_2DCODE_7_TO_PRESENTATION)&quot;
+			sA(22) = &quot;(ADD_2DCODE_6_TO_PRESENTATION)&quot;
+			sA(23) = &quot;(ADD_2DCODE_5_TO_PRESENTATION)&quot;
+			sA(24) = &quot;(ADD_2DCODE_4_TO_PRESENTATION)&quot;
+			sA(25) = &quot;(ADD_2DCODE_3_TO_PRESENTATION)&quot;
+			sA(26) = &quot;(ADD_2DCODE_2_TO_PRESENTATION)&quot;
+			sA(27) = &quot;(ADD_2DCODE_1_TO_PRESENTATION)&quot;
+			sA(28) = &quot;(ADD_TWITTER_2DCODE_TO_PRESENTATION)&quot;
+			sA(29) = &quot;(ADD_IDENTICA_2DCODE_TO_PRESENTATION)&quot;
+			sA(30) = &quot;(CONVERT_THIS_SLIDE_NOTE_TO_SIMPLE_XHTML)&quot;
+			sA(31) = &quot;(CONVERT_THIS_SLIDE_NOTE_TO_BULLETED_XHTML)&quot;
+			sA(32) = &quot;(CONVERT_THIS_SLIDE_NOTE_TO_NUMBERED_XHTML)&quot;
+			sA(33) = &quot;(ADD_COMPUTER_CODE_TAGS_TO_THIS_SLIDE_NOTE)&quot; 
+			sA(34) = &quot;(CONVERT_THIS_SLIDE_NOTE_TO_NO_XHTML)&quot;
+			sA(35) = &quot;(EDIT_THIS_SLIDES_NOTES)&quot;
+			sA(36) = &quot;(ADD_MECARD_TO_PRESENTATION)&quot;
+			&apos; sA(iCount) = &quot;&quot; &apos; last item must be blank! 40
+	    end select
+		fsGetCommands = sA(i)
+	case else 
+		&apos;
+	end select
+end function
+
+function fsNewCommands(i as integer, optional sLanguage, optional iBrand, optional iButton) as string
+&apos; Note to translator: Please translate from the English strings.
+&apos; This function returns readable computer commands for the settings dialog.
+&apos; set iBrand = 0 for a complete inventory of available functions. Most
+&apos; brands will only need to use functions that facilitate use of their
+&apos; product.
+	if ismissing(sLanguage) then 
+		sLanguage=fsGetSetting(&quot;language&quot;)
+	endif
+    if ismissing (iBrand) then
+        iBrand = I_BRANDED
+    endif
+        if ismissing (iButton) then
+        iButton = 1
+    endif
+    dim j as integer
+    dim iCount as integer
+    &apos;msgBox iBrand
+    select case iButton
+    case 3 
+    	fsNewCommands = fsExportCommands (i, sLanguage, iBrand)
+    case 2
+    	fsNewCommands = fsGetCommands (i, sLanguage, iBrand)
+    case 1
+    	iCount = 25
+		dim sA(iCount) as string
+	&apos;	for j = 0 to iCount
+	&apos;		sA (j) = &quot;&quot;
+	&apos;	next 
+	    select case iBrand
+	    case 4 	&apos; Webcam Client
+	    	select case sLanguage
+			case &quot;fr&quot; &apos;French
+				sA(8) = &quot;Nouveau projet portrait&quot;
+				sA(9) = &quot;Nouveau projet carré&quot;
+				sA(10) = &quot;Nouveau projet mobile&quot;
+				sA(11) = &quot;Nouveau projet photo DSLR&quot;
+			case else  &apos;en
+				Sa(8) = &quot;New portrait project&quot;
+				Sa(9) = &quot;New square project&quot;
+				Sa(10) = &quot;New mobile project&quot;
+				Sa(11) = &quot;New digital SLR photo project&quot;
+				Sa(12) = &quot;New HDMI project&quot;
+			end select	
+		case 3 	&apos; TTS publisher client
+				&apos; In the September 2012 release, images need to be more narrow than 
+				&apos; normal when publishing for the iOS platform to avoid an incorrect 
+				&apos; aspect ratio. Aspect ratio is not an issue on the Android platform.
+				&apos; Also, we restrict the number of images that can be imported so that
+				&apos; the files aren&apos;t ridiculously huge. Code name: Shackleton
+	    	select case sLanguage
+			case &quot;fr&quot; &apos;French
+				sA(2) = &quot;Importer 16 images à partir d&apos;un dossier à une nouveau projet&quot;
+				sA(7) = &quot;Questions pour nos ancêtres&quot;
+				sA(10) = &quot;Nouveau projet mobile&quot;
+			case else  &apos;en
+				sA(2) = &quot;Import 16 images from a folder to a new project&quot;
+				sA(7) = &quot;My family history (Interview)&quot;
+				sA(10) = &quot;New mobile project&quot;
+			end select			
+		case 2 	&apos;Preview
+	    	select case sLanguage
+			case &quot;fr&quot; &apos;French
+				sA(2) = &quot;Importer 16 images à partir d&apos;un dossier à une nouveau projet&quot;
+				sA(7) = &quot;Questions pour nos ancêtres&quot;
+				sA(10) = &quot;Nouveau projet mobile&quot;
+				sA(13) = &quot;Apropos&quot;
+			case else  &apos;en
+				sA(2) = &quot;Import 16 images from a folder to a new project&quot;
+				sA(7) = &quot;My family history (Interview)&quot;
+				sA(10) = &quot;New mobile project&quot;
+				sA(13) = &quot;About&quot;
+			end select		
+	    case 1 &apos; Ability Tools - this is my brand - French and English
+	    	select case sLanguage
+			case &quot;fr&quot; &apos;French
+				sA(0) = &quot;Importer toutes les images à partir d&apos;un dossier à une nouveau projet&quot;
+				sA(1) = &quot;Importer 32 images à partir d&apos;un dossier à une nouveau projet&quot;
+				sA(2) = &quot;Importer 16 images à partir d&apos;un dossier à une nouveau projet&quot;
+				sA(3) = &quot;Importer 8 images à partir d&apos;un dossier à une nouveau projet&quot;
+				sA(4) = &quot;Importer 4 images à partir d&apos;un dossier à une nouveau projet&quot;
+				sA(5) = &quot;The Tale of Big Buck Bunny (Portrait)&quot;
+				sA(6) = &quot;The Art of Big Buck Bunny (HDMI)&quot;
+				sA(7) = &quot;Questions pour nos ancêtres&quot;
+				sA(8) = &quot;Nouveau projet portrait&quot;
+				sA(9) = &quot;Nouveau projet carré&quot;
+				sA(10) = &quot;Nouveau projet mobile&quot;
+				sA(11) = &quot;Nouveau projet photo DSLR&quot;
+				sA(12) = &quot;Nouveau projet HDMI&quot;
+				sA(13) = &quot;Apropos&quot;
+			case else  &apos;en
+				sA(0) = &quot;Import all images from a folder to a new project&quot;
+				sA(1) = &quot;Import 32 images from a folder to a new project&quot;
+				sA(2) = &quot;Import 16 images from a folder to a new project&quot;
+				sA(3) = &quot;Import 8 images from a folder to a new project&quot;
+				sA(4) = &quot;Import 4 images from a folder to a new project&quot;
+				sA(5) = &quot;The Tale of Big Buck Bunny (Portrait)&quot;
+				sA(6) = &quot;The Art of Big Buck Bunny (HDMI)&quot;
+				sA(7) = &quot;My family history (Interview)&quot;
+				Sa(8) = &quot;New portrait project&quot;
+				Sa(9) = &quot;New square project&quot;
+				Sa(10) = &quot;New mobile project&quot;
+				Sa(11) = &quot;New digital SLR photo project&quot;
+				Sa(12) = &quot;New HDMI project&quot;
+				sA(13) = &quot;About&quot;
+			end select		
+		case else  
+	    &apos; The developer&apos;s strings. Parenthesis, English Uppercase, no spaces.
+	    &apos; Last item must be &quot;&quot;.
+			sA(0) = &quot;(IMPORT_IMAGES_FROM_DIRECTORY)&quot; &apos; Imports ALL images in a folder into a new slideshow. You should minimize the slideshow before exporting.
+			sA(1) = &quot;(IMPORT_32_IMAGES_FROM_DIRECTORY)&quot;
+			sA(2) = &quot;(IMPORT_16_IMAGES_FROM_DIRECTORY)&quot;
+			sA(3) = &quot;(IMPORT_8_IMAGES_FROM_DIRECTORY)&quot;
+			sA(4) = &quot;(IMPORT_4_IMAGES_FROM_DIRECTORY)&quot;
+			sA(5) = &quot;(THE_TALE_OF_BIG_BUCK_BUNNY)&quot;
+			sA(6) = &quot;(THE_ART_OF_BIG_BUCK_BUNNY)&quot;
+			sA(7) = &quot;(NEW_FAMILY_HISTORY_EBOOK)&quot;
+			sA(8) = &quot;(NEW_SLIDESHOW_PORTRAIT)&quot;
+			sA(9) = &quot;(NEW_SLIDESHOW_SQUARE)&quot;
+			sA(10) = &quot;(NEW_SLIDESHOW_FOR_MOBILE)&quot;
+			sA(11) = &quot;(NEW_SLIDESHOW_PHOTO)&quot;
+			sA(12) = &quot;(NEW_SLIDESHOW_HDMI)&quot;
+			sA(13) = &quot;(NEW_SLIDESHOW_ABOUT)&quot;
+			&apos; sA(iCount) = &quot;&quot; &apos; last item must be blank!
+	    end select
+		fsNewCommands = sA(i
+	case else 
+		&apos;
+	end select
+end function
+
+sub BunnyArtBook
+	&apos; How to make a presentation for a wide screen HDMI monitor.
+	&apos; On computers with both Great Britain and USA English voices,
+	&apos; the computer reader will change voices.
+	dim sA as string
+	sA = fsMyURL &amp; &quot;/templates/art_gallery_bunny.otp&quot;
+	BrandedTemplate (sA)
+end sub
+
+sub BunnyKidsBook
+	dim sA as string
+	sA = fsMyURL &amp; &quot;/templates/the_tale_of_big_buck_bunny.otp&quot;
+	BrandedTemplate (sA)
+end sub
+
+sub FamilyHistoryBook
+	dim sA as string
+	sA = fsMyURL &amp; &quot;/templates/family_history.otp&quot;
+	BrandedTemplate (sA)
+end sub
+
+sub BrandedTemplate (sA)
+	&apos; Use a title or caption in the slide to describe image content. 
+	&apos; Use XHTML in the notes field to show rich content.
+	dim oAlbum
+	if fileExists (sA) = false then
+		sA = fsOpenMyFileDialogURI(105)
+	endif
+	if len(sA) &lt;&gt; 0 then
+		oAlbum = StarDesktop.loadComponentFromUrl (sA,&quot;_blank&quot;,0,dimarray())
+	endif
+end sub
+
+sub newSlideShowPortrait
+	dim sA as string
+	sA = fsMyURL &amp; &quot;/templates/portrait.otp&quot;
+	BrandedTemplate (sA)
+	startEditingFirstNote
+end sub
+
+sub newSlideShowForMobile
+	dim sA as string
+	sA = fsMyURL &amp; &quot;/templates/narrow.otp&quot;
+	BrandedTemplate (sA)
+	startEditingFirstNote
+end sub
+
+sub newSlideShowSquare
+	dim sA as string
+	sA = fsMyURL &amp; &quot;/templates/square.otp&quot;
+	BrandedTemplate (sA)
+	startEditingFirstNote
+end sub
+
+sub newSlideShowPhoto
+	dim sA as string
+	sA = fsMyURL &amp; &quot;/templates/d40.otp&quot;
+	BrandedTemplate (sA)
+	startEditingFirstNote
+end sub
+
+sub newSlideShowHDMI
+	dim sA as string
+	sA = fsMyURL &amp; &quot;/templates/hdmi.otp&quot;
+	BrandedTemplate (sA)
+	startEditingFirstNote
+end sub
+
+sub newSlideShowAbout
+	dim sA as string
+	sA = fsMyURL &amp; &quot;/templates/about-ability-tools.otp&quot;
+	BrandedTemplate (sA)
+end sub
+</script:module>

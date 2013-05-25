@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:style-id="5" dlg:id="schooltools3" dlg:left="0" dlg:top="0" dlg:width="203" dlg:height="196" dlg:closeable="true" dlg:moveable="true">
+ <dlg:styles>
+  <dlg:style dlg:style-id="0" dlg:font-name="Sans" dlg:font-stylename="Regular" dlg:font-family="swiss"/>
+  <dlg:style dlg:style-id="1" dlg:text-color="0x4c4c4c" dlg:font-height="14"/>
+  <dlg:style dlg:style-id="2" dlg:font-name="Serif" dlg:font-height="11" dlg:font-stylename="Regular" dlg:font-family="roman"/>
+  <dlg:style dlg:style-id="3" dlg:font-name="Sans" dlg:font-height="11" dlg:font-stylename="Regular" dlg:font-family="swiss"/>
+  <dlg:style dlg:style-id="4" dlg:font-name="Monospace" dlg:font-height="11" dlg:font-stylename="Regular"/>
+  <dlg:style dlg:style-id="5" dlg:font-name=" " dlg:font-stylename="Regular"/>
+ </dlg:styles>
+ <dlg:bulletinboard>
+  <dlg:textfield dlg:style-id="0" dlg:id="TextField1" dlg:tab-index="0" dlg:left="2" dlg:top="52" dlg:width="196" dlg:height="115" dlg:tabstop="true" dlg:hide-inactive-selection="false" dlg:vscroll="true" dlg:multiline="true">
+   <script:event script:event-name="on-mouseover" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.upDateSchoolToolsNewStatus?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:textfield>
+  <dlg:button dlg:id="CommandButton1" dlg:tab-index="1" dlg:left="149" dlg:top="173" dlg:width="43" dlg:height="18" dlg:default="true" dlg:value="OK" dlg:button-type="ok"/>
+  <dlg:button dlg:id="CommandButton2" dlg:tab-index="2" dlg:left="101" dlg:top="173" dlg:width="43" dlg:height="18" dlg:value="Cancel" dlg:button-type="cancel"/>
+  <dlg:button dlg:id="CommandButton4" dlg:tab-index="4" dlg:left="0" dlg:top="0" dlg:width="18" dlg:height="22" dlg:tabstop="false" dlg:grab-focus="false">
+   <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsDialogFileOpen?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-mouseover" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.upDateSchoolToolsNewStatus?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton3" dlg:tab-index="5" dlg:left="95" dlg:top="0" dlg:width="18" dlg:height="22" dlg:tabstop="false" dlg:grab-focus="false">
+   <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsNew?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-mouseover" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.upDateSchoolToolsNewStatus?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton5" dlg:tab-index="7" dlg:left="19" dlg:top="0" dlg:width="18" dlg:height="22" dlg:tabstop="false" dlg:grab-focus="false">
+   <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsDialogSave?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-mouseover" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.upDateSchoolToolsNewStatus?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton6" dlg:tab-index="8" dlg:left="38" dlg:top="0" dlg:width="18" dlg:height="22" dlg:tabstop="false" dlg:grab-focus="false">
+   <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsDialogSaveAs?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-mouseover" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.upDateSchoolToolsNewStatus?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton7" dlg:tab-index="9" dlg:left="76" dlg:top="0" dlg:width="18" dlg:height="22" dlg:tabstop="false" dlg:grab-focus="false">
+   <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsPasteToTextEditor?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-mouseover" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.upDateSchoolToolsNewStatus?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton8" dlg:tab-index="10" dlg:left="114" dlg:top="0" dlg:width="18" dlg:height="22" dlg:tabstop="false" dlg:grab-focus="false">
+   <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsPreviewNote?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-mouseover" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.upDateSchoolToolsNewStatus?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:style-id="1" dlg:id="CommandButton11" dlg:tab-index="13" dlg:left="171" dlg:top="0" dlg:width="18" dlg:height="22" dlg:tabstop="false" dlg:toggled="1" dlg:grab-focus="false">
+   <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsTextEditorStyle?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-mouseover" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.upDateSchoolToolsNewStatus?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton12" dlg:tab-index="14" dlg:left="152" dlg:top="0" dlg:width="18" dlg:height="22" dlg:tabstop="false" dlg:toggled="1" dlg:grab-focus="false">
+   <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsLanguage?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-mouseover" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.upDateSchoolToolsNewStatus?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:combobox dlg:id="ComboBox1" dlg:tab-index="15" dlg:disabled="true" dlg:left="3" dlg:top="173" dlg:width="55" dlg:height="18" dlg:value="..." dlg:spin="true">
+   <dlg:menupopup>
+    <dlg:menuitem dlg:value="af-ZA"/>
+    <dlg:menuitem dlg:value="ar-AE"/>
+    <dlg:menuitem dlg:value="ar-BH"/>
+    <dlg:menuitem dlg:value="ar-DZ"/>
+    <dlg:menuitem dlg:value="ar-EG"/>
+    <dlg:menuitem dlg:value="ar-IQ"/>
+    <dlg:menuitem dlg:value="ar-JO"/>
+    <dlg:menuitem dlg:value="ar-KW"/>
+    <dlg:menuitem dlg:value="ar-LB"/>
+    <dlg:menuitem dlg:value="ar-LY"/>
+    <dlg:menuitem dlg:value="ar-MA"/>
+    <dlg:menuitem dlg:value="ar-OM"/>
+    <dlg:menuitem dlg:value="ar-QA"/>
+    <dlg:menuitem dlg:value="ar-SA"/>
+    <dlg:menuitem dlg:value="ar-SY"/>
+    <dlg:menuitem dlg:value="ar-TN"/>
+    <dlg:menuitem dlg:value="ar-YE"/>
+    <dlg:menuitem dlg:value="bg-BG"/>
+    <dlg:menuitem dlg:value="ca-ES"/>
+    <dlg:menuitem dlg:value="cs-CZ"/>
+    <dlg:menuitem dlg:value="cy-GB"/>
+    <dlg:menuitem dlg:value="da-DK"/>
+    <dlg:menuitem dlg:value="de-AT"/>
+    <dlg:menuitem dlg:value="de-CH"/>
+    <dlg:menuitem dlg:value="de-DE"/>
+    <dlg:menuitem dlg:value="de-LI"/>
+    <dlg:menuitem dlg:value="de-LU"/>
+    <dlg:menuitem dlg:value="en-AU"/>
+    <dlg:menuitem dlg:value="en-BS"/>
+    <dlg:menuitem dlg:value="en-BZ"/>
+    <dlg:menuitem dlg:value="en-CA"/>
+    <dlg:menuitem dlg:value="en-GB"/>
+    <dlg:menuitem dlg:value="en-GG"/>
+    <dlg:menuitem dlg:value="en-HK"/>
+    <dlg:menuitem dlg:value="en-ID"/>
+    <dlg:menuitem dlg:value="en-IE"/>
+    <dlg:menuitem dlg:value="en-IN"/>
+    <dlg:menuitem dlg:value="en-IO"/>
+    <dlg:menuitem dlg:value="en-JM"/>
+    <dlg:menuitem dlg:value="en-MY"/>
+    <dlg:menuitem dlg:value="en-NZ"/>
+    <dlg:menuitem dlg:value="en-PH"/>
+    <dlg:menuitem dlg:value="en-SG"/>
+    <dlg:menuitem dlg:value="en-TT"/>
+    <dlg:menuitem dlg:value="en-US"/>
+    <dlg:menuitem dlg:value="en-VG"/>
+    <dlg:menuitem dlg:value="en-ZA"/>
+    <dlg:menuitem dlg:value="en-ZW"/>
+    <dlg:menuitem dlg:value="es-AR"/>
+    <dlg:menuitem dlg:value="es-BO"/>
+    <dlg:menuitem dlg:value="es-CL"/>
+    <dlg:menuitem dlg:value="es-CO"/>
+    <dlg:menuitem dlg:value="es-CR"/>
+    <dlg:menuitem dlg:value="es-DO"/>
+    <dlg:menuitem dlg:value="es-EC"/>
+    <dlg:menuitem dlg:value="es-ES"/>
+    <dlg:menuitem dlg:value="es-GT"/>
+    <dlg:menuitem dlg:value="es-HN"/>
+    <dlg:menuitem dlg:value="es-MX"/>
+    <dlg:menuitem dlg:value="es-NI"/>
+    <dlg:menuitem dlg:value="es-PA"/>
+    <dlg:menuitem dlg:value="es-PE"/>
+    <dlg:menuitem dlg:value="es-PR"/>
+    <dlg:menuitem dlg:value="es-PY"/>
+    <dlg:menuitem dlg:value="es-SV"/>
+    <dlg:menuitem dlg:value="es-US"/>
+    <dlg:menuitem dlg:value="es-UY"/>
+    <dlg:menuitem dlg:value="es-VE"/>
+    <dlg:menuitem dlg:value="et-EE"/>
+    <dlg:menuitem dlg:value="eu-ES"/>
+    <dlg:menuitem dlg:value="eu-FR"/>
+    <dlg:menuitem dlg:value="fi-FI"/>
+    <dlg:menuitem dlg:value="fr-BE"/>
+    <dlg:menuitem dlg:value="fr-CA"/>
+    <dlg:menuitem dlg:value="fr-CG"/>
+    <dlg:menuitem dlg:value="fr-CH"/>
+    <dlg:menuitem dlg:value="fr-CI"/>
+    <dlg:menuitem dlg:value="fr-CM"/>
+    <dlg:menuitem dlg:value="fr-FR"/>
+    <dlg:menuitem dlg:value="fr-HT"/>
+    <dlg:menuitem dlg:value="fr-LU"/>
+    <dlg:menuitem dlg:value="fr-MA"/>
+    <dlg:menuitem dlg:value="fr-MC"/>
+    <dlg:menuitem dlg:value="fr-ML"/>
+    <dlg:menuitem dlg:value="fr-RE"/>
+    <dlg:menuitem dlg:value="fr-SN"/>
+    <dlg:menuitem dlg:value="ga-IE"/>
+    <dlg:menuitem dlg:value="gd-GB"/>
+    <dlg:menuitem dlg:value="he-IL"/>
+    <dlg:menuitem dlg:value="hi-IN"/>
+    <dlg:menuitem dlg:value="hl-GR"/>
+    <dlg:menuitem dlg:value="hr-HR"/>
+    <dlg:menuitem dlg:value="hu-HU"/>
+    <dlg:menuitem dlg:value="id-ID"/>
+    <dlg:menuitem dlg:value="is-IS"/>
+    <dlg:menuitem dlg:value="it-IT"/>
+    <dlg:menuitem dlg:value="jp-JP"/>
+    <dlg:menuitem dlg:value="ka-GE"/>
+    <dlg:menuitem dlg:value="ko-KP"/>
+    <dlg:menuitem dlg:value="ko-KR"/>
+    <dlg:menuitem dlg:value="mo-MN"/>
+    <dlg:menuitem dlg:value="ms-BN"/>
+    <dlg:menuitem dlg:value="ms-ID"/>
+    <dlg:menuitem dlg:value="ms-MY"/>
+    <dlg:menuitem dlg:value="ms-SG"/>
+    <dlg:menuitem dlg:value="nb-NO"/>
+    <dlg:menuitem dlg:value="nl-BE"/>
+    <dlg:menuitem dlg:value="nl-NL"/>
+    <dlg:menuitem dlg:value="nn-NO"/>
+    <dlg:menuitem dlg:value="no-NO"/>
+    <dlg:menuitem dlg:value="pl-PL"/>
+    <dlg:menuitem dlg:value="pt-BR"/>
+    <dlg:menuitem dlg:value="pt-PT"/>
+    <dlg:menuitem dlg:value="ro-RO"/>
+    <dlg:menuitem dlg:value="ru-RU"/>
+    <dlg:menuitem dlg:value="sk-SK"/>
+    <dlg:menuitem dlg:value="sl-SI"/>
+    <dlg:menuitem dlg:value="sv-SE"/>
+    <dlg:menuitem dlg:value="th-TH"/>
+    <dlg:menuitem dlg:value="tl-PH"/>
+    <dlg:menuitem dlg:value="tr-TR"/>
+    <dlg:menuitem dlg:value="uk-UA"/>
+    <dlg:menuitem dlg:value="vi-VN"/>
+    <dlg:menuitem dlg:value="zh-CN"/>
+    <dlg:menuitem dlg:value="zh-HK"/>
+    <dlg:menuitem dlg:value="zh-MO"/>
+    <dlg:menuitem dlg:value="zh-SG"/>
+    <dlg:menuitem dlg:value="zh-TW"/>
+   </dlg:menupopup>
+   <script:event script:event-name="on-itemstatechange" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.updateLanguageDisplay?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-textchange" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.updateLanguageDisplay?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.updateLanguageDisplay?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:combobox>
+  <dlg:button dlg:id="CommandButton10" dlg:tab-index="12" dlg:left="57" dlg:top="0" dlg:width="18" dlg:height="22" dlg:tabstop="false" dlg:grab-focus="false">
+   <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsShare?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-mouseover" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.upDateSchoolToolsNewStatus?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:button dlg:id="CommandButton9" dlg:tab-index="11" dlg:left="133" dlg:top="0" dlg:width="18" dlg:height="22" dlg:tabstop="false" dlg:grab-focus="false">
+   <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsSpeak?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-mouseover" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.upDateSchoolToolsNewStatus?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
+  <dlg:textfield dlg:style-id="2" dlg:id="Serif" dlg:tab-index="16" dlg:visible="false" dlg:left="173" dlg:top="44" dlg:width="29" dlg:height="16" dlg:value="Serif"/>
+  <dlg:textfield dlg:style-id="3" dlg:id="DefaultFont" dlg:tab-index="17" dlg:visible="false" dlg:left="173" dlg:top="27" dlg:width="29" dlg:height="16" dlg:printable="false" dlg:value="DefaultFont"/>
+  <dlg:textfield dlg:style-id="4" dlg:id="Monospace" dlg:tab-index="18" dlg:visible="false" dlg:left="173" dlg:top="60" dlg:width="29" dlg:height="16" dlg:value="Monospace"/>
+  <dlg:text dlg:id="Label1" dlg:tab-index="3" dlg:left="2" dlg:top="24" dlg:width="195" dlg:height="25" dlg:value="Label1" dlg:multiline="true">
+   <script:event script:event-name="on-mouseover" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.upDateSchoolToolsNewStatus?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsReadQuestion?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:text>
+  <dlg:filecontrol dlg:id="Destination1" dlg:tab-index="6" dlg:visible="false" dlg:left="3" dlg:top="173" dlg:width="43" dlg:height="18" dlg:printable="false" dlg:tabstop="false"/>
+  <dlg:textfield dlg:style-id="4" dlg:id="styleNo" dlg:tab-index="19" dlg:visible="false" dlg:left="173" dlg:top="76" dlg:width="29" dlg:height="16" dlg:value="0"/>
+ </dlg:bulletinboard>
+</dlg:window>

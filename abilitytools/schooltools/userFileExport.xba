@@ -1,0 +1,2544 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="userFileExport" script:language="StarBasic">REM  *****  BASIC  ***** 
+
+&apos; eBook publishers - amazon, apple, blurb, google, lulu 
+&apos; ISBN issuing authorities - nielsenbookdata.co.uk, myidentifiers.com 
+&apos; You may be required to register your book with a national library.
+
+function createPdfArchive (MyKey as string)
+	dim sFile as string
+	sFile = fsSaveSchoolToolFile(fsShortFileName(), &quot;zip archive(.zip)&quot;, &quot;*.zip&quot;)
+	if len (sFile) = 0 then
+		createPdfArchive = sFile
+		exit function
+	endif
+	if fileExists (sFile) then
+		kill sFile
+	endif
+	CleanUpStagingDirectory(true)
+	CreateAboutHTML
+	CreateDescriptionXML
+	CreateManifestXML
+	CreateNotesListXML(MyKey)
+	CreateArchivalContentsPdf
+	zipPresentationFiles(sFile)
+	CleanUpStagingDirectory(false)
+	createPdfArchive = sFile
+end function
+
+function fsToGradeOneBraille (byval sA, optional nStyle)
+	&apos; Use for for basic labelling of objects
+	&apos; like class materials found in the cupboard. 
+	&apos; Make sure font size is large - about 40 characters wide on a standard sheet.
+	&apos; Headings are indented. Don&apos;t use italics, underline or bold.
+	&apos; http://www.duxburysystems.com/products.asp#freeware (Fonts)
+	&apos; http://www.rnib.org.uk/livingwithsightloss/Documents/Everyday_Braille_RNIB_Factsheet.doc
+	dim LF as string
+	dim n as integer
+	if ismissing (nStyle) then
+		nStyle = 4
+	endif
+	LF = chr$(10)
+	sA = fsstripXMLTags (sA)
+	&apos; NOTE: Braille 1, a and A appear identical. When needed
+	&apos; we must add number and capitalization markers to the
+	&apos; beginning of each word to show numbers and capitals
+	&apos; Encode numbers from &quot;123&quot; to &quot;#123&quot;
+	for n = asc(&quot;1&quot;) to asc(&quot;9&quot;)
+		sA = fsReplaceText(sA, LF &amp; chr(n), LF &amp; &quot;#&quot; &amp; chr(n ))
+		sA = fsReplaceText(sA, &quot; &quot; &amp; chr(n), &quot; &quot; &amp; &quot;#&quot; &amp; chr(n ))
+		sA = fsReplaceText(sA, chr(n), chr(n )
+	next
+	&apos; Braille  zero is greater than nine, not less than one
+	sA = fsReplaceText(sA, LF &amp; &quot;0&quot;, LF &amp; &quot;#0&quot;)
+	sA = fsReplaceText(sA, &quot; 0&quot;, &quot; #0&quot;)
+	sA = fsReplaceText(sA, &quot;0&quot;, &quot;0&quot;)
+	&apos; Encode upper case letters from &quot;Braille&quot; to &quot;,braille&quot;
+	for n = asc(&quot;A&quot;) to asc(&quot;Z&quot;)
+		sA = fsReplaceText (sA, chr(n), &quot;,&quot; &amp; chr(n + 32) )
+	next
+	&apos; Braille font doesn&apos;t show smart quotes
+	sA = fsReplaceText(sA, &quot;“&quot;, &quot;&quot;&quot;&quot;)
+	sA = fsReplaceText(sA, &quot;”&quot;, &quot;&quot;&quot;&quot;)
+	sA = fsReplaceText(sA, &quot;‘&quot;, &quot;&apos;&quot;)
+	sA = fsReplaceText(sA, &quot;’&quot;, &quot;&apos;&quot;)
+	&apos;Braille replaces brackets with codes
+	sA = fsReplaceText (sA, &quot;(&quot;, &quot;7&quot;)
+	sA = fsReplaceText (sA, &quot;)&quot;, &quot;7&quot;)
+	sA = fsReplaceText (sA, &quot;[&quot;, &quot;,7&quot;) 
+	sA = fsReplaceText (sA, &quot;]&quot;, &quot;7&apos;&quot;)
+	sA = fsReplaceText (sA, &quot;{&quot;, &quot;;7&quot;)
+	sA = fsReplaceText (sA, &quot;}&quot;, &quot;72&quot;)
+	sA = fsReplaceText (sA, &quot;&gt;&quot;, &quot; &quot;)
+	sA = fsReplaceText (sA, &quot;&lt;&quot;, &quot; &quot;)
+	select case nStyle
+	case 5, 105
+		sA = fsAsciiToUnicodeBraille (sA)
+	case else 
+		&apos;
+	end select
+	&apos; Single spaces only. Put each word in a span so we can highlight it on mouseover
+	
+	sA = fsReplaceText(sA, &quot;  &quot;, &quot; &quot;)
+	select case nStyle
+	case 4, 5 &apos;code XHTML highlighter
+		sA = fsReplaceText(sA, &quot; &quot;, &quot; &lt;/span&gt;&lt;span&gt;&quot;)
+		sA = fsReplaceText(sA, &quot;-&quot;, &quot;-&lt;/span&gt;&lt;span&gt;&quot;)
+		sA = fsReplaceText(sA, &quot;&lt;/p&gt;&lt;p&gt;&quot;, &quot;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span&gt;&quot;)
+		sA = fsReplaceText(sA, &quot;&lt;/p&gt;&lt;/p&gt;&quot;, &quot;&lt;/span&gt;&lt;/p&gt;&lt;p&gt;&lt;span&gt;&quot;)
+		sA = fsReplaceText(sA, &quot;&lt;/p&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;p&gt;&quot;, &quot;&lt;/span&gt;&lt;/p&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;p&gt;&lt;span&gt;&quot;)
+		sA = fsReplaceText(sA, &quot;&lt;/p&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/p&gt;&quot;, &quot;&lt;/span&gt;&lt;/p&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;p&gt;&lt;span&gt;&quot;)
+		sA = fsReplaceText(sA, &quot;&lt;/p&gt;&quot; &amp; chr$(13) &amp; &quot;&lt;/p&gt;&quot;, &quot;&lt;/span&gt;&lt;/p&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;p&gt;&lt;span&gt;&quot;)
+		sA = fsReplaceText(sA, &quot;&lt;/p&gt;&lt;/p&gt;&quot;, &quot;&lt;/span&gt;&lt;/p&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;p&gt;&lt;span&gt;&quot;)
+		sA = fsReplaceText(sA, &quot;&lt;/p&gt;&quot; &amp; chr$(13) &amp; &quot;&lt;p&gt;&quot;, &quot;&lt;/span&gt;&lt;/p&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;p&gt;&lt;span&gt;&quot;)
+		sA = fsReplaceText(sA, &quot;&amp;ch;&quot;, &quot;&amp;amp;&quot;)
+		sA = &quot;&lt;span&gt;&quot; &amp; lcase(sA) &amp; &quot;&lt;/span&gt;&quot;
+	case else 
+		sA = lcase(sA)
+	end select
+	fsToGradeOneBraille = sA
+end function
+
+sub previewAsGradeOneBraille (optional sA)
+	if ismissing (sA) then
+		sA = getBranding(bI_ABOUT_TEXT, fsGetSetting(&quot;language&quot;))
+	endif
+	showDialog (fsToGradeOneBraille (sA) )
+
+end sub
+
+function createPdfMobile (MyKey as string)
+	dim sFile as string
+	sFile = fsSaveSchoolToolFile(fsShortFileName(), &quot;zip archive(.zip)&quot;, &quot;*.zip&quot;)
+	if len (sFile) = 0 then
+		createPdfMobile = sFile
+		exit function
+	endif
+	if fileExists (sFile) then
+		kill sFile
+	endif
+
+	CleanUpStagingDirectory(true)
+	CreateAboutHTML
+	CreateDescriptionXML
+	CreateManifestXML
+	CreateNotesListXML (MyKey)
+	createMobileContentsPdf
+	zipPresentationFiles(sFile)
+	CleanUpStagingDirectory(false)
+	createPdfMobile = sFile
+end function
+
+function fsDocAuthor
+	on error goto fsDocAuthorErr
+	fsDocAuthor = ThisComponent.DocumentProperties.Author
+	if len(fsDocAuthor) = 0 then
+		fsDocAuthor = getBranding (bI_SPOKEN_BRANDING)
+	endif
+	exit function
+	fsDocAuthorErr:
+	fsDocAuthor = getBranding (bI_SPOKEN_BRANDING)
+end function
+
+function createJsonMobile (Optional MyKey as string)
+	&apos; SlideSpeech.com currently uses data.json and image
+	&apos; files in a zip archive to store, display and audition 
+	&apos; talking presentations for Android, iOS and Windows 
+	&apos; Mobile. The mobile apps allow you to store SlideSpeech 
+	&apos; presentations so that they are available offline. 
+	&apos; I modelled this implementation on the file structure as it
+	&apos; appeared in the iOS file system on August 21, 2012.
+	&apos; German and English languages are currently supported. 
+	&apos; Future implementations may include additional features
+	&apos; or tags. See: http://code.google.com/p/slidespeech/w/list
+	dim sJpg, sFileOut as string
+	CleanUpStagingDirectory(true)
+	sFileOut = fsSaveSchoolToolFile(fsShortFileName() &amp; &quot;-json&quot;, &quot;zip archive(.zip)&quot;, &quot;*.zip&quot;)
+	sJpg = fsStagingDirectoryURL &amp; &quot;/slide_&quot; &apos; &amp; nn.jpg
+	ExportThumbJpeg (fsStagingDirectoryURL &amp; &quot;/thumb.jpg&quot;, 210) &apos; Uses current page as a thumbnail
+	CreateJsonlist()
+	ExportSlidesJpeg (sJpg, 35, 0)
+	zipJsonPresentationFiles(sFileOut)
+	CleanUpStagingDirectory(false)
+	createJsonMobile = sFileOut
+end function
+
+function fbIsJson(byval sA) as boolean
+	&apos; Quick test - not exhaustive. Currently, we mark
+	&apos; json code with an ambiguous language tag so that the
+	&apos; computer won&apos;t read it aloud. A json tag could
+	&apos; be used to indicate that you are using the notes
+	&apos; to form multiple choice questions.
+	on Error goto fbIsJsonErr
+	fbIsJson=false
+	if len(sA) = 0 then
+		exit function
+	endif
+	sA = fsReplaceText(sA,&quot; &quot;,&quot;&quot;)
+	sA = fsReplaceText(sA,chr$(13),&quot;&quot;)
+	sA = fsReplaceText(sA,chr$(10),&quot;&quot;)
+	sA = fsReplaceText(sA,chr$(9),&quot;&quot;)
+	if left(sA, 2) = &quot;{&quot;&quot;&quot; and right(sA, 1) = &quot;}&quot; then
+		fbIsJson = true
+		exit function
+	endif
+	if left(sA, 2) = &quot;{&apos;&quot; and right(sA, 1) = &quot;}&quot; then
+		fbIsJson = true
+		exit function
+	endif
+	fbIsJsonErr:
+	fbIsJson=false	
+end function
+
+sub CreateJsonlist
+	dim sA as string
+	if fileExists (fsTemporaryJsonURL) then
+		kill fsTemporaryJsonURL
+	endif
+	sA=fsPresentationNotesJson
+    CreateFile(fsTemporaryJsonURL,sA,&quot;UTF-8&quot;)
+end sub 
+
+function fsCleanForJson ( byval sA as string) as string
+	&apos; escapes utf-8 characters with special meanings in JSON
+	&apos; http://www.robelle.com/smugbook/ascii.html
+	&apos; http://www.json.org/
+	dim CR, LF, TB, FF, BS
+	FF = chr$(14) &apos;Form feed
+	CR = chr$(13) &apos;Carriage return
+	LF = chr$(10) &apos;Line Feed
+	TB = chr$(9)  &apos;Horizontal tab
+	BS = chr$(8)  &apos;Backspace
+	sA = fsReplaceText ( sA , &quot;\&quot; , &quot;\\&quot;) &apos; reverse solidus must be first!
+	sA = fsReplaceText ( sA , &quot;&quot;&quot;&quot; , &quot;\&quot;&quot;&quot;) &apos; double quote
+	sA = fsReplaceText ( sA , &quot;/&quot; , &quot;\/&quot;) &apos; solidus
+	sA = fsReplaceText ( sA , CR , &quot;\r&quot;) 
+	sA = fsReplaceText ( sA , LF , &quot;\n&quot;) 
+	sA = fsReplaceText ( sA , TB , &quot;\t&quot;) 
+	sA = fsReplaceText ( sA , BS , &quot;\b&quot;)
+	sA = fsReplaceText ( sA , FF , &quot;\f&quot;)
+	fsCleanForJson = sA
+end function
+
+function fsPresentationNotesJson
+	&apos; Adapted from code by Danny Brewer at http://www.oooforum.org/forum/viewtopic.phtml?t=10795 
+	&apos; Check json output with http://jsonlint.com/
+	dim oDoc, oDrawPages,oDrawPage,oShape,oElem
+	dim nNumShapes,nShape,nPage,nNumPages,nThisPage, iNo as integer
+	dim cTitle,cLocale,cAsianLanguage,cComplexLanguage, cWesternLanguage as string
+	dim n1 as integer
+	dim longI as Long
+	dim CR as string
+	CR = chr$(13)
+	oDoc=ThisComponent 
+	oDrawPages=oDoc.getDrawPages() 
+	nNumPages=oDrawPages.getCount()
+	oElem=oDoc.getDrawPages().getElementNames() 
+	fsPresentationNotesJson=&quot;{&quot;&quot;S&quot;&quot;:[&quot;
+	for nPage =  0 to nNumPages - 1 step 1
+		oDrawPage=oDrawPages.getByIndex( nPage ) 
+		if oDrawPage.getNotesPage.getCount &lt; 2 then &apos; User deleted the notes object
+			cTitle=&quot;&quot;
+			cAsianLanguage=&quot;zxx-&quot; &apos;if missing note field, use code for unknown language and locale
+			cComplexLanguage=&quot;zxx-&quot;
+			cWesternLanguage=&quot;zxx-&quot;
+		else 
+			iNo = fiGetSlideNoteIndex
+			cTitle=oDrawPage.getNotesPage.getByIndex(iNo).getText().getString()
+			cAsianLanguage=oDrawPage.getNotesPage.getByIndex(iNo).CharLocaleAsian.Language()
+			cComplexLanguage=oDrawPage.getNotesPage.getByIndex(iNo).CharLocaleComplex.Language()
+			cWesternLanguage=oDrawPage.getNotesPage.getByIndex(iNo).CharLocale.Language()
+		endif
+		select case  fsComplexAsiaOrWest( cTitle )
+		case &quot;WEST&quot;, &quot;DefaultLocale&quot;
+			cLocale=cWesternLanguage
+		case &quot;DefaultLocale_CJK&quot;, &quot;ASIA&quot;
+			cLocale=cAsianLanguage
+		case &quot;UNDEFINED&quot;
+			cLocale=&quot;zxx&quot;
+		case else  &apos;&quot; COMPLEX&quot;, &quot;DefaultLocale_CTL&quot;
+			cLocale=cComplexLanguage
+		end select
+		cTitle = fsstripXMLTags ( cTitle )
+		cTitle = fsCleanForJson ( cTitle )
+		fsPresentationNotesJson=fsPresentationNotesJson &amp; &quot;{&quot;&quot;t&quot;&quot;:&quot;&quot;tag&quot;&quot;,&quot;&quot;q&quot;&quot;:&quot;&quot;&quot; &amp; cTitle &amp; _
+			&quot;&quot;&quot;,&quot;&quot;l&quot;&quot;:&quot;&quot;&quot; &amp; cLocale &amp; &quot;&quot;&quot;,&quot;&quot;i&quot;&quot;:&quot;&quot;slide_&quot; &amp; trim(nPage) &amp; &quot;.jpg&quot;&quot;},&quot;
+	next
+	fsPresentationNotesJson = left(fsPresentationNotesJson, len(fsPresentationNotesJson)-1) &apos; remove trailing comma
+	fsPresentationNotesJson = fsPresentationNotesJson &amp; &quot;]}&quot;
+	exit function
+	fsPresentationNotesJsonError:
+	fsPresentationNotesJson=&quot;&quot;
+end function
+
+function fsImpressHeight
+	&apos; this may vary depending on the current view. for normal view and format, 
+	&apos; fsImpressHeight = 21000
+	xDoc = thiscomponent
+	xView = xDoc.currentController
+	xSelection = xView.selection
+	xObj = xView.currentPage
+	fsImpressHeight = xObj.getPropertyValue(&quot;Height&quot;)
+end function
+
+function fsImpressWidth
+	&apos; this may vary depending on the current view. for normal view and format, 
+	&apos; fsImpressWidth = 28000
+	xDoc = thiscomponent
+	xView = xDoc.currentController
+	xSelection = xView.selection
+	xObj = xView.currentPage
+	fsImpressWidth = xObj.getPropertyValue(&quot;Width&quot;)
+end function
+
+sub ExportThumbJpeg (Optional sPath, Optional iScale)
+	&apos; See http://codesnippets.services.openoffice.org/Office/Office.GraphicExport.snip
+	&apos; Export JPEG by Olivier Samyn (initial), Sven Jacobi, Michael Hoennig, Tom Schindl
+	&apos; if this sub is called first, the thumbnail image will
+	&apos; be the current page, not necessarily the first page.
+	&apos; This is not a bug, since you may need to use a page
+	&apos; other than the title page as your thumbnail image.
+	dim xDoc, sView, xSelection, xObj, xView
+	dim aFilterData (4) as new com.sun.star.beans.PropertyValue
+	viewNormal()
+	&apos; let&apos;s wait a second to make sure the display is stablilized.
+	wait 1000
+	if ismissing (iScale) then
+		iScale = 210 &apos; Image is 1/210 of full size. 133 x 100
+	endif
+	if ismissing (sPath) then
+		sPath = fsStagingDirectoryURL &amp; &quot;/thumb.jpg&quot;
+	endif
+   &apos;creating filter dependent filter properties
+   aFilterData(0).Name  = &quot;PixelWidth&quot;        &apos;
+   aFilterData(0).Value = int((fsImpressWidth / iScale) +.5)
+   aFilterData(1).Name  = &quot;PixelHeight&quot;
+   aFilterData(1).Value = int((fsImpressHeight / iScale) +.5)
+   aFilterData(2).Name  =&quot;LogicalWidth&quot;
+   aFilterData(2).Value = int((fsImpressWidth / iScale) +.5)
+   aFilterData(3).Name  =&quot;LogicalHeight&quot;
+   aFilterData(3).Value = int((fsImpressHeight / iScale) +.5)
+   aFilterData(4).Name  =&quot;Quality&quot;
+   aFilterData(4).Value = 85
+   xDoc = thiscomponent
+   xView = xDoc.currentController
+   xSelection = xView.selection
+   xObj = xView.currentPage
+   ExportJpeg( xObj, sPath, aFilterData() )  
+end sub 
+
+sub ExportSlidesJpeg (Optional sPath, Optional iScale, Optional iIndexOffset)
+	&apos; ExportSlidesJpeg (fsStagingDirectoryURL &amp; &quot;/slide_&quot;, 35)
+	&apos; This sub exports all the slides in the presentation
+	&apos; to a directory - normally a staging directory.
+	&apos; See http://www.oooforum.org/forum/viewtopic.phtml?t=8985
+	&apos; by D. French (Wellingdon, New Zealand)
+	dim xDoc, sView, xSelection, xObj, xView, i, odoc, octl
+	dim slide
+	dim oBar
+	dim sFileUrl as string
+	viewNormal()
+	&apos; let&apos;s wait a second to make sure the display is stablilized.
+	wait 1000
+	if ismissing(iIndexOffset) then
+		iIndexOffset = 0 &apos; Use numbering from 0 to numberOfSlides - 1
+	endif
+	if ismissing(iScale) then
+		iScale = 35 &apos; Image is 1/35 of full size. 800 x 600
+	endif
+	if ismissing(sPath) then
+		sPath = fsStagingDirectoryURL &amp; &quot;/slide_&quot; &apos; &amp; &quot;nn.jpg&quot;
+	endif
+	&apos;creating filter dependent filter properties
+	odoc=thiscomponent 
+	octl=odoc.getcurrentcontroller()
+	dim aFilterData (4) as new com.sun.star.beans.PropertyValue
+	aFilterData(0).Name  = &quot;PixelWidth&quot;        &apos;
+	aFilterData(0).Value = int((fsImpressWidth / iScale) +.5) 
+	aFilterData(1).Name  = &quot;PixelHeight&quot;
+	aFilterData(1).Value = int((fsImpressHeight / iScale) +.5) 
+	aFilterData(2).Name  =&quot;LogicalWidth&quot;
+	aFilterData(2).Value = int((fsImpressWidth / iScale) +.5)
+	aFilterData(3).Name  =&quot;LogicalHeight&quot;
+	aFilterData(3).Value = int((fsImpressHeight / iScale) +.5) 
+	aFilterData(4).Name  =&quot;Quality&quot;
+	aFilterData(4).Value = 90	
+	oBar=octl.getFrame().createStatusIndicator()
+	oBar.start( getBranding( bI_SPOKEN_BRANDING ), odoc.getdrawpages().count )
+	for i = odoc.getdrawpages().count - 1 To 0 step -1
+		oBar.Value=odoc.getdrawpages().count - i
+		slide=odoc.drawpages(i)
+		octl.setCurrentPage(slide) 
+		&apos;
+		sFileUrl = ( sPath &amp; trim(str(i + iIndexOffset)) &amp; &quot;.jpg&quot;)
+		xDoc = thiscomponent
+		xView = xDoc.currentController
+		xSelection = xView.selection
+		xObj = xView.currentPage
+		&apos;msgBox xObj.getPropertyValue(&quot;Width&quot;)
+		ExportJpeg( xObj, sFileUrl, aFilterData() )  
+	next
+	oBar.End()
+end sub 
+
+sub ExportJpeg( xobject, sFileUrl as string, aFilterData )
+	&apos; http://codesnippets.services.openoffice.org/Office/Office.GraphicExport.snip
+	&apos; Export JPEG by Olivier Samyn (initial), Sven Jacobi, Michael Hoennig, Tom Schindl
+	&apos; revised February 24, 2013 for LibreOffice 4
+	dim xExporter
+	xExporter = createUnoService(&quot;com.sun.star.drawing.GraphicExportFilter&quot;)
+	xExporter.SetSourceDocument( xobject )
+	dim aArgs (2) as new com.sun.star.beans.PropertyValue
+	dim aURL as new com.sun.star.util.URL
+	
+	aURL.Complete = sFileUrl
+	aArgs(0).Name  = &quot;MediaType&quot;
+	aArgs(0).Value = &quot;image/jpeg&quot;
+	aArgs(1).Name  = &quot;URL&quot;
+	aArgs(1).Value = sFileUrl &apos; aURL
+	aArgs(2).Name  = &quot;FilterData&quot;
+	aArgs(2).Value = aFilterData
+	xExporter.filter( aArgs() )
+end sub 
+
+sub viewNormal 
+	&apos; http://www.oooforum.org/forum/viewtopic.phtml?t=74996
+	dim aURL, oController, oDisp
+	aURL = CreateUnoStruct(&quot;com.sun.star.util.URL&quot;) 
+	aURL.Complete = &quot;.uno:NormalMultiPaneGUI&quot; 
+	CreateUnoService(&quot;com.sun.star.util.URLTransformer&quot;)._ 
+	parseStrict(aURL) 
+	oController = ThisComponent.getCurrentController() 
+	oDisp = oController.queryDispatch(aURL, &quot;_self&quot;, 0) 
+	if NOT IsNull(oDisp) then 
+		oDisp.dispatch(aURL, array()) 
+	endif 
+end sub 
+
+function fsEscapeStr(byval sA as string) as string
+	&apos;Examples of custom URL schemes include:
+	&apos; MECARD:N:Appleseed,Johnny;TEL:+14089961010;EMAIL:majordomo@apple.com;URL:http://www.apple.com;NOTE:Tech hardware and software;BDAY:19760401;ADR:,,1 Infinite Loop,Cupertino,CA,95014,USA;;
+	&apos; MEBKM:TITLE:Dartmouth Sportsplex;URL:http://www.dartmouthsportsplex.com/;;
+	&apos; mailto:support@microsoft.com &apos;Mail
+	&apos; tel:+18000000000 &apos; Phone call
+	&apos; sms:+18000000000 &apos; SMS message
+	&apos; http://www.dartmouthsportplex.com &apos; Web
+	&apos; http://maps.google.ca/maps?q=44.6696,-63.5750 &apos; Google Maps
+	&apos; http://www.youtube.com/watch?v=OCARVoZqC-s &apos; Youtube App
+	&apos; feed://sites.google.com/site/readtextextension/home/announcements/posts.xml &apos; subscription(Apple iOS)
+	&apos; comgoogleearth:// &apos; - Opens Google Earth app with Apple iOS if installed
+	&apos; com-innerfence-ccterminal:// &apos; Longest known stringlength 26 - Opens Credit Card terminal if installed
+	&apos; The Vcard format is not well supported on the Apple iOS
+	&apos; for more information,see: http://wiki.akosma.com/IPhone_URL_Schemes
+	&apos; Some programs and cameras can&apos;t read long URLs.
+	sA=fsreplaceText(sA,&quot;+&quot;,&quot;%2B&quot;)
+	sA=fsreplaceText(sA,&quot;&amp;&quot;,&quot;%26&quot;) 
+	select case LCase(Left(ConvertToURL(sA),Instr(ConvertToURL(sA),&quot;:&quot;)))
+	case &quot;file:&quot;
+		sA=Mid(ConvertToURL(sA),9)
+	case else 
+		&apos;It&apos;s a web URL
+		sA = ConvertToURL(sA)
+		sA=fsreplaceText(sA,&quot;%23&quot;,&quot;%2523&quot;) &apos;for link to Twitter or identi.ca %23 makes #
+	end select
+	
+	fsEscapeStr=sA
+end function
+
+function fsPdfZipURL
+	on error goto fsPdfZipURLError
+	if fbIsWindowsAsianOrComplexName then 
+		fsPdfZipURL=fsTimeOfCreationZipFileName
+	else
+		fsPdfZipURL=left(ThisComponent.getURL(),len(ThisComponent.getURL()) -4 ) &amp; &quot;.zip&quot;
+	endif
+	exit function
+	fsPdfZipURLError:
+		fsPdfZipURL=&quot;&quot;
+end function
+
+
+function fsJsonZipURL
+	on error goto fsJsonZipURLError
+	if fbIsWindowsAsianOrComplexName then 
+		fsJsonZipURL=left(fsTimeOfCreationZipFileName,len(fsTimeOfCreationZipFileName) -4 ) &amp; &quot;-json.zip&quot;
+	else
+		fsJsonZipURL=left(ThisComponent.getURL(),len(ThisComponent.getURL()) -4 ) &amp; &quot;-json.zip&quot;
+	endif
+	exit function
+	fsJsonZipURLError:
+		fsJsonZipURL=&quot;&quot;
+end function
+
+function fsTimeOfCreationZipFileName
+	&apos; Windows throws an error mailing a complex or Asian file name, so we will generate a file name using the date
+	&apos; that the presentation was created. This name should be stable for a given presentation.
+	dim iA as integer
+	dim result as string
+	iA=instr(ThisComponent.getURL(),fsShortMailFileName) - 1
+	result=left(ThisComponent.getURL(),iA)
+	fsTimeOfCreationZipFileName=result &amp; ThisComponent.DocumentProperties.CreationDate.Year() &amp; &quot;-&quot; &amp; _
+	fsPrefixZeroes(ThisComponent.DocumentProperties.CreationDate.Month(),2) &amp; &quot;-&quot; &amp; _
+	fsPrefixZeroes(ThisComponent.DocumentProperties.CreationDate.Day(),2) &amp; &quot;T&quot; &amp; _
+	fsPrefixZeroes(ThisComponent.DocumentProperties.CreationDate.Hours(),2) &amp; &quot;-&quot; &amp; _
+	fsPrefixZeroes(ThisComponent.DocumentProperties.CreationDate.Minutes(),2) &amp; &quot;-&quot; &amp; _
+	fsPrefixZeroes(ThisComponent.DocumentProperties.CreationDate.Seconds(),2) &amp; &quot;.zip&quot;
+end function
+
+function fsStagingDirectoryURL
+	fsStagingDirectoryURL=createUnoService(&quot;com.sun.star.util.PathSettings&quot;).userConfig &amp; &quot;/impresstools/staging&quot;
+end function
+
+function fsTemporarySpeechTextURL
+	fsTemporarySpeechTextURL=createUnoService(&quot;com.sun.star.util.PathSettings&quot;).userConfig &amp; &quot;/impresstools/said.txt&quot;
+end function
+
+function fsSpeechSettingURL
+	fsSpeechSettingURL=createUnoService(&quot;com.sun.star.util.PathSettings&quot;).userConfig &amp; &quot;/impresstools/speech.ini&quot;
+end function
+
+function fsLastPageTitle
+	fsLastPageTitle=createUnoService(&quot;com.sun.star.util.PathSettings&quot;).userConfig &amp; &quot;/impresstools/last-page-title.ini&quot;
+end function
+
+function fsLastImageInsertedRecord
+	fsLastImageInsertedRecord=createUnoService(&quot;com.sun.star.util.PathSettings&quot;).userConfig &amp; &quot;/impresstools/last-image-inserted.ini&quot;
+end function
+
+function fsNotesMenuSettingURL
+	fsNotesMenuSettingURL=createUnoService(&quot;com.sun.star.util.PathSettings&quot;).userConfig &amp; &quot;/impresstools/notes-menu.ini&quot;
+end function
+
+function fsTemporaryJsonURL
+	fsTemporaryJsonURL = fsStagingDirectoryURL &amp; &quot;/data.json&quot;
+end function
+
+function fsAboutStagingURL
+	fsAboutStagingURL=fsStagingDirectoryURL &amp; &quot;/about.html&quot;
+end function
+
+function fsNotesStagingURL
+	fsNotesStagingURL=fsStagingDirectoryURL &amp; &quot;/CONTENTS/slide-notes.xml&quot;
+end function
+
+function fsDescriptionStagingURL
+	fsDescriptionStagingURL=fsStagingDirectoryURL &amp; &quot;/description.xml&quot;
+end function
+
+function fsPdfStagingURL
+	fsPdfStagingURL=fsStagingDirectoryURL &amp; &quot;/CONTENTS/contents.pdf&quot;
+end function
+
+function fsManifestStagingURL
+	fsManifestStagingURL=fsStagingDirectoryURL &amp; &quot;/META-INF/manifest.xml&quot;
+end function
+
+function fsWhenMade (sURL)
+	if fileExists (sURL) then
+		fsWhenMade = fsReplaceText (FileDateTime(sURL),&quot; &quot;,&quot;T&quot;)
+	else 
+		fsWhenMade=fsNow
+	endif
+end function
+
+function fsNow
+	&apos; see http://www.ietf.org/rfc/rfc3339.txt
+	&apos; see Unix man date
+	&apos; local time - doesn&apos;t work in OSX
+	&apos; shell( &quot;bash -c &apos;date +%F-T%X%:z &gt;  &quot;&quot;$HOME/date.txt&quot;&quot;&apos;&quot;)
+	&apos; utc time - works in OSX and Linux 
+	&apos; shell( &quot;bash -c &apos;date -u +%F-T%X-00:00 &gt; &quot;&quot;$HOME/date.txt&quot;&quot;&apos;&quot;)
+	dim sA as string
+	sA= year(now) &amp; &quot;-&quot; &amp; _
+	fsPrefixZeroes(month(now),2) &amp; &quot;-&quot; &amp; _
+	fsPrefixZeroes(day(now),2) &amp; &quot;T&quot; &amp; _
+	fsPrefixZeroes(hour(now),2) &amp; &quot;:&quot; &amp; _
+	fsPrefixZeroes(minute(now),2) &amp; &quot;:&quot; &amp; _
+	fsPrefixZeroes(second(now),2)
+	fsNow = sA
+end function
+
+function createContentsPdf( optional cType)
+	&apos; cType 0 is mobile and cType 1 is archival
+	if isMissing (cType) then 
+		cType = 0
+	endif
+	dim document   as object
+	dim dispatcher as object
+	dim sA as string
+	dim bLossless as boolean
+	dim iRes as integer
+	if B_DEBUG = false then
+		on Error goto createContentsPdfError
+	else
+		&apos;msgBox (&quot;Debug mode - not for release - createContentsPdf&quot;,64,getBranding(bI_SPOKEN_BRANDING)) 
+	endif
+	sA=fsPdfStagingURL
+	if cType = 0 then
+		bLossless = false
+		iRes = 75
+	else
+		bLossless = true
+		iRes = 150
+	endif
+	if fileExists(sA) then
+		kill sA
+	endif
+	document   = ThisComponent.CurrentController.Frame
+	dispatcher = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
+	dim args1(2) as new com.sun.star.beans.PropertyValue
+	args1(0).Name = &quot;URL&quot;
+	args1(0).Value = sA
+	args1(1).Name = &quot;FilterName&quot;
+	args1(1).Value = &quot;impress_pdf_Export&quot;
+	args1(2).Name = &quot;FilterData&quot;
+	args1(2).Value = array(array(&quot;UseLosslessCompression&quot;,0,bLossless,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;Quality&quot;,0,80,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;ReduceImageResolution&quot;,0,true,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;MaxImageResolution&quot;,0,iRes,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;UseTaggedPDF&quot;,0,false,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;SelectPdfVersion&quot;,0,0,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;ExportNotes&quot;,0,false,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;ExportBookmarks&quot;,0,false,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;OpenBookmarkLevels&quot;,0,-1,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;UseTransitionEffects&quot;,0,true,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;IsSkipEmptyPages&quot;,0,true,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;IsAddStream&quot;,0,false,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;EmbedStandardFonts&quot;,0,false,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;FormsType&quot;,0,0,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;ExportFormFields&quot;,0,false,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;AllowDuplicateFieldNames&quot;,0,false,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;HideViewerToolbar&quot;,0,false,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;HideViewerMenubar&quot;,0,false,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;HideViewerWindowControls&quot;,0,false,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;ResizeWindowToInitialPage&quot;,0,true,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;CenterWindow&quot;,0,false,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;OpenInFullScreenMode&quot;,0,false,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;DisplayPDFDocumentTitle&quot;,0,true,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;InitialView&quot;,0,0,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;Magnification&quot;,0,3,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;Zoom&quot;,0,100,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;PageLayout&quot;,0,0,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;FirstPageOnLeft&quot;,0,false,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;InitialPage&quot;,0,1,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;Printing&quot;,0,2,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;Changes&quot;,0,4,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;EnableCopyingOfContent&quot;,0,true,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;EnableTextAccessForAccessibilityTools&quot;,0,true,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;ExportLinksRelativeFsys&quot;,0,false,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;PDFViewSelection&quot;,0,0,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;ConvertOOoTargetToPDFTarget&quot;,0,true,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;ExportBookmarksToPDFDestination&quot;,0,false,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;_OkButtonString&quot;,0,&quot;&quot;,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;EncryptFile&quot;,0,false,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;PreparedPasswords&quot;,0,,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;RestrictPermissions&quot;,0,false,com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;PreparedPermissionPassword&quot;,0,array(),com.sun.star.beans.PropertyState.DIRECT_VALUE), _
+	array(&quot;&quot;,0,,com.sun.star.beans.PropertyState.DIRECT_VALUE))
+	dispatcher.executeDispatch(document, &quot;.uno:ExportToPDF&quot;, &quot;&quot;, 0, args1())
+	createContentsPdf=true
+	exit function
+	createContentsPdfError:
+	createContentsPdf=false 
+end function
+
+function CreateArchivalContentsPdf
+	&apos; PNG format
+	&apos; This sets images to resolution suitable for archiving. To minimize file size, most options are disabled.
+	&apos; By default, PDF documents include the keyword, subject, author and title information from the generator program&apos;s
+	&apos; File - Properties menu. Use vector images whenever possible to reduce file size.
+	CreateArchivalContentsPdf=CreateContentsPdf (1)
+end function
+
+function createMobileContentsPdf
+	&apos; JPG format
+	&apos; This sets images to small file size suitable for mobile devices. To minimize file size, most options are disabled.
+	&apos; By default, PDF documents include the keyword, subject, author and title information from the generator program&apos;s
+	&apos; File - Properties menu. Use vector images whenever possible to reduce file size.
+	createMobileContentsPdf=CreateContentsPdf (0)
+end function
+
+sub CreateAboutHTML
+	dim CR as string
+	CR = chr$(10)
+	dim sA as string
+	if fileExists (fsAboutStagingURL) then
+		kill fsAboutStagingURL
+	endif
+	sA=getAboutBrand(hI_ABOUT_HTML)
+    CreateFile(fsAboutStagingURL,sA,&quot;UTF-8&quot;)
+end sub 
+
+sub CreateNotesListXML (MyKey as string)
+	dim Today as string
+	Today = fsWhenMade (ThisComponent.getURL())
+ 	dim CR as string
+	CR = chr$(10)
+    dim sA as string
+	if fileExists (fsNotesStagingURL) then
+		kill fsNotesStagingURL
+	endif
+	sA = &quot;&lt;?xml version=&quot;&quot;1.0&quot;&quot; encoding=&quot;&quot;UTF-8&quot;&quot;?&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;notedocument version=&quot;&quot;1.0&quot;&quot;&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;meta&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;topic id=&quot;&quot;&quot; &amp; fsMyID &amp; &quot;&quot;&quot; indexer=&quot;&quot;include&quot;&quot; status=&quot;&quot;PUBLISH&quot;&quot;&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;title id=&quot;&quot;title1.0&quot;&quot; encoding=&quot;&quot;UTF-8-PCT-ENCODED&quot;&quot; xml-lang=&quot;&quot;&quot; &amp; fsDocLanguage &amp; &quot;-&quot; &amp; fsDocCountry &amp; &quot;&quot;&quot;&gt;&quot; &amp; fsEscapeStr(fsShortFileName) &amp; &quot;&lt;/title&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;filename&gt;/CONTENTS/slide-notes.xml&lt;/filename&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;subject encoding=&quot;&quot;UTF-8-PCT-ENCODED&quot;&quot;&gt;&quot; &amp; fsEscapeStr(fsSubject) &amp; &quot;&lt;/subject&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;keywords encoding=&quot;&quot;UTF-8-PCT-ENCODED&quot;&quot;&gt;&quot; &amp; fsEscapeStr(fsKeyWords) &amp; &quot;&lt;/keywords&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;description encoding=&quot;&quot;UTF-8-PCT-ENCODED&quot;&quot;&gt;&quot; &amp; fsEscapeStr(fsDescription) &amp; &quot;&lt;/description&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/topic&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;history&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;created encoding=&quot;&quot;UTF-8-PCT-ENCODED&quot;&quot; date=&quot;&quot;&quot; &amp; fsCreationDate &amp; &quot;&quot;&quot;&gt;&quot; &amp; fsEscapeStr(fsDocAuthor) &amp; &quot;&lt;/created&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;modified encoding=&quot;&quot;UTF-8-PCT-ENCODED&quot;&quot; date=&quot;&quot;&quot; &amp; Today &amp; &quot;&quot;&quot;&gt;&quot; &amp; fsEscapeStr(ThisComponent.DocumentProperties.ModifiedBy) &amp; &quot;&lt;/modified&gt;&quot; &amp; CR	
+	sA = sA &amp; &quot;&lt;generator encoding=&quot;&quot;UTF-8-PCT-ENCODED&quot;&quot;&gt;&quot; &amp; fsEscapeStr(ThisComponent.DocumentProperties.Generator) &amp; &quot;&lt;/generator&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/history&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;security&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;key&gt;&quot; &amp; myKey &amp; &quot;&lt;/key&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;job&gt;&quot; &amp; &quot;JOB-51E76C0E-&quot; &amp; UUIDv4() &amp; &quot;&lt;/job&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/security&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/meta&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;body&gt;&quot; &amp; CR
+	&apos; Start looping through the slides
+	sA = sA &amp; fsPresentationNotesXML
+	&apos; Finish looping through the slides
+	sA = sA &amp; &quot;&lt;/body&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/notedocument&gt;&quot; &amp; CR
+    CreateFile(fsNotesStagingURL,sA,&quot;UTF-8&quot;)
+end sub 
+
+sub CreateManifestXML
+ 	dim CR as string
+	CR = chr$(10)
+	dim sA as string
+	if fileExists (fsManifestStagingURL) then
+		kill fsManifestStagingURL
+	endif
+	sA =&quot;&lt;?xml version=&quot;&quot;1.0&quot;&quot; encoding=&quot;&quot;UTF-8&quot;&quot;?&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;manifest:manifest&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;!--Notes: Notes to speak aloud or to display in an auxillary device--&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;manifest:file-entry manifest:media-type=&quot;&quot;application/xml&quot;&quot; manifest:full-path=&quot;&quot;CONTENTS/slide-notes.xml&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;!--PDF: Device or Web app renders the PDF file as an image, or optionally reads the text aloud.--&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;manifest:file-entry manifest:media-type=&quot;&quot;application/pdf&quot;&quot; manifest:full-path=&quot;&quot;CONTENTS/contents.pdf&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;!--HTML: Brief description of the archive.--&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;manifest:file-entry manifest:media-type=&quot;&quot;text/html&quot;&quot; manifest:full-path=&quot;&quot;about.html&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/manifest:manifest&gt;&quot; &amp; CR
+	CreateFile(fsManifestStagingURL,sA,&quot;UTF-8&quot;)
+end sub 
+
+sub CreateDescriptionXML
+ 	dim CR as string
+	CR = chr$(10)
+	dim sA as string
+	if fileExists (fsDescriptionStagingURL) then
+		kill fsDescriptionStagingURL
+	endif
+	sA = &quot;&lt;?xml version=&quot;&quot;1.0&quot;&quot; encoding=&quot;&quot;UTF-8&quot;&quot;?&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;description xmlns=&quot;&quot;&quot; &amp; getBranding(bI_HOMEPAGE) &amp; &quot;/content/description/2012&quot;&quot; xmlns:d=&quot;&quot;&quot; &amp; getBranding(bI_HOMEPAGE) &amp; &quot;/content/description/2012&quot;&quot; xmlns:xlink=&quot;&quot;http://www.w3.org/1999/xlink&quot;&quot;&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;version value=&quot;&quot;0.1.1&quot;&quot; /&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;identifier value=&quot;&quot;&quot; &amp; fsMyID &amp; &quot;&quot;&quot; /&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;display-name&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;name lang=&quot;&quot;en&quot;&quot;&gt;&quot; &amp; getBranding(bI_BRANDING) &amp; &quot;&lt;/name&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;name lang=&quot;&quot;fr&quot;&quot;&gt;&quot; &amp; getBranding(bI_BRANDING) &amp; &quot;&lt;/name&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/display-name&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;publisher&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;name xlink:href=&quot;&quot;&quot; &amp; getBranding(bI_HOMEPAGE) &amp; &quot;&quot;&quot; lang=&quot;&quot;en&quot;&quot;&gt;&quot; &amp; getBranding(bI_BRANDING) &amp; &quot;&lt;/name&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;name xlink:href=&quot;&quot;&quot; &amp; getBranding(bI_HOMEPAGE) &amp; &quot;&quot;&quot; lang=&quot;&quot;fr&quot;&quot;&gt;&quot; &amp; getBranding(bI_BRANDING) &amp; &quot;&lt;/name&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/publisher&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/description&gt;&quot; &amp; CR
+	CreateFile(fsDescriptionStagingURL,sA,&quot;UTF-8&quot;)
+end sub 
+
+function fsPresentationNotesXML
+	&apos;Adapted from code by Danny Brewer at http://www.oooforum.org/forum/viewtopic.phtml?t=10795 
+	dim oDoc, oDrawPages,oDrawPage,oShape,oElem
+	dim nNumShapes,nShape,nPage,nNumPages,nThisPage, iNo as integer
+	dim cTitle,cLocale,cAsianLanguage,cComplexLanguage, cWesternLanguage as string
+	dim n1 as integer
+	dim longI as Long
+	dim isSpeechApp as boolean
+	dim CR as string
+	select case I_BRANDED
+	case 3 &apos; tts only client
+		isSpeechApp = true
+	case else
+		isSpeechApp = false
+	end select
+	CR = chr$(10)
+	oDoc=ThisComponent 
+	oDrawPages=oDoc.getDrawPages() 
+	nNumPages=oDrawPages.getCount()
+	oElem=oDoc.getDrawPages().getElementNames() 
+	fsPresentationNotesXML=&quot;&quot;
+	for nPage=0 To nNumPages - 1 step 1
+		oDrawPage=oDrawPages.getByIndex( nPage ) 
+		if oDrawPage.getNotesPage.getCount &lt; 2 then &apos; User deleted the notes object
+			cTitle=&quot;&quot;
+			cAsianLanguage=&quot;zxx-&quot; &apos;if missing note field, use code for unknown language and locale
+			cComplexLanguage=&quot;zxx-&quot;
+			cWesternLanguage=&quot;zxx-&quot;
+		else 
+			iNo = fiGetSlideNoteIndex
+			cTitle=oDrawPage.getNotesPage.getByIndex(iNo).getText().getString()
+			if len(cTitle &lt;&gt; 0) then
+				if instr(cTitle, &quot;&gt;&quot;) &lt;&gt; 0 and lcase(Left(cTitle,len(&quot;&lt;speak&quot;))) &lt;&gt; &quot;&lt;speak&quot; and isSpeechApp = true then 
+				&apos; if there is no greater than sign, than string is not XML. Skip stripping for speed.
+				&apos; The TTS publisher client player application produces speech using text to speech.
+				&apos; We don&apos;t want to strip out speech XML but we should strip out XHTML
+					cTitle = fsstripXMLTags(cTitle)
+					cTitle = fsSuperTrim (cTitle)
+					cTitle = fsReplaceText (cTitle, &quot;&amp;lt;&quot;, &quot;&lt;&quot;)
+					cTitle = fsReplaceText (cTitle, &quot;&amp;gt;&quot;, &quot;&gt;&quot;)
+				endif
+			endif
+			cAsianLanguage=oDrawPage.getNotesPage.getByIndex(iNo).CharLocaleAsian.Language &amp; &quot;-&quot; &amp; oDrawPage.getNotesPage.getByIndex(iNo).CharLocaleAsian.Country
+			cComplexLanguage=oDrawPage.getNotesPage.getByIndex(iNo).CharLocaleComplex.Language &amp; &quot;-&quot; &amp; oDrawPage.getNotesPage.getByIndex(iNo).CharLocaleComplex.Country
+			cWesternLanguage=oDrawPage.getNotesPage.getByIndex(iNo).CharLocale.Language() &amp; &quot;-&quot; &amp; oDrawPage.getNotesPage.getByIndex(iNo).CharLocale.Country()
+		endif
+		select case  fsComplexAsiaOrWest( cTitle )
+		case &quot;WEST&quot;
+			cLocale=cWesternLanguage
+		case &quot;ASIA&quot;
+			cLocale=cAsianLanguage
+		case &quot;UNDEFINED&quot; &apos;We would prefer that the client not read URLs aloud, instead let the user open the URL
+			cLocale=&quot;zxx-&quot;
+		case else  &apos;COMPLEX
+			cLocale=cComplexLanguage
+		end select
+		cTitle = fsEscapeStr(cTitle) 
+			
+		fsPresentationNotesXML=fsPresentationNotesXML &amp; &quot;&lt;paragraph encoding=&quot; &amp; Chr$(34) &amp; &quot;UTF-8-PCT-ENCODED&quot; &amp; Chr$(34) &amp; &quot; role=&quot; &amp; Chr$(34) &amp; _
+			&quot;note&quot; &amp; Chr$(34) &amp; &quot; id=&quot; &amp; Chr$(34) &amp; _
+			&quot;slide-&quot; &amp; fsPrefixZeroes(nPage+1, 5) &amp; Chr$(34) &amp; &quot; xml-lang=&quot; &amp; Chr$(34) &amp; cLocale &amp; _
+			Chr$(34) &amp; &quot;&gt;&quot; &amp;  cTitle &amp; &quot;&lt;/paragraph&gt;&quot; &amp; CR
+	next
+	exit function
+	fsPresentationNotesXMLError:
+	fsPresentationNotesXML=&quot;&quot;
+end function
+
+function fsNotesListHTML
+	&apos;Adapted from code by Danny Brewer at http://www.oooforum.org/forum/viewtopic.phtml?t=10795 
+	dim oDoc, oDrawPages,oDrawPage,oShape,oElem
+	dim nNumShapes,nShape,nPage,nNumPages,nThisPage as integer
+	dim cBody,cLocale,cAsianLanguage,cComplexLanguage, cWesternLanguage, cTitle, cStyle as string
+	dim n1, iNo as integer
+	dim longI as Long
+	dim CR as string
+	CR = chr$(10)
+	cStyle=&quot;cjk&quot;
+	oDoc=ThisComponent 
+	oDrawPages=oDoc.getDrawPages() 
+	nNumPages=oDrawPages.getCount()
+	oElem=oDoc.getDrawPages().getElementNames() 
+	fsNotesListHTML=&quot;&lt;hr&gt;&quot;
+	for nPage=0 To nNumPages - 1 step 1
+		oDrawPage=oDrawPages.getByIndex( nPage ) 
+		if oDrawPage.getNotesPage.getCount &lt; 2 then &apos; User deleted the notes object
+			cBody=&quot;&quot;
+			cTitle=oDrawPage.getName
+			cAsianLanguage=&quot;zxx-&quot; &apos;if missing note field, use code for unknown language and locale
+			cComplexLanguage=&quot;zxx-&quot;
+			cWesternLanguage=&quot;zxx-&quot;
+		else 
+			iNo = fiGetSlideNoteIndex 
+			cBody= oDrawPage.getNotesPage.getByIndex(iNo).getText().getString()
+			cBody = fsstripXMLTags(cBody)
+			cBody = fsReplaceText (cBody, &quot;&amp;lt;&quot;, &quot;&lt;&quot;)
+			cBody = fsReplaceText (cBody, &quot;&amp;gt;&quot;, &quot;&gt;&quot;)
+			on error goto czz1
+			cTitle=oDrawPage.getByIndex(0).getText().GetString &apos; Won&apos;t work if there is no text field
+			goto czz2 
+			czz1: 
+			&apos;error finding index
+			cTitle =oDrawPage.getName &apos; use the name of the slide - usually okay.
+			czz2:
+			cAsianLanguage=oDrawPage.getNotesPage.getByIndex(iNo).CharLocaleAsian.Language &amp; &quot;-&quot; &amp; oDrawPage.getNotesPage.getByIndex(iNo).CharLocaleAsian.Country
+			cComplexLanguage=oDrawPage.getNotesPage.getByIndex(iNo).CharLocaleComplex.Language &amp; &quot;-&quot; &amp; oDrawPage.getNotesPage.getByIndex(iNo).CharLocaleComplex.Country
+			cWesternLanguage=oDrawPage.getNotesPage.getByIndex(iNo).CharLocale.Language() &amp; &quot;-&quot; &amp; oDrawPage.getNotesPage.getByIndex(iNo).CharLocale.Country()
+		endif
+		select case  fsComplexAsiaOrWest( cBody )
+		case &quot;WEST&quot;
+			cLocale=cWesternLanguage
+			cStyle=&quot;western&quot; &apos;arial
+		case &quot;ASIA&quot;
+			cLocale=cAsianLanguage
+			cStyle=&quot;cjk&quot; &apos;no specific font.
+		case &quot;UNDEFINED&quot;
+			cLocale=&quot;zxx-&quot;
+			cStyle=&quot;western&quot; &apos;arial
+		case else  &apos;COMPLEX
+			cLocale=cComplexLanguage
+			cStyle=&quot;cjk&quot; &apos;no specific font.
+		end select
+		&apos;Only very basic formatting...
+		cBody = fsCodeTheHTML ( cBody)
+		fsNotesListHTML=fsNotesListHTML &amp;  &quot;&lt;p class=&quot;&quot;&quot;&amp; cStyle &amp; &quot;&quot;&quot; id=&quot; &amp; Chr$(34) &amp; _
+			&quot;slide-heading-&quot; &amp; fsPrefixZeroes(nPage+1, 5) &amp; Chr$(34) &amp; &quot; lang=&quot; &amp; Chr$(34) &amp; cLocale &amp; _
+			Chr$(34) &amp; &quot;&gt;&lt;b&gt;&quot; &amp; cTitle &amp; &quot;&lt;/b&gt;&lt;/p&gt;&quot; &amp; CR
+		fsNotesListHTML=fsNotesListHTML &amp; &quot;&lt;p class=&quot;&quot;&quot;&amp; cStyle &amp; &quot;&quot;&quot; id=&quot; &amp; Chr$(34) &amp; _
+			&quot;slide-&quot; &amp; fsPrefixZeroes(nPage+1, 5) &amp; Chr$(34) &amp; &quot; lang=&quot; &amp; Chr$(34) &amp; cLocale &amp; _
+			Chr$(34) &amp; &quot;&gt;&quot; &amp; cBody &amp; &quot;&lt;/p&gt;&quot; &amp; CR
+	&apos;
+	next
+	exit function
+	fsNotesListHTMLError:
+	fsNotesListHTML=&quot;&quot;
+end function
+
+function fsAsciiToUnicodeBraille (byval sA)
+	sA = lcase (sA)
+	&apos; Common symbols - no Braille
+	sA = fsReplaceText (sA, &quot;©&quot;, getBrailleL10N(17))
+	sA = fsReplaceText (sA, &quot;™&quot;, getBrailleL10N(18))
+	&apos; Transcode letters to Unicode characters
+	sA = fsReplaceText (sA,&quot;-&quot;,&quot;⠤&quot;)
+	sA = fsReplaceText (sA,&quot;a&quot;,&quot;⠁&quot;)
+	sA = fsReplaceText (sA,&quot;b&quot;,&quot;⠃&quot;)
+	sA = fsReplaceText (sA,&quot;c&quot;,&quot;⠉&quot;)
+	sA = fsReplaceText (sA,&quot;d&quot;,&quot;⠙&quot;)
+	sA = fsReplaceText (sA,&quot;e&quot;,&quot;⠑&quot;)
+	sA = fsReplaceText (sA,&quot;f&quot;,&quot;⠋&quot;)
+	sA = fsReplaceText (sA,&quot;g&quot;,&quot;⠛&quot;)
+	sA = fsReplaceText (sA,&quot;h&quot;,&quot;⠓&quot;)
+	sA = fsReplaceText (sA,&quot;i&quot;,&quot;⠊&quot;)
+	sA = fsReplaceText (sA,&quot;j&quot;,&quot;⠚&quot;)
+	sA = fsReplaceText (sA,&quot;k&quot;,&quot;⠅&quot;)
+	sA = fsReplaceText (sA,&quot;l&quot;,&quot;⠇&quot;)
+	sA = fsReplaceText (sA,&quot;m&quot;,&quot;⠍&quot;)
+	sA = fsReplaceText (sA,&quot;n&quot;,&quot;⠝&quot;)
+	sA = fsReplaceText (sA,&quot;o&quot;,&quot;⠕&quot;)
+	sA = fsReplaceText (sA,&quot;p&quot;,&quot;⠏&quot;)
+	sA = fsReplaceText (sA,&quot;q&quot;,&quot;⠟&quot;)
+	sA = fsReplaceText (sA,&quot;r&quot;,&quot;⠗&quot;)
+	sA = fsReplaceText (sA,&quot;s&quot;,&quot;⠎&quot;)
+	sA = fsReplaceText (sA,&quot;t&quot;,&quot;⠞&quot;)
+	sA = fsReplaceText (sA,&quot;u&quot;,&quot;⠥&quot;)
+	sA = fsReplaceText (sA,&quot;v&quot;,&quot;⠧&quot;)
+	sA = fsReplaceText (sA,&quot;w&quot;,&quot;⠺&quot;)
+	sA = fsReplaceText (sA,&quot;x&quot;,&quot;⠭&quot;)
+	sA = fsReplaceText (sA,&quot;y&quot;,&quot;⠽&quot;)
+	sA = fsReplaceText (sA,&quot;z&quot;,&quot;⠵&quot;)
+	sA = fsReplaceText (sA,&quot;1&quot;,&quot;⠁&quot;)
+	sA = fsReplaceText (sA,&quot;2&quot;,&quot;⠃&quot;)
+	sA = fsReplaceText (sA,&quot;3&quot;,&quot;⠉&quot;)
+	sA = fsReplaceText (sA,&quot;4&quot;,&quot;⠙&quot;)
+	sA = fsReplaceText (sA,&quot;5&quot;,&quot;⠑&quot;)
+	sA = fsReplaceText (sA,&quot;6&quot;,&quot;⠋&quot;)
+	sA = fsReplaceText (sA,&quot;7&quot;,&quot;⠛&quot;)
+	sA = fsReplaceText (sA,&quot;8&quot;,&quot;⠓&quot;)
+	sA = fsReplaceText (sA,&quot;9&quot;,&quot;⠊&quot;)
+	sA = fsReplaceText (sA,&quot;0&quot;,&quot;⠚&quot;)
+	sA = fsReplaceText (sA,&quot;,&quot;,&quot;⠠&quot;)
+	sA = fsReplaceText (sA,&quot;#&quot;,&quot;⠼&quot;)
+	sA = fsReplaceText (sA,&quot;.&quot;,&quot;⠨&quot;)
+	sA = fsReplaceText (sA,&quot;!&quot;,&quot;⠮&quot;)
+	sA = fsReplaceText (sA,&quot;?&quot;,&quot;⠹&quot;)
+	sA = fsReplaceText (sA,&quot;&quot;&quot;&quot;,&quot;⠐&quot;)
+	sA = fsReplaceText(sA,&quot;@&quot;,&quot; ⠸⠬⠈⠨⠱&quot;) 
+	&apos;Computer code - &quot;⠸⠬&quot; &amp; sCode &amp; &quot;⠨⠱&quot;
+	sA = fsReplaceText (sA,&quot;/&quot;,&quot;⠌&quot;)
+	&apos; http://www.brailleauthority.org/update-cbc10/cbc-specialsymbolsupdate2010.pdf
+	sA = fsReplaceText(sA,&quot;&amp;&quot;,&quot;⠯&quot;)
+	sA = fsReplaceText(sA,&quot;=&quot;,&quot;⠿&quot;)
+	sA = fsReplaceText(sA,&quot;(&quot;,&quot;⠷&quot;)
+	sA = fsReplaceText(sA,&quot;)&quot;,&quot;⠾&quot;)
+	sA = fsReplaceText(sA,&quot;[&quot;,&quot;⠪&quot;)
+	sA = fsReplaceText(sA,&quot;]&quot;,&quot;⠻&quot;)
+	sA = fsReplaceText(sA,&quot;\&quot;,&quot;⠳&quot;)
+	sA = fsReplaceText(sA,&quot;*&quot;,&quot;⠡&quot;)
+	sA = fsReplaceText(sA,&quot;&lt;&quot;,&quot;⠣&quot;)
+	sA = fsReplaceText(sA,&quot;&gt;&quot;,&quot;⠜&quot;)
+	sA = fsReplaceText(sA,&quot;%&quot;,&quot;⠩&quot;)
+	sA = fsReplaceText(sA,&quot;;&quot;,&quot;⠰&quot;)
+	sA = fsReplaceText(sA,&quot;:&quot;,&quot; ⠱&quot;)
+	sA = fsReplaceText(sA,&quot;&apos;&quot;,&quot;⠄&quot;)
+	&apos; USA Braille by default uses a generic accent prefix &quot;⠠&quot; (DOTS-6) to denote accented letters.
+	&apos; We&apos;ll use this scheme for unknown letter forms *** TO DO ***
+	sA = fsReplaceText(sA,&quot;á&quot;, &quot;⠠⠁&quot;)
+	sA = fsReplaceText(sA,&quot;ó&quot;, &quot;⠠⠕&quot;)
+	sA = fsReplaceText(sA,&quot;ñ&quot;, &quot;⠠⠝&quot;)
+	&apos; http://www.omniglot.com/writing/braille.htm
+	sA = fsReplaceText(sA,&quot;é&quot;, &quot;⠿&quot;)
+	sA = fsReplaceText(sA,&quot;è&quot;, &quot;⠮&quot;)
+	sA = fsReplaceText(sA,&quot;ê&quot;, &quot;⠣&quot;) 
+	sA = fsReplaceText(sA,&quot;ë&quot;, &quot;⠫&quot;)
+	sA = fsReplaceText(sA,&quot;â&quot;, &quot;⠡&quot;)
+	sA = fsReplaceText(sA,&quot;à&quot;, &quot;⠷&quot;)
+	sA = fsReplaceText(sA,&quot;ä&quot;, &quot;⠜&quot;) 
+	sA = fsReplaceText(sA,&quot;æ&quot;, &quot;⠜&quot;) 
+	sA = fsReplaceText(sA,&quot;ì&quot;, &quot;⠌&quot;)
+	sA = fsReplaceText(sA,&quot;î&quot;, &quot;⠩&quot;)
+	sA = fsReplaceText(sA,&quot;ö&quot;, &quot;⠪&quot;) 
+	sA = fsReplaceText(sA,&quot;ô&quot;, &quot;⠹&quot;)
+	sA = fsReplaceText(sA,&quot;ò&quot;, &quot;⠬&quot;) 
+	sA = fsReplaceText(sA,&quot;œ&quot;, &quot;⠬&quot;)
+	sA = fsReplaceText(sA,&quot;ù&quot;, &quot;⠾&quot;)
+	sA = fsReplaceText(sA,&quot;û&quot;, &quot; ⠱&quot;)
+	sA = fsReplaceText(sA,&quot;ü&quot;, &quot;⠳&quot;)
+	sA = fsReplaceText(sA,&quot;ç&quot;, &quot;⠯&quot;)
+	fsAsciiToUnicodeBraille = sA
+end function
+
+function fsAsciiToBrailleTypeWriter (byval sA)
+	sA = lcase (sA)
+	sA = fsReplaceText (sA,&quot;1&quot;, &quot;A1&quot;)
+	sA = fsReplaceText (sA,&quot;2&quot;, &quot;A12&quot;)
+	sA = fsReplaceText (sA,&quot;3&quot;, &quot;A14&quot;)
+	sA = fsReplaceText (sA,&quot;4&quot;, &quot;A145&quot;)
+	sA = fsReplaceText (sA,&quot;5&quot;, &quot;A15&quot;)
+	sA = fsReplaceText (sA,&quot;6&quot;, &quot;A124&quot;)
+	sA = fsReplaceText (sA,&quot;7&quot;, &quot;A1245&quot;)
+	sA = fsReplaceText (sA,&quot;8&quot;, &quot;A125&quot;)
+	sA = fsReplaceText (sA,&quot;9&quot;, &quot;A24&quot;)
+	sA = fsReplaceText (sA,&quot;0&quot;, &quot;A245&quot;)
+	sA = fsReplaceText (sA,&quot;-&quot;, &quot;A36&quot;)
+	sA = fsReplaceText (sA,&quot;a&quot;, &quot;A1&quot;)
+	sA = fsReplaceText (sA,&quot;b&quot;, &quot;A12&quot;)
+	sA = fsReplaceText (sA,&quot;c&quot;, &quot;A14&quot;)
+	sA = fsReplaceText (sA,&quot;d&quot;, &quot;A145&quot;)
+	sA = fsReplaceText (sA,&quot;e&quot;, &quot;A15&quot;)
+	sA = fsReplaceText (sA,&quot;f&quot;, &quot;A124&quot;)
+	sA = fsReplaceText (sA,&quot;g&quot;, &quot;A1245&quot;)
+	sA = fsReplaceText (sA,&quot;h&quot;, &quot;A125&quot;)
+	sA = fsReplaceText (sA,&quot;i&quot;, &quot;A24&quot;)
+	sA = fsReplaceText (sA,&quot;j&quot;, &quot;A245&quot;)
+	sA = fsReplaceText (sA,&quot;k&quot;, &quot;A13&quot;)
+	sA = fsReplaceText (sA,&quot;l&quot;, &quot;A123&quot;)
+	sA = fsReplaceText (sA,&quot;m&quot;, &quot;A134&quot;)
+	sA = fsReplaceText (sA,&quot;n&quot;, &quot;A1345&quot;)
+	sA = fsReplaceText (sA,&quot;o&quot;, &quot;A135&quot;)
+	sA = fsReplaceText (sA,&quot;p&quot;, &quot;A1234&quot;)
+	sA = fsReplaceText (sA,&quot;q&quot;, &quot;A12345&quot;)
+	sA = fsReplaceText (sA,&quot;r&quot;, &quot;A1235&quot;)
+	sA = fsReplaceText (sA,&quot;s&quot;, &quot;A234&quot;)
+	sA = fsReplaceText (sA,&quot;t&quot;, &quot;A2345&quot;)
+	sA = fsReplaceText (sA,&quot;u&quot;, &quot;A136&quot;)
+	sA = fsReplaceText (sA,&quot;v&quot;, &quot;A1236&quot;)
+	sA = fsReplaceText (sA,&quot;w&quot;, &quot;A2456&quot;)
+	sA = fsReplaceText (sA,&quot;x&quot;, &quot;A1346&quot;)
+	sA = fsReplaceText (sA,&quot;y&quot;, &quot;A13456&quot;)
+	sA = fsReplaceText (sA,&quot;z&quot;, &quot;A1356&quot;)
+	sA = fsReplaceText (sA,&quot;,&quot;, &quot;A6&quot;)
+	sA = fsReplaceText (sA,&quot;#&quot;, &quot;A3456&quot;)
+	sA = fsReplaceText (sA,&quot;.&quot;, &quot;A46&quot;)
+	sA = fsReplaceText (sA,&quot;!&quot;, &quot;A2346&quot;)
+	sA = fsReplaceText (sA,&quot;?&quot;, &quot;A1456&quot;)
+	sA = fsReplaceText (sA,&quot;&quot;&quot;&quot;,&quot;A7&quot;)
+	sA = fsReplaceText (sA,&quot;@&quot;,&quot;A456A346A4A46A156&quot;) 
+	&apos;@ = Computer code start A456A346 / cell A4 / Computer code end - A46A156
+	sA = fsReplaceText (sA,&quot;/&quot;,&quot;A34&quot;)
+	&apos; http://www.brailleauthority.org/update-cbc10/cbc-specialsymbolsupdate2010.pdf
+	sA = fsReplaceText (sA,&quot;&amp;&quot;,&quot;A12346&quot;)
+	sA = fsReplaceText (sA,&quot;=&quot;,&quot;A123456&quot;)
+	sA = fsReplaceText (sA,&quot;(&quot;,&quot;A12356&quot;)
+	sA = fsReplaceText (sA,&quot;)&quot;,&quot;A23456&quot;)
+	sA = fsReplaceText (sA,&quot;[&quot;,&quot;A246&quot;)
+	sA = fsReplaceText (sA,&quot;]&quot;,&quot;A12456&quot;)
+	sA = fsReplaceText (sA,&quot;\&quot;,&quot;A1256&quot;)
+	sA = fsReplaceText (sA,&quot;*&quot;,&quot;A16&quot;)
+	sA = fsReplaceText (sA,&quot;&lt;&quot;,&quot;A126&quot;)
+	sA = fsReplaceText (sA,&quot;&gt;&quot;,&quot;A345&quot;)
+	sA = fsReplaceText (sA,&quot;%&quot;,&quot;A146&quot;)
+	sA = fsReplaceText (sA,&quot;;&quot;,&quot;A56&quot;)
+	sA = fsReplaceText (sA,&quot;:&quot;,&quot;A156&quot;)
+	sA = fsReplaceText (sA,&quot;&apos;&quot;,&quot;A3&quot;)
+	&apos; USA Braille by default uses a generic accent prefix A6 to denote accented letters.
+	&apos; We&apos;ll use this scheme for unknown letter forms *** TO DO ***
+	sA = fsReplaceText (sA,&quot;á&quot;, &quot;A6A1&quot;)
+	sA = fsReplaceText (sA,&quot;ó&quot;, &quot;A6A135&quot;)
+	sA = fsReplaceText (sA,&quot;ñ&quot;, &quot;A6A1345&quot;)
+	&apos; http://www.omniglot.com/writing/braille.htm
+	sA = fsReplaceText (sA,&quot;é&quot;, &quot;A123456&quot;)
+	sA = fsReplaceText (sA,&quot;è&quot;, &quot;A2346&quot;)
+	sA = fsReplaceText (sA,&quot;ê&quot;, &quot;A126&quot;) 
+	sA = fsReplaceText (sA,&quot;ë&quot;, &quot;A1246&quot;)
+	sA = fsReplaceText (sA,&quot;â&quot;, &quot;A16&quot;)
+	sA = fsReplaceText (sA,&quot;à&quot;, &quot;A12356&quot;)
+	sA = fsReplaceText (sA,&quot;ä&quot;, &quot;A345&quot;) 
+	sA = fsReplaceText (sA,&quot;æ&quot;, &quot;A345&quot;) 
+	sA = fsReplaceText (sA,&quot;ì&quot;, &quot;A34&quot;)
+	sA = fsReplaceText (sA,&quot;î&quot;, &quot;A146&quot;)
+	sA = fsReplaceText (sA,&quot;ö&quot;, &quot;A246&quot;) 
+	sA = fsReplaceText (sA,&quot;ô&quot;, &quot;A1456&quot;)
+	sA = fsReplaceText (sA,&quot;ò&quot;, &quot;A346&quot;) 
+	sA = fsReplaceText (sA,&quot;œ&quot;, &quot;A346&quot;)
+	sA = fsReplaceText (sA,&quot;ù&quot;, &quot;A23456&quot;)
+	sA = fsReplaceText (sA,&quot;û&quot;, &quot;A156&quot;)
+	sA = fsReplaceText (sA,&quot;ü&quot;, &quot;A1256&quot;)
+	sA = fsReplaceText (sA,&quot;ç&quot;, &quot;A12346&quot;)
+	&apos; Key caps
+	sA = fsReplaceText (sA,&quot; &quot;, &quot;A&quot; &amp; getBrailleL10N(2)) &apos; space
+	sA = fsReplaceText (sA, chr$(10), &quot;A&quot; &amp; getBrailleL10N(13)) &apos; new line
+	sA = fsReplaceText (sA, chr$(13), &quot;A&quot; &amp; getBrailleL10N(3)) &apos; return
+	sA = fsReplaceText (sA, chr$(9), &quot;A&quot; &amp; getBrailleL10N(15)) &apos; tab
+	&apos; Let&apos;s put those key strokes into cells
+	sA = fsReplaceText (mid(sA,2), &quot;A&quot;, &quot;), (&quot;)
+	sA = &quot;(&quot; &amp; sA &amp; &quot;)&quot;
+	fsAsciiToBrailleTypeWriter = sA
+end function
+
+function fsCodeTheHTML (byval cBody, optional bSpan )
+	if ismissing (bSpan) then
+		bSpan = false
+	endif
+	cBody=fsreplaceText(cBody,&quot;&amp;&quot;,&quot;&amp;#38;&quot;)
+	cBody=fsreplaceText(cBody,&quot;&lt;&quot;,&quot;&amp;#60;&quot;) 
+	cBody=fsreplaceText(cBody,&quot;&gt;&quot;,&quot;&amp;#62;&quot;) 
+	select case bSpan
+	case false
+		cBody=fsreplaceText(cBody,Chr$(10),&quot;&lt;/p&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;p&gt;&quot;)
+	case else 
+		cBody=fsreplaceText(cBody,Chr$(10),&quot;&lt;/span&gt;&lt;/p&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;p&gt;&lt;span&gt;&quot;)
+	end select
+	cBody=fsreplaceText(cBody,Chr$(13),&quot;&quot;)
+	fsCodeTheHTML = cBody
+end function 
+
+function fsComplexAsiaOrWest (sA)
+	dim longI as long
+	dim iLocale as integer
+	if sA=&quot;&quot; then
+		longI=0
+    	else
+		longI=asc(sA)
+	endif
+	if longI &gt;= clng(&quot;&amp;H0000&quot;) And longI &lt;=clng(&quot;&amp;H058F&quot;) then
+		iLocale=0
+	&apos;Asian characters
+	elseif longI &gt;=clng(&quot;&amp;H3400&quot;) And longI &lt;=clng(&quot;&amp;H9FFF&quot;) then
+		iLocale=1 &apos;zh, ja or ko 
+	elseif longI &gt;=clng(&quot;&amp;H3040&quot;) And longI &lt;=clng(&quot;&amp;H31FF&quot;) then
+   		iLocale=1 &apos; &quot;ja&quot;
+   	elseif longI &gt;=asc(&quot;･&quot;) And longI &lt;=asc(&quot;ﾟ&quot;) then
+   		iLocale=1 &apos; &quot;ja&quot;
+   	elseif longI &gt;=clng(&quot;&amp;HAC00&quot;) And longI &lt;=clng(&quot;&amp;HD7A3&quot;) then
+   		iLocale=1 &apos; &quot;ko&quot;
+  	elseif longI &gt;=clng(&quot;&amp;HFFA0&quot;) And longI &lt;=clng(&quot;&amp;HFFDC&quot;) then
+   		iLocale=1 &apos; &quot;ko&quot;
+   	&apos;Complex characters
+  	elseif longI = clng(&quot;&amp;H02BC&quot;) then
+   		iLocale=2 &apos; Dogri, Bodo, Maithili
+  	elseif longI &gt;=clng(&quot;&amp;H1750&quot;) And longI &lt;=clng(&quot;&amp;H17FF&quot;) then
+   		iLocale=2 &apos; Khmer, Thaana, Dhiveh, Urdu
+  	elseif longI &gt;=clng(&quot;&amp;HFB50&quot;) And longI &lt;=clng(&quot;&amp;HFDFF&quot;) then
+   		iLocale=2 &apos; Urdu
+  	elseif longI &gt;=clng(&quot;&amp;HFE70&quot;) And longI &lt;=clng(&quot;&amp;HFEFF&quot;) then
+   		iLocale=2 &apos; Urdu
+  	elseif longI &gt;=clng(&quot;&amp;H19E0&quot;) And longI &lt;=clng(&quot;&amp;H19FF&quot;) then
+   		iLocale=2 &apos; &quot;km&quot; &apos; Khmer symbols
+ 	elseif longI &gt;=clng(&quot;&amp;H0600&quot;) And longI &lt;=clng(&quot;&amp;H06FF&quot;) then
+   		iLocale=2 &apos; Farsi, Arabic, Kashmiri, Kurdish
+   	elseif longI &gt;=clng(&quot;&amp;H0900&quot;) And longI &lt;=clng(&quot;&amp;H0972&quot;) then
+   		iLocale=2 &apos; Devanagari for Hindi or other Indic languages
+   	elseif longI &gt;=clng(&quot;&amp;H0591&quot;) And longI &lt;=clng(&quot;&amp;H05F4&quot;) then
+   		iLocale=2 &apos; &quot;he&quot; &apos; Hebrew - no voice for Google Translate
+   	elseif longI &gt;=clng(&quot;&amp;H0A00&quot;) And longI &lt;=clng(&quot;&amp;H0AFF&quot;) then
+   		iLocale=2 &apos; &quot;pa&quot; &apos; Gurmukhi script is probably Punjabi
+   	elseif longI &gt;=clng(&quot;&amp;H0980&quot;) And longI &lt;=clng(&quot;&amp;H09FF&quot;) then
+   		iLocale=2 &apos;Bengali
+   	elseif longI &gt;=clng(&quot;&amp;H0A80&quot;) And longI &lt;=clng(&quot;&amp;HOD7F&quot;) then
+   		iLocale=2 &apos;Gurjarti, Oriya, Tamil, Telugu, Kannada, Malayalam
+   	elseif longI &gt;=clng(&quot;&amp;H1000&quot;) And longI &lt;=clng(&quot;&amp;H109F&quot;) then
+   		iLocale=2 &apos;Burmese (Myanmar)
+   	elseif longI &gt;=clng(&quot;&amp;H0E00&quot;) And longI &lt;=clng(&quot;&amp;H0FFF&quot;) then
+   		iLocale=2 &apos;Thai, Lao, Tibetan, Dzongkha
+   	elseif longI &gt;=clng(&quot;&amp;H1200&quot;) And longI &lt;=clng(&quot;&amp;H139F&quot;) then
+   		iLocale=2 &apos;Ethiopic, Ethiopic Supplement
+   	elseif longI &gt;=clng(&quot;&amp;H1700&quot;) And longI &lt;=clng(&quot;&amp;H171F&quot;) then
+   		iLocale=2 &apos;Limbu
+   	elseif longI &gt;=clng(&quot;&amp;H2D80&quot;) And longI &lt;=clng(&quot;&amp;H2DDF&quot;) then
+   		iLocale=2 &apos;Ethopic Extended
+   	else &apos;western
+		iLocale=0
+	endif
+	select case iLocale
+	case 0
+		select case fbIsAnURL(sA)
+		case false
+			fsComplexAsiaOrWest=&quot;WEST&quot;
+		case else  &apos;
+			fsComplexAsiaOrWest=&quot;UNDEFINED&quot;
+		end select
+	case 1
+		fsComplexAsiaOrWest=&quot;ASIA&quot;
+	case else 
+		fsComplexAsiaOrWest=&quot;COMPLEX&quot;
+	end select
+end function
+
+function fbIsMacOrWindowsAsianOrComplexName
+	if fbIsWindowsAsianOrComplexName or fbIsMacAsianOrComplexName then
+		fbIsMacOrWindowsAsianOrComplexName=true
+	else 
+		fbIsMacOrWindowsAsianOrComplexName=false
+	endif
+end function
+
+function fbIsWindowsAsianOrComplexName
+	&apos;Windows LibreOffice fails to attach Asian files to email. 
+	select case fsGetOS()
+	case &quot;WINDOWS&quot;
+		if fsComplexAsiaOrWest(ConvertFromURL(fsShortMailFileName())) =&quot;WEST&quot; then
+			fbIsWindowsAsianOrComplexName=false
+		else
+			fbIsWindowsAsianOrComplexName=true
+		endif
+	case else  
+		fbIsWindowsAsianOrComplexName=false
+	end select
+end function
+
+function fbIsMacAsianOrComplexName
+	&apos;Mac LibreOffice throws an error at oDrawPage.getNotesPage.getByIndex(iNo).getText().getString()
+	&apos;when a file with an Asian file name is used.
+	select case fsGetOS()
+	case &quot;MAC&quot;,&quot;OSX&quot;
+		if fsComplexAsiaOrWest(fsShortMailFileName()) =&quot;WEST&quot; then
+			fbIsMacAsianOrComplexName=false
+		else
+			fbIsMacAsianOrComplexName=true
+		endif
+	case else  
+		fbIsMacAsianOrComplexName=false
+	end select
+end function
+
+&apos;  ---------------
+&apos; ePub 2 export
+&apos; ePub is a standard publishing archive format for books
+&apos; It uses xhtml, indexes and images in jpeg, png or svg
+&apos; format. The files are packaged in a zip archive with files
+&apos; stored in a logical structure to facilitate indexing. ePub is
+&apos; well suited for people with vision problems, because
+&apos; the text can be resized or, depending on the eBook reader,
+&apos; read aloud. ePub 3 adds multimedia and scripting capabilities,
+&apos; but the format may not work with legacy eBook readers.
+&apos; calibre is free software that can read, publish, manage
+&apos; and convert unencrypted ePub 2 publications..  
+&apos; http://calibre-ebook.com/
+&apos; http://idpf.org/epub/201
+
+
+function makeAlternativeEpub
+	&apos;Try different cover etc.
+	makeAlternativeEpub = makeCalibreEpub (1) &apos; Get the file path string
+end function
+
+function fbtestKindle ()
+	&apos; The Kindle installer appears to install the Windows program
+	&apos; in the users Local settings directory -- i. e.:
+	&apos; C:\users\username\AppData\Local\Amazon\Kindle
+	fbtestKindle = false
+	dim sA as string
+	sA = environ(&quot;TEMP&quot;)
+	if sA &lt;&gt; &quot;&quot; then
+		sA = fsReplaceText(sA, &quot;Temp&quot;,&quot;Amazon\Kindle&quot;)
+		if fileExists (sA) then
+			fbTestKindle = true
+		endif	
+	endif
+end function
+
+function makeCalibreEpub (optional ntype)
+	if ismissing (bType) then
+		nType = 0
+	endif
+	dim i, iNO_SYSTEM_ERROR_MESSAGE as integer
+	dim sA, CR, cURL as string
+	dim bCalibreOK as boolean
+	dim oSvc
+	CR = chr$(13)
+	iNO_SYSTEM_ERROR_MESSAGE = 1
+	if fileExists (&quot;/Applications/calibre.app&quot;) then
+		bCalibreOK = true
+	elseif fileExists (&quot;/Applications/Adobe Digital Editions.app&quot;) then
+		bCalibreOK = true
+	&apos;elseif fileExists (&quot;/Applications/Kobo.app&quot;) then
+	&apos;	bCalibreOK = true
+	elseif fileExists (&quot;/usr/bin/calibre&quot;) then
+		bCalibreOK = true
+	elseif fileExists (&quot;/usr/bin/fbreader&quot;) then
+		bCalibreOK = true
+	&apos;-----------
+	&apos; Adobe Digital Editions hasn&apos;t been updated in over two years. 
+	&apos; It doesn&apos;t respect font alignment in SVGs created with Inkscape.
+	&apos; Other images randomly fail to display. 
+	&apos; No Hindi fonts, even if Hindi fonts are installed on the system.
+	&apos; Menus are not standard for system. You might need Adobe Digital
+	&apos; Editions to read DRM protected books. Otherwise, use calibre.
+	elseif fileExists (fsProgramDirectory() &amp; &quot;Adobe\Adobe Digital Editions&quot;) then
+		bCalibreOK = true
+	elseif fileExists (fsProgramDirectoryx86() &amp; &quot;Adobe\Adobe Digital Editions&quot;) then
+		bCalibreOK = true
+	elseif fileExists (fsProgramDirectory() &amp; &quot;Calibre2&quot;) then
+		bCalibreOK = true
+	elseif fileExists (fsProgramDirectoryx86() &amp; &quot;Calibre2&quot;) then
+		bCalibreOK = true
+	elseif fileExists (fsProgramDirectory() &amp; &quot;fbreader&quot;) then
+		bCalibreOK = true
+	elseif fileExists (fsProgramDirectoryx86() &amp; &quot;fbreader&quot;) then
+		bCalibreOK = true
+	elseif fileExists(createUnoService(&quot;com.sun.star.util.PathSettings&quot;).userConfig &amp; &quot;/impresstools/calibre.txt&quot;) then
+		bCalibreOK = true &apos; You saw the dialogue but declined installing calibre or another known ePub reader.
+	&apos; Kobo on PC does not display fonts properly. Problem verified with
+	&apos;  .epub documents created with dotEpub.com and with this extension.
+	&apos;elseif fileExists (fsProgramDirectory() &amp; &quot;Kobo&quot;) then
+	&apos;	bCalibreOK = true
+	&apos;elseif fileExists (fsProgramDirectoryx86() &amp; &quot;Kobo&quot;) then
+	&apos;	bCalibreOK = true
+	else 
+		bCalibreOK = false
+	endif
+	
+	if bCalibreOK = false then
+		cURL = &quot;http://calibre-ebook.com/&quot;
+		sA = fs_EPUB_CALIBRE(fs_cL)
+		i = msgBox (sA, 163)
+		select case i
+		case 2 &apos; Cancel
+			end
+		case 6 &apos; Yes
+			oSvc = createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
+			oSvc.execute(cURL,&quot;&quot;,iNO_SYSTEM_ERROR_MESSAGE)
+		case else  &apos; No
+			&apos; Don&apos;t show the dialogue again.
+			CreateFile((createUnoService(&quot;com.sun.star.util.PathSettings&quot;).userConfig &amp; &quot;/impresstools/calibre.txt&quot;),cURL,&quot;UTF-8&quot;)
+		end select
+	endif
+	select case nType
+	case 1
+		makeCalibreEpub = makeEPubAlt1 &apos; Get the file path string
+	case else 
+		makeCalibreEpub = makeEpub &apos; Get the file path string
+	end select
+	
+end function
+
+function fsSaveSchoolToolFile(optional sDefault, optional sFileDesc, optional sFileExtension ) 
+	&apos; Adapted from http://www.oooforum.org/forum/viewtopic.phtml?t=27188
+	&apos; by Danny Brewer et. al.
+	dim oDoc, oDocCtrl, oDocFrame, sFilePickerArgs, oFilePicker, sFiles
+	dim sFileURL, sDirectory
+	oDoc = ThisComponent 
+	oDocCtrl = oDoc.getCurrentController() 
+	oDocFrame = oDocCtrl.getFrame() 
+	if ismissing (sDefault) then
+		sDefault = &quot;calibre-epub&quot;
+	endif
+	if ismissing (sFileDesc) then
+		sFileDesc = &quot;calibre epub (.epub)&quot;
+	endif
+	if ismissing (sFileExtension) then
+		sFileExtension = &quot;*.epub&quot;
+	endif
+	
+	sDirectory = CreateUnoService(&quot;com.sun.star.util.PathSettings&quot;).Work
+	sFilePickerArgs = array(com.sun.star.ui.dialogs.TemplateDescription.FILESAVE_AUTOEXTENSION_PASSWORD ) 
+	oFilePicker = CreateUnoService(&quot;com.sun.star.ui.dialogs.FilePicker&quot;) 
+	with oFilePicker 
+		.Initialize ( sFilePickerArgs() ) 
+		&apos;sDirectory = oFilePicker.getDisplayDirectory 
+		.SetDisplayDirectory (sDirectory) 
+		.SetDefaultName (sdefault) 
+		.AppendFilter( sFileDesc, sFileExtension ) 
+		.SetCurrentFilter( sFileDesc, sFileExtension ) 
+		.SetValue(com.sun.star.ui.dialogs.ExtendedFilePickerElementIds.CHECKBOX_AUTOEXTENSION, 0, true) 
+		.SetValue(com.sun.star.ui.dialogs.ExtendedFilePickerElementIds.CHECKBOX_PASSWORD, 0, false) 
+		.EnableControl(com.sun.star.ui.dialogs.ExtendedFilePickerElementIds.CHECKBOX_PASSWORD, false) 
+	end with 
+	if oFilePicker.execute() then 
+		sFiles = oFilePicker.getFiles() 
+		sFileURL = sFiles(0) 
+		fsSaveSchoolToolFile =  sFileURL 
+	else 
+		end
+	endif 
+end function 
+
+function makeEPubAlt1
+	&apos; sUUID is a required unique id number for each ePub publication
+	dim sUUID as string
+	dim odoc, octl, oBar, sFileOut
+	sFileOut = fsSaveSchoolToolFile(fsShortFileName(), &quot;calibre epub (.epub)&quot;, &quot;*.epub&quot;)
+	viewNormal () &apos; required for jpeg export
+	CleanUpStagingDirectory(true)
+	if fileExists ( sFileOut ) then
+		kill sFileOut
+	endif
+	sUUID = UUIDv4()
+	writeEpubMimeType (sUUID) &apos; ok - write the mimetype
+	writeEpubContainer (sUUID) &apos; ok - write the metadata
+	writeEpubCoverJpg (sUUID) &apos; ok - write jpeg cover
+	&apos; Styled image in svg format.
+	writeAltCoverSvg (fsShortFileName(),fsDocAuthor,fsCreationShortDate)
+	writeEpubCoverTextAlt1 (sUUID) &apos; ok write cover text
+	writeEpubTableOfContentsPage (sUUID) &apos; ok write toc page
+	writeEpubBookCss (sUUID) &apos; ok we might want to customize this. Currently optimal for iBooks
+	writeEpubChapter (sUUID) &apos; Adobe Digital Editions occasionally randomly fails to show an image - why?
+		&apos; Also Adobe Digital Editions fails to show Hindi fonts in Windows. Chinese is okay.
+	writeEpubEpbNcx (sUUID) &apos; ok write Daisy index. No issues.
+	writeEpubEpbOpf (sUUID, true) &apos; spine is verbose compared to calibre. We  include all pages. Checks okay with standards tester.
+	writeEpubImages (sUUID) &apos; ok we might want to customize this. Currently optimal for iBooks 
+		
+	&apos; store the file
+	writeEpubArchive ( fsStagingDirectoryURL, sFileOut )
+	CleanUpStagingDirectory(false)
+	makeEPubAlt1 = sFileOut
+end function
+
+function makeEpub
+	&apos; sUUID is a required unique id number for each ePub publication
+	&apos; This is a plain ePub, styled for small mobile devices.
+	dim sUUID as string
+	dim odoc, octl, oBar, sFileOut
+	sFileOut = fsSaveSchoolToolFile(fsShortFileName(), &quot;ePub 2 (.epub)&quot;, &quot;*.epub&quot;)
+	viewNormal () &apos; required for jpeg export
+	CleanUpStagingDirectory(true)
+	if fileExists ( sFileOut ) then
+		kill sFileOut
+	endif
+	sUUID = UUIDv4()
+	writeEpubMimeType (sUUID) &apos; ok - write the mimetype
+	writeEpubContainer (sUUID) &apos; ok - write the metadata
+	writeTinyEpubCoverJpg (sUUID) &apos; ok - write small jpg cover image - fbReader and Adobe Digital Reader need tiny thumbnails.
+	&apos; Very simple svg image is required because it is included in the manifest.
+	writePlainCoverSvg (fsShortFileName(),fsDocAuthor,fsCreationShortDate)
+	writeEpubCoverText (sUUID) &apos; ok write simple cover text with small graphic
+	writeEpubTableOfContentsPage (sUUID) &apos; ok write a toc page
+	writeEpubBookCss (sUUID) &apos; ok we might want to customize this. Currently optimal for iBooks
+	writeEpubChapter (sUUID) &apos; todo Adobe Digital Editions occasionally randomly fails to show a slide image - why?
+		&apos; Also Adobe Digital Editions fails to show Hindi fonts in Windows. Chinese is okay.
+	writeEpubEpbNcx (sUUID) &apos; ok write Daisy index. No issues.
+	writeEpubEpbOpf (sUUID, true) &apos; ok is verbose - we include all pages.
+	writeEpubImages (sUUID, 65.625 ) &apos; This is for native resolution of iPod.
+		
+	&apos; store the file
+	writeEpubArchive ( fsStagingDirectoryURL, sFileOut )
+	if B_DEBUG = false then
+		if fileExists (fsStagingDirectoryURL) then
+			rmdir (fsStagingDirectoryURL)
+		endif
+	endif
+	makeEpub = sFileOut
+end function
+
+sub writeEpubArchive(sSourceDirUrl as string, sZipUrl as string) 
+	dim oFileAccess As object
+	dim oPackage As object
+	dim oZipRootFolder As object
+	dim bIncludeFolders As Boolean
+	dim mFolderContents()
+	dim sContentUrl as string
+	oFileAccess = CreateUnoService(&quot;com.sun.star.ucb.SimpleFileAccess&quot;)	
+	oPackage = CreateUnoService(&quot;com.sun.star.packages.Package&quot;)
+	dim aArg As New com.sun.star.beans.NamedValue
+	aArg.Name = &quot;PackageFormat&quot;
+	aArg.Value = false
+	oPackage.initialize(array(sZipUrl, aArg))
+	oZipRootFolder = oPackage.getByHierarchicalName(&quot;/&quot;)
+	bIncludeFolders = true
+	mFolderContents() = oFileAccess.getFolderContents(sSourceDirUrl, bIncludeFolders)
+	AddResourceToZip(sSourceDirUrl &amp; &quot;/mimetype&quot;, oZipRootFolder, oPackage,  false )
+	AddResourceToZip(sSourceDirUrl &amp; &quot;/META-INF&quot;, oZipRootFolder, oPackage, false )
+	AddResourceToZip(sSourceDirUrl &amp; &quot;/OEBPS&quot;, oZipRootFolder, oPackage,  false )
+	
+	
+	&apos;commit
+	&apos;the second call avoids an unespected file locking in Windows (bug??)
+ 	oPackage.commitChanges()
+ 	oPackage.commitChanges()
+
+end sub
+
+function fsEpubURL
+	if fbIsWindowsAsianOrComplexName then 
+		fsEpubURL=left(fsTimeOfCreationZipFileName,len(fsTimeOfCreationZipFileName) -4 ) &amp; &quot;.epub&quot;
+	else
+		fsEpubURL=left(ThisComponent.getURL(),len(ThisComponent.getURL()) -4 ) &amp; &quot;.epub&quot;
+	endif
+end function
+
+function fsCleanForXtml ( byval sA as string) as string
+	&apos; replace characters with special meanings in XTML
+	dim CR, LF, TB, FF, BS
+	FF = chr$(14) &apos;Form feed
+	CR = chr$(13) &apos;Carriage return
+	LF = chr$(10) &apos;Line Feed
+	TB = chr$(9)  &apos;Horizontal tab
+	BS = chr$(8)  &apos;Backspace
+	sA = fsSuperTrim (sA)
+	&apos; Only use line feeds.
+	sA = fsReplaceText ( sA , CR &amp; LF , LF )
+	sA = fsReplaceText ( sA , LF &amp; CR , LF )
+	sA = fsReplaceText ( sA , CR , LF )
+	&apos; XML should escape these for sure...
+	sA = fsReplaceText (sA , &quot;&amp;&quot; , &quot;&amp;amp;&quot;)
+	sA = fsReplaceText (sA , &quot;&apos;&quot; , &quot;&amp;#39;&quot;)
+	sA = fsReplaceText (sA , &quot;&quot;&quot;&quot; , &quot;&amp;#34;&quot;) &apos; double quote
+	sA = fsReplaceText (sA , &quot;&lt;&quot; , &quot;&amp;lt;&quot;)
+	sA = fsReplaceText (sA , &quot;&gt;&quot; , &quot;&amp;gt;&quot;)
+	&apos; OK, now let&apos;s add some  paragraphs
+	sA = fsReplaceText ( sA , LF , &quot;&lt;/p&gt;&quot; &amp; LF &amp;&quot;&lt;p class=&quot;&quot;s5&quot;&quot;&gt;&quot;)
+	&apos; Get rid of unsavory characters  
+	sA = fsReplaceText ( sA , TB , &quot; &quot;) 
+	sA = fsReplaceText ( sA , BS , &quot;&quot;)
+	sA = fsReplaceText ( sA , FF , &quot; &quot;)
+	sA = fsReplaceText ( sA , chr(11) , &quot; &quot;)
+	sA = fsReplaceText ( sA , chr(12) , &quot; &quot;)
+	sA = fsReplaceText ( sA ,&quot;&amp;nbsp;&quot; , &quot; &quot;)
+	sA = fsReplaceText ( sA , &quot;  &quot; , &quot; &quot;)
+	sA = fsReplaceText ( sA , &quot;  &quot; , &quot; &quot;)
+	sA = fsReplaceText ( sA , &quot;  &quot; , &quot; &quot;)	
+	&apos;Special meanings 
+
+&apos;	sA = fsReplaceText (sA, &quot;¡&quot;, &quot;&amp;#161;&quot;)
+&apos;	sA = fsReplaceText (sA, &quot;¢&quot;, &quot;&amp;#162;&quot;)
+&apos;	sA = fsReplaceText (sA, &quot;£&quot;, &quot;&amp;#163;&quot;)
+&apos;	sA = fsReplaceText (sA, &quot;¤&quot;, &quot;&amp;#164;&quot;)
+&apos;	sA = fsReplaceText (sA, &quot;¥&quot;, &quot;&amp;#165;&quot;)
+&apos;	sA = fsReplaceText (sA, &quot;¦&quot;, &quot;&amp;#166;&quot;)
+&apos;	sA = fsReplaceText (sA, &quot;§&quot;, &quot;&amp;#167;&quot;)
+&apos;	sA = fsReplaceText (sA, &quot;¨&quot;, &quot;&amp;#168;&quot;)
+&apos;	sA = fsReplaceText (sA, &quot;©&quot;, &quot;&amp;#169;&quot;)
+&apos;	sA = fsReplaceText (sA, &quot;ª&quot;, &quot;&amp;#170;&quot;)
+&apos;	sA = fsReplaceText (sA, &quot;«&quot;, &quot;&amp;#171;&quot;)
+&apos;	sA = fsReplaceText (sA, &quot;¬&quot;, &quot;&amp;#172;&quot;)
+&apos;	sA = fsReplaceText (sA, &quot;­&quot;, &quot;&amp;#173;&quot;)
+&apos;	sA = fsReplaceText (sA, &quot;®&quot;, &quot;&amp;#174;&quot;)
+&apos;	sA = fsReplaceText (sA, &quot;¯&quot;, &quot;&amp;#175;&quot;)
+&apos;	sA = fsReplaceText (sA, &quot;°&quot;, &quot;&amp;#176;&quot;)
+&apos;	sA = fsReplaceText (sA, &quot;±&quot;, &quot;&amp;#177;&quot;)
+&apos;	sA = fsReplaceText (sA, &quot;²&quot;, &quot;&amp;#178;&quot;)
+&apos;	sA = fsReplaceText (sA, &quot;³&quot;, &quot;&amp;#179;&quot;)
+&apos;	sA = fsReplaceText (sA, &quot;´&quot;, &quot;&amp;#180;&quot;)
+&apos;	sA = fsReplaceText (sA, &quot;µ&quot;, &quot;&amp;#181;&quot;)
+&apos;	sA = fsReplaceText (sA, &quot;¶&quot;, &quot;&amp;#182;&quot;)
+&apos;	sA = fsReplaceText (sA, &quot;·&quot;, &quot;&amp;#183;&quot;)
+&apos;	sA = fsReplaceText (sA, &quot;¸&quot;, &quot;&amp;#184;&quot;)
+&apos;	sA = fsReplaceText (sA, &quot;¹&quot;, &quot;&amp;#185;&quot;)
+&apos;	sA = fsReplaceText (sA, &quot;º&quot;, &quot;&amp;#186;&quot;)
+&apos;	sA = fsReplaceText (sA, &quot;»&quot;, &quot;&amp;#187;&quot;)
+&apos;	sA = fsReplaceText (sA, &quot;¼&quot;, &quot;&amp;#188;&quot;)
+&apos;	sA = fsReplaceText (sA, &quot;½&quot;, &quot;&amp;#189;&quot;)
+&apos;	sA = fsReplaceText (sA, &quot;¾&quot;, &quot;&amp;#190;&quot;)
+&apos;	sA = fsReplaceText (sA, &quot;¿&quot;, &quot;&amp;#191;&quot;)
+&apos;	sA = fsReplaceText (sA, &quot;×&quot;, &quot;&amp;#215;&quot;)
+&apos;	sA = fsReplaceText (sA, &quot;÷&quot;, &quot;&amp;#247;&quot;)
+	fsCleanForXtml = sA
+end function
+
+sub writeEpubMimeType (sUUID)
+	dim sA as string
+	sA = &quot;application/epub+zip&quot;
+	CreateFile(fsStagingDirectoryURL &amp; &quot;/mimetype&quot;,sA,&quot;UTF-8&quot;)
+end sub
+
+function fsSuperTrim (byval sA )
+	&apos; Remove extra line feeds and character returns
+	for n = 1 to 100
+		if right(sA, 1) = chr(10) or right(sA, 1) = chr(13) then
+			sA = left(sA, len(sA) - 1 )
+			sA = trim (sA)
+		else
+			exit for
+		endif
+	next
+	for n = 1 to 100
+		if left(sA, 1) = chr(10) or left(sA, 1) = chr(13) then
+			sA = mid(sA, 2 )
+			sA = trim (sA)
+		else
+			exit for
+		endif
+	next
+	fsSuperTrim = sA
+end function
+
+function fsFixCommonXhtmlProblems(byval sB, optional bVerbose as boolean)
+	if ismissing (bVerbose) then
+		bVerbose = true
+	endif
+	dim sA as string
+	sA = sB
+	&apos; if we modify the output, then we can tell you about it.
+	&apos; Replace control characters
+	sA = fsReplaceText (sA, chr$(14), &quot; &quot;) &apos;Form feed
+	sA = fsReplaceText (sA, chr$(13) &amp; chr$(10), chr$(10) )  &apos;chr 13 never used in XML.
+	sA = fsReplaceText (sA, chr$(10) &amp; chr$(13), chr$(10) )
+	sA = fsReplaceText (sA, chr$(13), chr$(10) )
+	sA = fsReplaceText (sA, chr$(9), &quot; &quot;) &apos;Horizontal tab
+	sA = fsReplaceText (sA, chr$(8), &quot; &quot;) &apos;Backspace
+	&apos; Remove extra line feeds and character returns
+	sA = fsSuperTrim ( sA )
+
+	&apos; Probable bad code thanks to auto smart quotes. Deal with it.
+	sA = fsReplaceText ( sA , &quot;=”&quot; , &quot;=&quot;&quot;&quot;)
+	sA = fsReplaceText ( sA , &quot;= ”&quot; , &quot;= &quot;&quot;&quot;)
+	sA = fsReplaceText ( sA , &quot;/”&gt;&quot; , &quot;/&quot;&quot;&gt;&quot;)
+	&apos; Closing single tag should have a space three characters from end - fix this common error
+	sA = fsReplaceText (sA, &quot;/&gt;&quot;,&quot; /&gt;&quot;) 
+	&apos; Remove extra spaces. with XML, the white-space in a document is not truncated. 
+	sA = fsReplaceText (sA, &quot;  &quot;,&quot; &quot;) 
+	sA = fsReplaceText (sA, &quot;. . &quot;,&quot;. &quot;)
+	&apos; XHTML specifies lower case tokens. Useful for us, because it&apos;s faster to match tokens.
+	&apos; disabled November 2, 2012 because it converts user comments to lower case.
+	&apos; sA = fsLCaseXMLTags (sA)
+	&apos;Many HTML editors use codes not necessarily defined in XHTML
+	
+	&apos;sA = fsreplaceText (sA ,&quot;&amp;amp;&quot;, &quot;&amp;#38;&quot;) &apos; defined in XHTML
+	&apos;sA = fsreplaceText (sA ,&quot;&amp;lt;&quot;, &quot;&amp;#60;&quot;) &apos; defined in XHTML
+	&apos;sA = fsreplaceText (sA ,&quot;&amp;gt;&quot;, &quot;&amp;#62;&quot;) &apos; defined in XHTML
+	&apos;sA = fsReplaceText (sA, &quot;{&quot; , &quot;&amp;#123;&quot;)
+	&apos;sA = fsReplaceText (sA, &quot;}&quot; , &quot;&amp;#125;&quot;)
+	sA = fsReplaceText (sA ,&quot;&amp;nbsp;&quot;, &quot;&amp;#160;&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;iexcl;&quot;, &quot;&amp;#161;&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;cent;&quot;, &quot;&amp;#162;&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;pound;&quot;, &quot;&amp;#163;&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;curren;&quot;, &quot;&amp;#164;&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;yen;&quot;, &quot;&amp;#165;&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;brvbar;&quot;, &quot;&amp;#166;&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;sect;&quot;, &quot;&amp;#167;&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;uml;&quot;, &quot;&amp;#168;&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;copy;&quot;, &quot;&amp;#169;&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;ordf;&quot;, &quot;&amp;#170;&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;laquo;&quot;, &quot;&amp;#171;&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;not;&quot;, &quot;&amp;#172;&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;shy;&quot;, &quot;&amp;#173;&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;reg;&quot;, &quot;&amp;#174;&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;macr;&quot;, &quot;&amp;#175;&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;deg;&quot;, &quot;&amp;#176;&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;plusmn;&quot;, &quot;&amp;#177;&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;sup2;&quot;, &quot;&amp;#178;&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;sup3;&quot;, &quot;&amp;#179;&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;acute;&quot;, &quot;&amp;#180;&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;micro;&quot;, &quot;&amp;#181;&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;para;&quot;, &quot;&amp;#182;&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;middot;&quot;, &quot;&amp;#183;&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;cedil;&quot;, &quot;&amp;#184;&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;sup1;&quot;, &quot;&amp;#185;&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;ordm;&quot;, &quot;&amp;#186;&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;raquo;&quot;, &quot;&amp;#187;&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;frac14;&quot;, &quot;&amp;#188;&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;frac12;&quot;, &quot;&amp;#189;&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;frac34;&quot;, &quot;&amp;#190;&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;iquest;&quot;, &quot;&amp;#191;&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;times;&quot;, &quot;&amp;#215;&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;divide;&quot;, &quot;&amp;#247;&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;rsquo;&quot;, &quot;’&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;lsquo;&quot;, &quot;‘&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;rdquo;&quot;, &quot;”&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;ldquo;&quot;, &quot;“&quot;)
+	sA = fsReplaceText (sA, &quot;&amp;hellip;&quot;, &quot;…&quot;)
+	
+	&apos; HTML special tags need modification for XHTML.
+	sA = fsReplaceText ( sA , &quot;&lt;br&gt;&quot;, &quot;&lt;br /&gt;&quot;)
+	sA = fsReplaceText ( sA , &quot;&lt;/br&gt;&quot;, &quot;&quot;)
+	sA = fsReplaceText ( sA , &quot;&lt;hr&gt;&quot;, &quot;&lt;hr /&gt;&quot;)
+	sA = fsReplaceText ( sA , &quot;&lt;/hr&gt;&quot;, &quot;&quot;)
+	if fbtagsMatch (sA ) = false then
+		if bVerbose = true then
+			ShowDialog(&quot;&lt;!-- &quot; &amp; fsNow &amp; &quot; &quot; &amp; fs_UNFIXABLE_XHTML(fs_cL) &amp; &quot; --&gt;&quot; &amp; chr$(10) &amp; sA )
+			&apos; Let&apos;s translate the bad code into xhtml so that we can evaluate the code in our eBook reader.
+			&apos; We&apos;ll highlight a common problem in red.
+			sA = fsReplaceText (sA, &quot;&lt;&quot; , &quot;&amp;lt;&quot;)
+			sA = fsReplaceText (sA, &quot;&gt;&quot; , &quot;&amp;gt;&quot;)
+			sA = fsReplaceText (sA, &quot;&amp;gt;&amp;gt;&quot; , &quot;&lt;span style=&quot;&quot;color:red;background-color:yellow;&quot;&quot;&gt;&amp;gt;&amp;gt;&lt;/span&gt;&quot;)
+			sA = fsReplaceText (sA, &quot;&amp;lt;&amp;lt;&quot; , &quot;&lt;span style=&quot;&quot;color:red;background-color:yellow;&quot;&quot;&gt;&amp;lt;&amp;lt;&lt;/span&gt;&quot;)
+			sA = fsReplaceText (sA, &quot;&amp;gt; &amp;gt;&quot; , &quot;&lt;span style=&quot;&quot;color:red;background-color:yellow;&quot;&quot;&gt;&amp;gt; &amp;gt;&lt;/span&gt;&quot;)
+			sA = fsReplaceText (sA, &quot;&amp;lt; &amp;lt;&quot; , &quot;&lt;span style=&quot;&quot;color:red;background-color:yellow;&quot;&quot;&gt;&amp;lt; &amp;lt;&lt;/span&gt;&quot;)
+			sA = fsReplaceText (sA, chr$(10) , &quot;&lt;br /&gt;&quot; &amp; chr$(10) )
+		
+		endif
+
+		sA =  &quot;&lt;!-- &quot; &amp; fsNow &amp; &quot; &quot; &amp; fs_UNFIXABLE_XHTML(fs_cL) &amp; &quot; --&gt;&quot; &amp; chr$(10) &amp; sA
+	elseif lcase (sA) &lt;&gt; lcase (fsSuperTrim (sB)) then
+		if bVerbose = true then
+			sA =  &quot;&lt;!-- &quot; &amp; fsNow &amp; &quot; &quot; &amp; fs_REPAIRED_BAD_XHTML(fs_cL) &amp; &quot; --&gt;&quot; &amp; chr$(10) &amp; sA
+			ShowDialog(sA)
+		endif
+	endif
+	fsFixCommonXhtmlProblems = sA
+end function
+
+function fsgetSlideAltContentText(byval i, optional bCleanit)
+	if ismissing (bCleanit) then 
+		bCleanit = true
+	endif
+	dim oDoc, oDrawPage, oDrawPages
+	dim nShape,nNumShapes
+	dim oShape
+	dim sA,sB
+	fsgetSlideAltContentText = &quot;&quot;
+	sB = &quot;&quot;
+	sA = &quot;&quot;
+	oDoc=ThisComponent
+	oDrawPages=oDoc.getDrawPages()
+	oDrawPage=oDrawPages.getByIndex(i)
+	nNumShapes=oDrawPage.getCount()
+	for nShape=0 To nNumShapes - 1
+		oShape=oDrawPage.getByIndex( nShape )
+		if HasUnoInterfaces( oShape, &quot;com.sun.star.lang.XServiceInfo&quot;) then
+			sA = &quot;&quot;
+			on error resume next &apos; The slide has a table or other item that doesn&apos;t support getString
+		    sA =  fsSuperTrim (oShape.getText().getString())
+		    on error goto fsgetSlideAltContentTextErr1
+		    fsgetSlideAltContentTextErr1:
+		    if len(sA) &lt;&gt; 0 then
+		        sB = sB &amp; sA &amp; &quot;. &quot;
+		    endif
+		endif
+	next
+	if bCleanit = true then
+		sB = fsReplaceText(sB,&quot;.&quot;&amp;chr(10),&quot;. &quot;)
+		sB = fsReplaceText(sB,&quot;?&quot;&amp;chr(10),&quot;? &quot;)
+		sB = fsReplaceText(sB,&quot;!&quot;&amp;chr(10),&quot;! &quot;)
+		sB = fsReplaceText(sB,&quot;:&quot;&amp;chr(10),&quot;: &quot;)
+		sB = fsReplaceText(sB,&quot;;&quot;&amp;chr(10),&quot;; &quot;)
+		sB = fsReplaceText(sB,&quot;]&quot;&amp;chr(10),&quot;] &quot;)
+		sB = fsReplaceText(sB,&quot;)&quot;&amp;chr(10),&quot;) &quot;)
+		sB = fsReplaceText(sB,&quot;}&quot;&amp;chr(10),&quot;} &quot;)
+		sB = fsReplaceText(sB,chr(10),&quot;. &quot;) &apos;Add a period so speaker pauses between lines
+		sB = fsReplaceText(sB,&quot;.. &quot;,&quot;. &quot;) &apos;
+		sB = fsReplaceText(sB,&quot;  &quot;,&quot; &quot;) &apos; Kids sometimes try to format by adding lots of spaces.
+		sB = fsReplaceText(sB,&quot;  &quot;,&quot; &quot;)
+		sB = fsCleanForXtml (sB)
+	endif
+	if sB = &quot;&quot; then
+		sB = fs_SLIDE(fs_cL)
+	endif
+	fsgetSlideAltContentText = sB
+end function
+
+sub writeEpubChapter (sUUID)
+	&apos; Writes XHTML files. Each document is a chapter. 
+	&apos; An image link points to the location of a 
+	&apos; corresponding image file.
+	&apos; /OEBPS/chapter-1.xhtml points 
+	&apos; to /OEBPS/images/image1.jpg. The documents all
+	&apos; point to /page_styles.css and /stylesheet.css
+	dim sA, sB, sFile, clcStr as string
+	dim i, j as integer
+	dim oDoc, oDrawPages,oDrawPage,oShape,oElem, octl, oBar
+	dim nNumShapes,nShape,nPage,nNumPages,nThisPage as integer
+	dim cStr,cLocale,cAsianLanguage,cComplexLanguage, cWesternLanguage as string
+	dim cChapterTitle, cChapterSlideText
+	dim n1, iNo as integer
+	dim longI as Long
+	dim CR as string
+	dim bSeenWarning as boolean
+	bSeenWarning = false
+	CR = chr$(10)
+	oDoc=ThisComponent 
+	oDrawPages=oDoc.getDrawPages() 
+	oDrawPage=oDrawPages.getByIndex(0)
+	nNumPages=oDrawPages.getCount()
+	oElem=oDoc.getDrawPages().getElementNames()
+	sFile = fsStagingDirectoryURL &amp; &quot;/OEBPS/text/chapter-&quot;
+	sA = &quot;&quot;
+	sB = &quot;&quot;
+	octl=odoc.getcurrentcontroller()
+	oBar=octl.getFrame().createStatusIndicator()
+	oBar.start( getBranding( bI_SPOKEN_BRANDING ), odoc.getdrawpages().count )
+	oBar.Value=0
+	for i = 0 to nNumPages - 1 
+		oBar.Value = i
+		cChapterSlideText = fsgetSlideAltContentText(i)
+		&apos;on error goto pageHasLinkedImageError
+		oDrawPage=oDrawPages.getByIndex(i)
+		cChapterTitle = getSlideTitle(i)
+		cChapterTitle = fsReplaceText (cChapterTitle, &quot;&amp;&quot;, &quot;&amp;amp;&quot;)
+		sA = &quot;&quot;
+		if oDrawPage.getNotesPage.getCount &lt; 2 then &apos; User deleted the notes object
+			cStr=&quot;&quot;
+			cAsianLanguage=&quot;zxx-&quot; &apos;if missing note field, use code for unknown language and locale
+			cComplexLanguage=&quot;zxx-&quot;
+			cWesternLanguage=&quot;zxx-&quot;
+		else 
+			iNo = fiGetSlideNoteIndex
+			cStr=oDrawPage.getNotesPage.getByIndex(iNo).getText().getString()
+			cAsianLanguage=oDrawPage.getNotesPage.getByIndex(iNo).CharLocaleAsian.Language 
+			cComplexLanguage=oDrawPage.getNotesPage.getByIndex(iNo).CharLocaleComplex.Language
+			cWesternLanguage=oDrawPage.getNotesPage.getByIndex(iNo).CharLocale.Language
+		endif
+		select case  fsComplexAsiaOrWest( cStr )
+		case &quot;WEST&quot;
+			cLocale=cWesternLanguage
+		case &quot;ASIA&quot;
+			cLocale=cAsianLanguage
+		case &quot;UNDEFINED&quot;
+			cLocale=fsDocLanguage
+		case else  &apos;COMPLEX
+			cLocale=cComplexLanguage
+		end select
+		
+		clcStr = fsSuperTrim(lcase(cStr))
+		sA = &quot;&lt;?xml version=&apos;1.0&apos; encoding=&apos;utf-8&apos;?&gt;&quot; &amp; CR
+		if instr (clcStr, &quot;&lt;html&gt;&quot;) = 1 and lcase (right(clcStr, 7 )) = &quot;&lt;/html&gt;&quot; then
+		&apos; replace the whole chapter, ignoring stylesheets, images and everything.
+		&apos; Use well formed xhtml 
+			
+			if bSeenWarning = false and instr(cStr,&quot;org.microformats&quot;) = 0 then
+				ShowDialog (fs_EPUB_XML_WARNING(fs_cL) &amp; cStr)
+				bSeenWarning = true
+			endif
+			cStr = fsFixCommonXhtmlProblems(cStr)
+			sA = sA &amp; cStr
+		else
+		&apos; add xhtml header
+			sA = &quot;&lt;meta name=&quot;&quot;EPB-UUID&quot;&quot; content=&quot;&quot;&quot; &amp; sUUID &amp; &quot;&quot;&quot; /&gt;&quot; &amp; CR
+			sA = sA &amp; &quot;&lt;link href=&quot;&quot;../styles/stylesheet.css&quot;&quot; type=&quot;&quot;text/css&quot;&quot; rel=&quot;&quot;stylesheet&quot;&quot; /&gt;&quot; &amp; CR
+			sA = sA &amp; &quot;&lt;link href=&quot;&quot;../styles/page_styles.css&quot;&quot; type=&quot;&quot;text/css&quot;&quot; rel=&quot;&quot;stylesheet&quot;&quot; /&gt;&quot; &amp; CR
+			sA = fsXhtmlPreviewHeaderCode( cChapterTitle, cLocale, sA, &quot;image-&quot; &amp; trim(i+1) &amp; &quot;.jpg&quot; )
+			&apos;----------------
+			cStr = fsSuperTrim(cStr)
+			if instr (clcStr,&quot;&lt;body&gt;&quot;) = 1 and right(clcStr, 7 ) = &quot;&lt;/body&gt;&quot; then
+			&apos; replace the body of the text while retaining stylesheet and title
+				if bSeenWarning = false and instr(cStr,&quot;org.microformats&quot;) = 0 then
+					ShowDialog (fs_EPUB_XML_WARNING(fs_cL) &amp; cStr)
+					bSeenWarning = true
+				endif
+				cStr = fsFixCommonXhtmlProblems(cStr)
+				sA = sA &amp; cStr
+			else
+				sA = sA &amp; &quot;&lt;body&gt;&quot; &amp; CR
+				sA = sA &amp; &quot;&lt;div&gt;&quot; &amp; CR
+				sA = sA &amp; &quot;&lt;p class=&quot;&quot;s&quot;&quot;&gt;&quot; &amp; CR
+				sA = sA &amp; &quot;&lt;img src=&quot;&quot;../images/image-&quot; &amp; trim(i+1) &amp; &quot;.jpg&quot;&quot; alt=&quot;&quot;&quot; &amp; cChapterSlideText &amp; &quot;&quot;&quot; title=&quot;&quot;&quot; &amp; cChapterSlideText &amp; &quot;&quot;&quot; class=&quot;&quot;calibre1&quot;&quot;/&gt;&quot;
+				sA = sA &amp; &quot;&lt;/p&gt;&quot; &amp; CR
+				if instr (clcStr,&quot;&lt;p&quot;) = 1 and right(clcStr, 4 ) = &quot;&lt;/p&gt;&quot; then
+					&apos; Uer did  a little simple formatting of the text - like adding a link or bold text
+					if bSeenWarning = false and instr(cStr,&quot;org.microformats&quot;) = 0 then
+						ShowDialog (fs_EPUB_XML_WARNING(fs_cL) &amp; cStr)
+						bSeenWarning = true
+					endif
+					cStr = fsFixCommonXhtmlProblems(cStr)
+					sA = sA &amp; cStr
+					
+				elseif instr (clcStr,&quot;&lt;h&quot;) = 1 or instr (clcStr,&quot;&lt;div&quot;) = 1 or instr (clcStr,&quot;&lt;p&quot;) = 1 then
+					&apos; User added a section below the picture with html text
+					if bSeenWarning = false and instr(cStr,&quot;org.microformats&quot;) = 0 then
+						ShowDialog (fs_EPUB_XML_WARNING(fs_cL) &amp; cStr)
+						bSeenWarning = true
+					endif
+					cStr = fsFixCommonXhtmlProblems(cStr)
+					sA = sA &amp; cStr
+				elseif instr (clcStr,&quot;&lt;ask&gt;&quot;) = 1 and right(clcStr, 6 ) = &quot;&lt;/ask&gt;&quot; then
+					&apos; the author wants the user to update some information at runtime
+					cStr = fsReplaceText ( cStr , &quot;&lt;ask&gt;&quot; , &quot;&quot;) 
+					cStr = fsReplaceText ( cStr , &quot;&lt;/ask&gt;&quot; , &quot;&quot;)
+					oDoc.getcurrentcontroller().setCurrentPage(odoc.drawpages(i))
+					viewNormal()
+					cStr = fsSchoolToolsInputBox (cStr, getBranding (bI_BRANDING) &amp; &quot; - &quot; &amp; _
+						fs_SLIDE(cLocale) &amp; &quot; &quot; &amp; trim(i+1) &amp; &quot;/&quot; &amp; trim(nNumPages), &quot;&quot;)
+					if cStr = &quot;&quot; then &apos; You hit the cancel button. Abort.
+						oBar.End()
+						if fileExists (fsStagingDirectoryURL) then
+							rmdir (fsStagingDirectoryURL)
+						endif
+						end
+					endif
+					sA = sA &amp; &quot;&lt;p&gt;&quot; &amp; fsCleanForXtml ( cStr ) &amp; &quot;&lt;/p&gt;&quot; &amp; CR
+				elseif instr (cStr,&quot;http&quot;) = 1 and instr(cStr, &quot;&amp;&quot;) = 0 then
+					&apos; the subroutine converts the URL text to a URL link.
+					&apos; xhtml doesn&apos;t let us use an ampersand anywhere in the body, so
+					&apos; complex URLs that include an ampersand like Google forms
+					&apos; cause a rendering error.
+					sA = sA &amp; &quot;&lt;p&gt;&lt;a href=&quot;&quot;&quot; &amp;  cStr &amp; &quot;&quot;&quot;&gt;&quot; &amp; _
+						fsCleanForXtml ( cStr ) &amp; &quot;&lt;/a&gt;&lt;/p&gt;&quot; &amp; CR
+				else
+					&apos; simply format into paragraphs.
+					sA = sA &amp; &quot;&lt;p class=&quot;&quot;s5&quot;&quot;&gt;&quot; &amp; fsCleanForXtml ( cStr ) &amp; &quot;&lt;/p&gt;&quot; &amp; CR
+				endif
+				sA = sA &amp; &quot;&lt;/div&gt;&quot; &amp; CR
+				sA = sA &amp; &quot;&lt;/body&gt;&quot; &amp; CR
+			endif
+		endif
+		sA = sA &amp; &quot;&lt;/html&gt;&quot; &amp; CR
+		CreateFile(sFile &amp; trim(str(i+1)) &amp; &quot;.xhtml&quot; ,sA,&quot;UTF-8&quot;)
+	next
+	oBar.End()
+	exit sub
+	pageHasLinkedImageError:
+		oBar.End()
+		CleanUpStagingDirectory(true)
+		ShowDialog(fs_SLIDE(fs_cL) &amp; &quot; &quot; &amp; trim(i+1) &amp; fs_INVALID_LINK(fs_cL)) 
+	end
+end sub
+
+sub CleanUpStagingDirectory(optional bAlways as boolean)
+	&apos; bAlways true means ignore the B_DEBUG setting and always delete the directory
+	if ismissing (bAlways) then
+		bAlways = false
+	endif
+	if B_DEBUG=false or bAlways = true then
+		if fileExists (fsStagingDirectoryURL) then
+			rmdir fsStagingDirectoryURL
+		endif
+	endif
+end sub
+
+sub writeEpubContainer (sUUID)
+	&apos; Standard location in META-INF directory. Points to opf file
+	dim sA, LF as string
+	LF = chr$(10)
+	sA = &quot;&lt;?xml version=&quot;&quot;1.0&quot;&quot; encoding=&quot;&quot;UTF-8&quot;&quot;?&gt;&quot; &amp; LF
+	sA = sA &amp; &quot;&lt;container version=&quot;&quot;1.0&quot;&quot; xmlns=&quot;&quot;urn:oasis:names:tc:opendocument:xmlns:container&quot;&quot;&gt;&quot; &amp; LF
+	sA = sA &amp; &quot;&lt;rootfiles&gt;&quot; &amp; LF
+	sA = sA &amp; &quot;&lt;rootfile full-path=&quot;&quot;OEBPS/content.opf&quot;&quot; media-type=&quot;&quot;application/oebps-package+xml&quot;&quot;/&gt;&quot; &amp; LF
+	sA = sA &amp; &quot;&lt;/rootfiles&gt;&quot; &amp; LF
+	sA = sA &amp; &quot;&lt;/container&gt;&quot; &amp; LF
+	CreateFile(fsStagingDirectoryURL &amp; &quot;/META-INF/container.xml&quot;,sA,&quot;UTF-8&quot;)
+end sub
+
+sub writeEpubCoverText (optional sUUID)
+	&apos; points to cover.jpeg in the base directory.
+	&apos; This is a minimalist - based on the regular page
+	&apos; but with caption styled text instead of normal.
+	&apos; Some eReaders don&apos;t respect paragraph and page
+	&apos; formatting.
+	dim sA, sB, sC, CR as string
+	if ismissing (sUUID) then
+		sUUID = &quot;-------------Unknown-------------&quot;
+	endif
+	CR = chr$(10)
+	sA = &quot;&lt;meta name=&quot;&quot;EPB-UUID&quot;&quot; content=&quot;&quot;&quot; &amp; sUUID &amp; &quot;&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;meta name=&quot;&quot;calibre:cover&quot;&quot; content=&quot;&quot;true&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;link href=&quot;&quot;../styles/stylesheet.css&quot;&quot; type=&quot;&quot;text/css&quot;&quot; rel=&quot;&quot;stylesheet&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;link href=&quot;&quot;../styles/page_styles.css&quot;&quot; type=&quot;&quot;text/css&quot;&quot; rel=&quot;&quot;stylesheet&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;style type=&quot;&quot;text/css&quot;&quot;&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;body { background-color:&quot; &amp; fsBackgroundColour &amp; &quot;; color:&quot; &amp; fsTextColour &amp; &quot;; padding:0; margin:0 }&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/style&gt;&quot; &amp; CR
+	sA =  fsXhtmlPreviewHeaderCode(fs_BOOK_COVER(fs_cL), fsDocLanguage, sA, &quot;cover.jpeg&quot;)
+	sA = sA &amp; &quot;&lt;body&gt;&quot;
+	sA = sA &amp; &quot;&lt;p class=&quot;&quot;t&quot;&quot;&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;img src=&quot;&quot;../images/cover.jpeg&quot;&quot; alt=&quot;&quot;&quot; &amp; fsShortFileName &amp; &quot;&quot;&quot; title=&quot;&quot;&quot; &amp; fsShortFileName &amp; &quot;&quot;&quot; /&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/p&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;div class=&quot;&quot;u33&quot;&quot;&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;p&gt;&quot; &amp; CR
+	sA = sA &amp; fsShortFileName &amp; CR
+	sA = sA &amp; &quot;&lt;/p&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/div&gt;&quot; &amp; CR 
+	sA = sA &amp; &quot;&lt;p class=&quot;&quot;s&quot;&quot;&gt;&quot; &amp; CR
+	if B_DEBUG = false then
+		sB = fsDocAuthor
+	else
+		sB = &quot;AbilityToolsTestingDemo&quot;
+	endif
+	
+	if len(sB) &lt;&gt; 0 and instr (sB, &quot; &quot;) &lt;&gt; 0 then 
+		sA = sA &amp; sB
+	else &apos; No first and last name. Use brand link instead.
+		sA = sA &amp; &quot;&lt;a href=&quot;&quot;&quot; &amp; getBranding( bI_HOMEPAGE, fsDocLanguage) &amp; &quot;&quot;&quot;&gt;&quot; &amp; lcase (getBranding( bI_BRANDING, fsDocLanguage)) &amp; &quot;&lt;/a&gt;&quot; &amp; CR
+	endif
+	sA = sA &amp; &quot;&lt;/p&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/body&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/html&gt;&quot; &amp; CR
+	CreateFile(fsStagingDirectoryURL &amp; &quot;/OEBPS/text/cover.xhtml&quot;,sA,&quot;UTF-8&quot;) 
+end sub
+
+sub writeEpubCoverTextAlt1 (optional sUUID)
+	&apos; points to cover.svg in the images directory.
+	dim sA, sB, CR as string
+	if ismissing (sUUID) then
+		sUUID = &quot;-------------Unknown-------------&quot;
+	endif
+	CR = chr$(10)
+	sA = &quot;&lt;meta name=&quot;&quot;EPB-UUID&quot;&quot; content=&quot;&quot;&quot; &amp; sUUID &amp; &quot;&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;meta name=&quot;&quot;calibre:cover&quot;&quot; content=&quot;&quot;true&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;style type=&quot;&quot;text/css&quot;&quot;&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;.ub45 { max-width: 100%; padding: 0%; margin: 0%; }&quot; &amp; CR
+	sA = sA &amp; &quot;body { oeb-column-number: 1; }&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/style&gt;&quot; &amp; CR
+	sA =  fsXhtmlPreviewHeaderCode(fs_BOOK_COVER(fs_cL), fsDocLanguage, sA, &quot;cover.svg&quot;)
+	sA = sA &amp; &quot;&lt;body&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;div&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;img class=&quot;&quot;ub45&quot;&quot; src=&quot;&quot;../images/cover.svg&quot;&quot; alt=&quot;&quot;&quot; &amp; fsShortFileName &amp; &quot;&quot;&quot; title=&quot;&quot;&quot; &amp; fsShortFileName &amp; &quot;&quot;&quot; /&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/div&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/body&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/html&gt;&quot; &amp; CR
+	CreateFile(fsStagingDirectoryURL &amp; &quot;/OEBPS/text/cover.xhtml&quot;,sA,&quot;UTF-8&quot;)
+end sub
+
+sub writeEpubTableOfContentsPage (optional sUUID)
+	dim sA, CR as string
+	dim sTo,sFrom as string
+	dim i as integer
+	sTo = fsStagingDirectoryURL &amp; &quot;/OEBPS/images/icon.png&quot;
+	if B_DEBUG = true then
+		sFrom =fsMyURL &amp; &quot;/images/&quot; &amp; getBranding( bI_QR_PNG )
+	else
+		sFrom =fsMyURL &amp; &quot;/images/&quot; &amp; getBranding( bI_SMALL_LOGO_PNG )
+	endif
+	FileCopy (sFrom, sTo)
+	if ismissing (sUUID) then
+		sUUID = &quot;-------------Unknown-------------&quot;
+	endif
+	CR = chr$(10)
+	sA =  &quot;&lt;meta name=&quot;&quot;EPB-UUID&quot;&quot; content=&quot;&quot;&quot; &amp; sUUID &amp; &quot;&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;link href=&quot;&quot;../styles/stylesheet.css&quot;&quot; type=&quot;&quot;text/css&quot;&quot; rel=&quot;&quot;stylesheet&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;link href=&quot;&quot;../styles/page_styles.css&quot;&quot; type=&quot;&quot;text/css&quot;&quot; rel=&quot;&quot;stylesheet&quot;&quot;/&gt;&quot; &amp; CR
+	sA =  fsXhtmlPreviewHeaderCode(fsShortFileName(), fsDocLanguage, sA , &quot;icon.png&quot;)
+	sA = sA &amp; &quot;&lt;body&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;div&gt;&quot; &amp; CR
+    sA = sA &amp; &quot;&lt;h1 class = &quot;&quot;t&quot;&quot;&gt;&quot; &amp; fsShortFileName() &amp; &quot;&lt;/h1&gt;&quot; &amp; CR
+    sA = sA &amp; &quot;&lt;ul&gt;&quot; &amp; CR
+    for i=1 To ThisComponent.getDrawPages.getCount()
+  		sA = sA &amp; &quot;&lt;li&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;&lt;a href=&quot;&quot;chapter-&quot; &amp; trim (i) &amp; &quot;.xhtml&quot;&quot;&gt;&quot; &amp; fsReplaceText (getSlideTitle (i-1), &quot;&amp;&quot;, &quot;&amp;amp;&quot;) &amp; &quot;&lt;/a&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;&lt;/li&gt;&quot; &amp; CR
+	next
+	sA = sA &amp; &quot;&lt;/ul&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;hr/&gt;&quot; &amp; CR
+    sA = sA &amp; fsEpubFooterText
+	sA = sA &amp; &quot;&lt;/div&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/body&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/html&gt;&quot;	&amp; CR
+	CreateFile(fsStagingDirectoryURL &amp; &quot;/OEBPS/text/toc.xhtml&quot;,sA,&quot;UTF-8&quot;)
+end sub
+
+function fsEpubFooterText()
+	&apos; put it all here so that it is consistent.
+	dim sA as string
+	sA = sA &amp; &quot;&lt;p class=&quot;&quot;t&quot;&quot;&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;img src=&quot;&quot;../images/icon.png&quot;&quot; alt=&quot;&quot;&quot; &amp; getBranding( bI_SPOKEN_BRANDING, fsDocLanguage) &amp; &quot;&quot;&quot;/&gt;&quot;
+    sA = sA &amp; &quot;&lt;/p&gt;&quot; &amp; CR
+    sA = sA &amp; &quot;&lt;p class=&quot;&quot;s&quot;&quot;&gt;&quot; &amp; CR
+    sA = sA &amp; &quot;&lt;a href=&quot;&quot;&quot; &amp; getBranding( bI_HOMEPAGE, fsDocLanguage) &amp; &quot;&quot;&quot;&gt;&quot; &amp; lcase (getBranding( bI_BRANDING, fsDocLanguage))  &amp; &quot;&lt;/a&gt;&quot; &amp; CR
+    sA = sA &amp; &quot;&lt;/p&gt;&quot; &amp; CR
+    fsEpubFooterText = sA
+end function
+
+sub writeEpubImages (sUUID, optional iScale)
+	if ismissing (iScale) then 
+		&apos; 1/50 scale is good for a Mac or an iPad. You can convert 
+		&apos; to a smaller scale for use on mobile devices using higher number. i. e.:
+		&apos; ipod 320x480
+		&apos; impress 21000 x 28000
+		&apos; impress aspect ratio is 3 by 4
+		&apos; ipod aspect ratio is 2 by 3
+		iScale = 50 &apos; images are nominally 28000/50 or 560 pixels wide
+	endif
+	dim sJpg as string
+	dim i as integer
+	sJpg = fsStagingDirectoryURL &amp; &quot;/OEBPS/images/image-&quot; &apos; &amp; nn.jpg
+	ExportSlidesJpeg (sJpg, iScale, 1) 
+end sub
+
+sub writeEpubCoverJpg (sUUID)
+	dim sJpg as string
+	sJpg = fsStagingDirectoryURL &amp; &quot;/OEBPS/images/cover.jpeg&quot; 
+	ExportThumbJpeg (sJpg, 80)
+end sub
+
+sub writeTinyEpubCoverJpg (sUUID)
+	&apos;nominal 300 pix wide - a thumbnail for mobile
+	dim sJpg as string
+	sJpg = fsStagingDirectoryURL &amp; &quot;/OEBPS/images/cover.jpeg&quot; 
+	ExportThumbJpeg (sJpg, 28000/300)
+end sub
+
+sub writeEpubBookCss (sUUID)
+	dim sFile, sA as string
+	sFile = fsMyURL &amp; &quot;/templates/css/page_styles.css&quot;
+	sA = getTextFromFile(sFile, &quot;utf-8&quot;)
+	sA = fsReplaceText (sA, &quot;lightgreY&quot;, fsAccentColour)
+	sA = fsReplaceText (sA, &quot;greY&quot;, fsBackgroundColour)
+	CreateFile(fsStagingDirectoryURL &amp; &quot;/OEBPS/styles/page_styles.css&quot;,sA,&quot;UTF-8&quot;)
+	
+	sFile = fsMyURL &amp; &quot;/templates/css/stylesheet.css&quot;
+	sA = getTextFromFile(sFile, &quot;utf-8&quot;)
+	sA = fsReplaceText (sA, &quot;lightgreY&quot;, fsAccentColour)
+	sA = fsReplaceText (sA, &quot;greY&quot;, fsBackgroundColour)
+	CreateFile(fsStagingDirectoryURL &amp; &quot;/OEBPS/styles/stylesheet.css&quot;,sA,&quot;UTF-8&quot;)
+end sub
+
+sub writeEpubEpbNcx (sUUID)
+	&apos; The Daisy index points to OPS/chapter-nn.xhtml files and
+	&apos; includes some publishing information
+	dim sA, CR as string
+	dim i as integer
+		dim oDoc, oDrawPages,oDrawPage,oShape,oElem
+	dim nNumShapes,nShape,nPage,nNumPages,nThisPage as integer
+	dim cTitle,cLocale as string
+	dim n1, iNo as integer
+	dim longI as Long
+	CR = chr$(10)
+	oDoc=ThisComponent 
+	oDrawPages=oDoc.getDrawPages() 
+	nNumPages=oDrawPages.getCount()
+	oElem=oDoc.getDrawPages().getElementNames()
+	cLocale = fsDocLanguage
+	sA =  &quot;&lt;?xml version=&apos;1.0&apos; encoding=&apos;utf-8&apos;?&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;ncx xmlns=&quot;&quot;http://www.daisy.org/z3986/2005/ncx/&quot;&quot; version=&quot;&quot;2005-1&quot;&quot; xml:lang=&quot;&quot;&quot; &amp; fsDocLanguage &amp; &quot;&quot;&quot;&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;head&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;meta content=&quot;&quot;&quot; &amp; sUUID &amp; &quot;&quot;&quot; name=&quot;&quot;dtb:uid&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;meta content=&quot;&quot;1&quot;&quot; name=&quot;&quot;dtb:depth&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;meta content=&quot;&quot;&quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp; &quot; - &quot; &amp; getBranding (bI_BRANDING) &amp; &quot;&quot;&quot; name=&quot;&quot;dtb:generator&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;meta content=&quot;&quot;0&quot;&quot; name=&quot;&quot;dtb:totalPageCount&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;meta content=&quot;&quot;0&quot;&quot; name=&quot;&quot;dtb:maxPageNumber&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/head&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;docTitle&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;text&gt;&quot; &amp; fsShortFileName() &amp; &quot;&lt;/text&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/docTitle&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;docAuthor&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;text&gt;&quot; &amp; fsDocAuthor &amp; &quot;&lt;/text&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/docAuthor&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;navMap&gt;&quot; &amp; CR
+	i = 0
+	sA = sA &amp; &quot;&lt;navPoint id=&quot;&quot;navPoint-&quot; &amp; trim(i+1) &amp; &quot;&quot;&quot; playOrder=&quot;&quot;&quot; &amp; trim(i+1) &amp; &quot;&quot;&quot;&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;navLabel&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;text&gt;&quot; &amp; fs_BOOK_COVER(cLocale)  &amp; &quot;&lt;/text&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/navLabel&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;content src=&quot;&quot;text/cover.xhtml&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/navPoint&gt;&quot; &amp; CR
+	i = 1
+	sA = sA &amp; &quot;&lt;navPoint id=&quot;&quot;navPoint-&quot; &amp; trim(i+1) &amp; &quot;&quot;&quot; playOrder=&quot;&quot;&quot; &amp; trim(i+1) &amp; &quot;&quot;&quot;&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;navLabel&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;text&gt;&quot; &amp; fs_TABLE_OF_CONTENTS(cLocale)  &amp; &quot;&lt;/text&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/navLabel&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;content src=&quot;&quot;text/toc.xhtml&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/navPoint&gt;&quot; &amp; CR
+	&apos; --------------
+	for i=1 To ThisComponent.getDrawPages.getCount()
+		oDrawPage=oDrawPages.getByIndex(i-1) 
+		&apos; Add two to navPoint to account for Cover and TOC
+		sA = sA &amp; &quot;&lt;navPoint id=&quot;&quot;navPoint-&quot; &amp; trim(i+2) &amp; &quot;&quot;&quot; playOrder=&quot;&quot;&quot; &amp; trim(i+2) &amp; &quot;&quot;&quot;&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;&lt;navLabel&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;&lt;text&gt;&quot; &amp; fsReplaceText ( getSlideTitle (i-1), &quot;&amp;&quot;, &quot;&amp;amp;&quot;) &amp; &quot;&lt;/text&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;&lt;/navLabel&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;&lt;content src=&quot;&quot;text/chapter-&quot; &amp; trim(i) &amp; &quot;.xhtml&quot;&quot;/&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;&lt;/navPoint&gt;&quot; &amp; CR
+	next
+	sA = sA &amp; &quot;&lt;/navMap&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/ncx&gt;&quot; &amp; CR
+	CreateFile(fsStagingDirectoryURL &amp; &quot;/OEBPS/toc.ncx&quot;,sA,&quot;UTF-8&quot;)
+end sub
+
+function getSlideTitle (optional byval i)
+	dim oDoc, oDrawPages, oDrawPage, oShape
+	dim sA, cChapterTitle, sB, cLocale
+	on error goto getSlideTitleError
+	if ismissing (i) then 
+		i = 0
+	endif
+	dim j, k, iNo
+	cLocale = fsDocLanguage
+    oDoc=ThisComponent
+	oDrawPages=oDoc.getDrawPages()
+    oDrawPage=oDrawPages.getByIndex(i)
+    sA = &quot;&quot;
+    if len(sA) = 0 then
+		if len(oDrawpage.Name) &gt; 8 or oDrawpage.Name = fs_IMPRINT (fsDocLanguage) then
+			sA = trim (oDrawpage.Name)
+		endif 
+	endif
+    if len(sA) = 0 then
+	    for j = 0 to oDrawPage.Count - 1
+		    oShape=oDrawPage.getByIndex( j )
+		    if HasUnoInterfaces( oShape, &quot;com.sun.star.lang.XServiceInfo&quot;) then
+				sA =  oShape.getText().getString()
+				if len(sA) &lt;&gt; 0 then
+					sA = fsReplaceText(sA,chr(10),&quot; - &quot;) 
+					cChapterTitle = sA
+					exit for
+				endif
+			endif
+		next
+	endif
+	if len(sA) = 0 then
+		&apos; There is no text field in the slide. Let&apos;s look at the note.		
+		iNo = fiGetSlideNoteIndex
+		sA = oDrawPage.getNotesPage.getByIndex(iNo).getText().getString() &apos; oDrawPage note of slide 
+		sA = fsSuperTrim (sA)  
+		sA = fsstripXMLTags (sA)
+		sA = fsSuperTrim (sA) 
+		sA = fsReplaceText(sA,chr(10),&quot; &quot;)  
+		if len(sA) &gt; 30 then 
+			j = iGetBreakPoint (sA, 30)
+			sA = left(sA, j) &amp; &quot;...&quot;
+		endif
+	endif
+	if len (sA) = 0  then
+		&apos; Ok, no text fields anywhere. Use slide number
+		sA = fsshortfilename()  &amp; &quot; - &quot; &amp; trim(i+1)
+	endif
+	sA = fsstripXMLTags (sA)
+	getSlideTitle = fsReplaceText (sA, &quot;&quot;&quot;&quot;, &quot;&amp;#34;&quot;)
+    exit function
+    getSlideTitleError:
+	getSlideTitle = fsshortfilename() &amp; &quot; - &quot; &amp; trim(i+1)
+end function
+
+function fbSlideNameIsUnique (sA)
+	dim oDoc, oDrawPages
+	dim j as integer
+	fbSlideNameIsUnique = true
+    oDoc=ThisComponent
+	oDrawPages=oDoc.getDrawPages()
+	for j = 0 to oDrawPages.Count - 1
+    	if sA = getSlideTitle(j) then
+    		fbSlideNameIsUnique = false
+    		exit for
+    	endif
+    next
+end function
+
+sub writeAlternateEpubOpf (optional UUID)
+	&apos; Tip o&apos; the hat to dotEpub.org - create ePub documents with your web browser
+	&apos; Create the Alternate Epub opf file if you prefer to use a single svg image as 
+	&apos; your book cover. Note that some ePub readers do not support the full SVG feature
+	&apos; set, and may change the appearance of your image.
+	if ismissing (UUID) then
+		UUID =  UUIDv4()
+	endif
+	dim sA, CR as string
+	dim j as integer
+	j = ThisComponent.getDrawPages.getCount()
+	CR = chr$(10)
+	sA = &quot;&lt;?xml version=&quot;&quot;1.0&quot;&quot; encoding=&quot;&quot;UTF-8&quot;&quot; ?&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;package xmlns=&quot;&quot;http://www.idpf.org/2007/opf&quot;&quot; unique-identifier=&quot;&quot;BookID&quot;&quot; version=&quot;&quot;2.0&quot;&quot;&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;metadata xmlns:dc=&quot;&quot;http://purl.org/dc/elements/1.1/&quot;&quot; xmlns:opf=&quot;&quot;http://www.idpf.org/2007/opf&quot;&quot;&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;dc:title&gt;&quot; &amp; fsShortFileName() &amp; &quot;&lt;/dc:title&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;dc:rights&gt;(c) &quot; &amp; fsDocAuthor &amp; &quot; &quot; &amp;  ThisComponent.DocumentProperties.CreationDate.Year() &amp; &quot;&lt;/dc:rights&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;dc:creator opf:role=&quot;&quot;aut&quot;&quot;&gt;&quot; &amp; fsDocAuthor &amp; &quot;&lt;/dc:creator&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;dc:type&gt;Presentation&lt;/dc:type&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;dc:publisher&gt;&quot; &amp; getBranding (bI_SPOKEN_BRANDING)&amp; &quot;&lt;/dc:publisher&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;dc:source&gt;&quot; &amp; getBranding (bI_HOMEPAGE)&amp; &quot;&lt;/dc:source&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;dc:date opf:event=&quot;&quot;publication&quot;&quot;&gt;&quot; &amp;  fsCreationShortDate() &amp; &quot;&lt;/dc:date&gt;&quot; &amp; CR &apos; zero
+	sA = sA &amp; &quot;&lt;dc:language&gt;&quot; &amp; fsDocLanguage &amp; &quot;&lt;/dc:language&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;dc:identifier id=&quot;&quot;BookID&quot;&quot; opf:scheme=&quot;&quot;CustomID&quot;&quot;&gt;&quot; &amp; getBranding (bI_BRANDING) &amp; &quot;-&quot; &amp; UUID &amp; &quot;&lt;/dc:identifier&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;meta name=&quot;&quot;cover&quot;&quot; content=&quot;&quot;CoverImage&quot;&quot; /&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/metadata&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;manifest&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;item id=&quot;&quot;ncx&quot;&quot; href=&quot;&quot;toc.ncx&quot;&quot; media-type=&quot;&quot;application/x-dtbncx+xml&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;item id=&quot;&quot;estils&quot;&quot; href=&quot;&quot;styles/stylesheet.css&quot;&quot; media-type=&quot;&quot;text/css&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;item id=&quot;&quot;logo&quot;&quot; href=&quot;&quot;/images/icon.png&quot;&quot; media-type=&quot;&quot;image/png&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;item id=&quot;&quot;covertext&quot;&quot; href=&quot;&quot;text/cover.xhtml&quot;&quot; media-type=&quot;&quot;application/xhtml+xml&quot;&quot;/&gt;&quot; &amp; CR
+	for i=1 To j
+		sA = sA &amp; &quot;&lt;item href=&quot;&quot;text/chapter-&quot; &amp; trim (i) &amp; &quot;.xhtml&quot;&quot; id=&quot;&quot;chapter-&quot; &amp; trim (i) &amp; &quot;&quot;&quot; media-type=&quot;&quot;application/xhtml+xml&quot;&quot;/&gt;&quot; &amp; CR
+	next
+	for i=1 To j
+		sA = sA &amp; &quot;&lt;item href=&quot;&quot;images/image-&quot; &amp; trim (i) &amp; &quot;.jpg&quot;&quot; id=&quot;&quot;dataItem&quot; &amp; trim (i) &amp; &quot;&quot;&quot; media-type=&quot;&quot;image/jpeg&quot;&quot;/&gt;&quot; &amp; CR
+	next	
+	sA = sA &amp; &quot;&lt;item id=&quot;&quot;CoverImage&quot;&quot; href=&quot;&quot;images/cover.jpeg&quot;&quot; media-type=&quot;&quot;image/jpeg&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;item id=&quot;&quot;toc&quot;&quot; media-type=&quot;&quot;application/xhtml+xml&quot;&quot; href=&quot;&quot;text/toc.xhtml&quot;&quot;&gt;&lt;/item&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/manifest&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;spine toc=&quot;&quot;ncx&quot;&quot;&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;itemref idref=&quot;&quot;covertext&quot;&quot; linear=&quot;&quot;no&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;itemref idref=&quot;&quot;toc_xhtml&quot;&quot; linear=&quot;&quot;no&quot;&quot;/&gt;&quot; &amp; CR
+	for i=1 To j
+		sA = sA &amp; &quot;&lt;itemref idref=&quot;&quot;chapter-&quot; &amp; i &amp; &quot;&quot;&quot; linear=&quot;&quot;yes&quot;&quot;/&gt;&quot; &amp; CR
+	next
+	sA = sA &amp; &quot;&lt;/spine&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;guide&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;reference href=&quot;&quot;text/cover.xhtml&quot;&quot; type=&quot;&quot;cover&quot;&quot; title=&quot;&quot;&quot; &amp; fs_BOOK_COVER(cLocale) &amp; &quot;&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;reference href=&quot;&quot;text/toc.xhtml&quot;&quot; type=&quot;&quot;toc&quot;&quot; title=&quot;&quot;&quot; &amp; fs_TABLE_OF_CONTENTS(cLocale)  &amp;&quot;&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;reference href=&quot;&quot;text/chapter-1.xhtml&quot;&quot; type=&quot;&quot;text&quot;&quot; title=&quot;&quot;&quot; &amp; fsShortFileName() &amp; &quot;&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/guide&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/package&gt;&quot;
+	 &apos;ShowDialog (sA)
+	CreateFile(fsStagingDirectoryURL &amp; &quot;/OEBPS/content.opf&quot;,sA,&quot;UTF-8&quot;)
+end sub
+
+sub writeEpubEpbOpf (sUUID, optional bIsEpub)
+	&apos; Publishing information plus a complete
+	&apos; manifest of all files with the exception of
+	&apos; /META-DATA/container.xml and /mimetype
+	&apos; use this opf if you prefer to set up your title page using
+	&apos; an XHTML chapter as your title page and a JPEG image as your
+	&apos; title page icon. 
+	if ismissing (bIsEpub) then
+		bIsEpub = true
+	endif
+	dim sA, CR as string
+	dim i, j as integer
+	CR = chr$(10)
+	j = ThisComponent.getDrawPages.getCount()
+	sA = sA &amp; &quot;&lt;?xml version=&apos;1.0&apos; encoding=&apos;utf-8&apos;?&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;package xmlns=&quot;&quot;http://www.idpf.org/2007/opf&quot;&quot; version=&quot;&quot;2.0&quot;&quot; unique-identifier=&quot;&quot;BookID&quot;&quot;&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;metadata xmlns:xsi=&quot;&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&quot; xmlns:opf=&quot;&quot;http://www.idpf.org/2007/opf&quot;&quot; xmlns:dcterms=&quot;&quot;http://purl.org/dc/terms/&quot;&quot; xmlns:calibre=&quot;&quot;http://calibre.kovidgoyal.net/2009/metadata&quot;&quot; xmlns:dc=&quot;&quot;http://purl.org/dc/elements/1.1/&quot;&quot;&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;dc:contributor opf:role=&quot;&quot;bkp&quot;&quot;&gt;&quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp; &quot; - &quot; &amp; getBranding (bI_BRANDING) &amp; &quot; [&quot; &amp; getBranding (bI_HOMEPAGE ) &amp; &quot;]&quot; &amp; &quot;&lt;/dc:contributor&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;dc:creator opf:role=&quot;&quot;aut&quot;&quot;&gt;&quot; &amp; fsDocAuthor &amp; &quot;&lt;/dc:creator&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;dc:date opf:event=&quot;&quot;publication&quot;&quot;&gt;&quot; &amp; fsCreationShortDate &amp; &quot;&lt;/dc:date&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;dc:identifier id=&quot;&quot;BookID&quot;&quot; opf:scheme=&quot;&quot;UUID&quot;&quot;&gt;&quot; &amp; sUUID &amp; &quot;&lt;/dc:identifier&gt;&quot; &amp; CR 
+	sA = sA &amp; &quot;&lt;dc:language&gt;&quot; &amp; fsDocLanguage &amp; &quot;&lt;/dc:language&gt;&quot; &amp; CR
+	if len(fsSubject) &lt;&gt; 0 then
+		sA = sA &amp; &quot;&lt;dc:subject&gt;&quot; &amp; fsstripXMLTags (fsSubject,true) &amp; &quot;&lt;/dc:subject&gt;&quot; &amp; CR
+	endif
+	if len(fsDescription) &lt;&gt; 0 then
+	 	sA = sA &amp; &quot;&lt;dc:description&gt;&quot; &amp; fsstripXMLTags (fsDescription,true) &amp; &quot;&lt;/dc:description&gt;&quot; &amp; CR 
+	endif
+	sA = sA &amp; &quot;&lt;dc:title&gt;&quot; &amp; fsstripXMLTags (fsShortFileName(),true) &amp; &quot;&lt;/dc:title&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;meta name=&quot;&quot;&quot; &amp; lcase (getBranding (bI_BRANDING)) &amp; &quot;:securityid&quot;&quot; content=&quot;&quot;&quot; &amp; sUUID &amp; &quot;&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;meta name=&quot;&quot;&quot; &amp; lcase (getBranding (bI_BRANDING)) &amp; &quot;:jobid&quot;&quot; content=&quot;&quot;&quot; &amp; &quot;JOB-51E76C0E-&quot; &amp; UUIDv4() &amp; &quot;&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;meta name=&quot;&quot;calibre:timestamp&quot;&quot; content=&quot;&quot;&quot; &amp; fsNow &amp; &quot;&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;meta name=&quot;&quot;calibre:title_sort&quot;&quot; content=&quot;&quot;&quot; &amp; fsTrimArticle (fsstripXMLTags (fsShortFileName(),true)) &amp; &quot;&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;meta name=&quot;&quot;cover&quot;&quot; content=&quot;&quot;cover.jpeg&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/metadata&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;manifest&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;item href=&quot;&quot;images/cover.jpeg&quot;&quot; id=&quot;&quot;cover.jpeg&quot;&quot; media-type=&quot;&quot;image/jpeg&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;item href=&quot;&quot;images/cover.svg&quot;&quot; id=&quot;&quot;cover_svg&quot;&quot; media-type=&quot;&quot;image/svg+xml&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;item href=&quot;&quot;text/cover.xhtml&quot;&quot; id=&quot;&quot;covertext&quot;&quot; media-type=&quot;&quot;application/xhtml+xml&quot;&quot;/&gt;&quot; &amp; CR
+	for i=1 To j
+		sA = sA &amp; &quot;&lt;item href=&quot;&quot;text/chapter-&quot; &amp; trim (i) &amp; &quot;.xhtml&quot;&quot; id=&quot;&quot;chapter-&quot; &amp; trim (i) &amp; &quot;&quot;&quot; media-type=&quot;&quot;application/xhtml+xml&quot;&quot;/&gt;&quot; &amp; CR
+	next
+	for i=1 To j
+		sA = sA &amp; &quot;	&lt;item href=&quot;&quot;images/image-&quot; &amp; trim (i) &amp; &quot;.jpg&quot;&quot; id=&quot;&quot;dataItem&quot; &amp; trim (i) &amp; &quot;&quot;&quot; media-type=&quot;&quot;image/jpeg&quot;&quot;/&gt;&quot; &amp; CR
+	next
+	sA = sA &amp; &quot;	&lt;item href=&quot;&quot;images/icon.png&quot;&quot; id=&quot;&quot;icon-png&quot; &amp; trim (i) &amp; &quot;&quot;&quot; media-type=&quot;&quot;image/png&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;item href=&quot;&quot;text/toc.xhtml&quot;&quot; id=&quot;&quot;toc_xhtml&quot;&quot; media-type=&quot;&quot;application/xhtml+xml&quot;&quot;/&gt;&quot; &amp; CR
+	
+	sA = sA &amp; &quot;&lt;item href=&quot;&quot;styles/page_styles.css&quot;&quot; id=&quot;&quot;page_css&quot;&quot; media-type=&quot;&quot;text/css&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;item href=&quot;&quot;styles/stylesheet.css&quot;&quot; id=&quot;&quot;css&quot;&quot; media-type=&quot;&quot;text/css&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;item href=&quot;&quot;toc.ncx&quot;&quot; media-type=&quot;&quot;application/x-dtbncx+xml&quot;&quot; id=&quot;&quot;ncx&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/manifest&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;spine toc=&quot;&quot;ncx&quot;&quot;&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;itemref idref=&quot;&quot;covertext&quot;&quot; linear=&quot;&quot;no&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;itemref idref=&quot;&quot;toc_xhtml&quot;&quot; linear=&quot;&quot;no&quot;&quot;/&gt;&quot; &amp; CR
+	for i=1 To j
+		sA = sA &amp; &quot;&lt;itemref idref=&quot;&quot;chapter-&quot; &amp; i &amp; &quot;&quot;&quot; linear=&quot;&quot;yes&quot;&quot;/&gt;&quot; &amp; CR
+	next
+	sA = sA &amp; &quot;&lt;/spine&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;guide&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;reference href=&quot;&quot;text/cover.xhtml&quot;&quot; type=&quot;&quot;cover&quot;&quot; title=&quot;&quot;&quot; &amp; fs_BOOK_COVER(cLocale) &amp; &quot;&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;reference href=&quot;&quot;text/toc.xhtml&quot;&quot; type=&quot;&quot;toc&quot;&quot; title=&quot;&quot;&quot; &amp; fs_TABLE_OF_CONTENTS(cLocale) &amp;&quot;&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;reference href=&quot;&quot;text/chapter-1.xhtml&quot;&quot; type=&quot;&quot;text&quot;&quot; title=&quot;&quot;&quot; &amp; fsShortFileName() &amp; &quot;&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/guide&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/package&gt;&quot; &amp; CR
+	CreateFile(fsStagingDirectoryURL &amp; &quot;/OEBPS/content.opf&quot;,sA,&quot;UTF-8&quot;)
+end sub
+
+
+&apos;------------------------------------------------------------
+&apos; SVG vector drawings are in the %ORIGIN%/templates directory
+&apos; You can create custom SVG drawings for covers using Inkscape.
+&apos; The scripts can modify the colours of some accent colours
+&apos; for high visibility or to code images by time and day of week.
+&apos; In the origin SVG image, use these exact names for the colours
+&apos; in order to make the colours change:
+&apos; 	lightgrey changes to a bright accent colour
+&apos;	grey transforms to a muted background colour
+&apos;	white transforms to a very light foreground colour
+
+function fsTextColour (optional byval mColour)
+	if ismissing (mColour) or mColour = &quot;&quot; then
+		fsTextColour = &quot;#000000&quot;
+	else
+		fsTextColour = mColour
+	endif
+end function
+
+function fsAccentColour (optional byval mColour)
+	&apos; add a colourful stripe to help users organize
+	&apos; electronic books, classes or projects visually. 
+	&apos; This is an accent, so choose bright colours.
+	dim mYear,mMonth,mDay as string
+	mYear = year(Now)
+	mMonth = month(Now)
+	mDay = day(Now)
+	dim lDate as Long
+	if ismissing (mColour) or mColour = &quot;&quot; then
+		lDate = DateSerial(mYear, mMonth, mDay)
+		select case lDate mod 7
+		case 0
+			fsAccentColour = &quot;#D0AAF3&quot; &apos; &quot;Saturday&quot;
+		case 1
+			fsAccentColour = &quot;#CC0000&quot; &apos; &quot;Sunday&quot; 
+		case 2
+			fsAccentColour = &quot;#FFD700&quot; &apos; &quot;Monday&quot;
+		case 3
+			fsAccentColour = &quot;#FFC0CB&quot; &apos; &quot;Tuesday&quot;
+		case 4
+			fsAccentColour = &quot;#00AA00&quot; &apos; &quot;Wednesday&quot;
+		case 5
+			fsAccentColour = &quot;#FF9933&quot; &apos; &quot;Thursday&quot; 
+		case 6
+			fsAccentColour = &quot;#0099FF&quot; &apos; Friday
+		end select
+	else
+		fsAccentColour = mColour
+	endif
+end function
+
+function fsBackgroundColour (optional byval mColour)
+	&apos; Make sure colours are muted. This is the background.
+	dim sA as string
+	if ismissing (mColour) or mColour = &quot;&quot; then
+		select case month(now)
+		case 1 &apos;January- Lightblue 
+			sA = &quot;#87CEFA&quot;
+		case 2 &apos;February- Salmon 
+			sA = &quot;#FA8072&quot;
+		case 3 &apos;March- Green 
+			sA = &quot;#008000&quot;
+		case 4 &apos;April- Yellowgreen 
+			sA = &quot;#9ACD32&quot;
+		case 5 &apos;May- Purple  
+			sA = &quot;#800080&quot;
+		case 6 &apos;June- Lavender  
+			sA = &quot;#E6E6FA&quot;
+		case 7 &apos;July- DarkPurple  
+			sA = &quot;#8B008B&quot;
+		case 8 &apos;August- Brown  
+			sA = &quot;#A52A2A&quot;
+		case 9 &apos;September- Tan  
+			sA = &quot;#D2B48C&quot;
+		case 10 &apos;October- Orange  
+			sA = &quot;#FF4500&quot;
+		case 11 &apos;November- DarkBrown  
+			sA = &quot;#8B4513&quot;
+		case else  &apos;December- Darkblue  
+			sA = &quot;#483D8B&quot;
+		end select
+		fsBackgroundColour = sA
+	else
+		fsBackgroundColour = mColour
+	endif
+end function
+
+sub writePlainCoverSvg (optional cTitle, optional cAuthor, optional cDate)
+	dim  sFilePath, sColor, sAccentColour, sBackgroundColour as string
+	if ismissing (cTitle) then 
+		cTitle = fsShortFileName()
+	endif
+	if ismissing (cAuthor) then 
+		cAuthor = fsDocAuthor
+	endif
+	if ismissing (cDate) then 
+		cDate = fsCreationShortDate
+	endif
+	cTitle = fsShortFileName()
+ 	cAuthor = fsDocAuthor
+ 	cDate = fsCreationShortDate
+ 	sFilepath = fsMyURL &amp; &quot;/templates/plain_cover.svg&quot;
+ 	sColor = &quot;#ffffff&quot;
+ 	sAccentColour = fsAccentColour
+ 	sBackgroundColour = fsBackgroundColour
+	writeAltCoverSvg (cTitle, cAuthor, cDate, sFilepath, sColor, sAccentColour, sBackgroundColour)	
+end sub
+
+sub writeInuksukCoverSvg (optional cTitle)
+	if ismissing(cTitle) then
+		cTitle = fsShortFileName()
+	endif
+	dim cAuthor, cDate, sFilePath, sColor, sAccentColour, sBackgroundColour as string
+	
+ 	cAuthor = fsDocAuthor
+ 	cDate = fsCreationShortDate
+ 	sFilepath = fsMyURL &amp; &quot;/templates/inuksuk_cover.svg&quot;
+ 	sColor = &quot;#ffffff&quot;
+ 	sAccentColour = fsAccentColour
+ 	sBackgroundColour = fsBackgroundColour
+	writeAltCoverSvg (cTitle, cAuthor, cDate, sFilepath, sColor, sAccentColour, sBackgroundColour)	
+end sub
+
+sub writePhotoLogoSvg (optional cTitle)
+	if ismissing(cTitle) then
+		cTitle = fsShortFileName()
+	endif
+	dim cAuthor, cDate, sFilePath, sColor, sAccentColour, sBackgroundColour as string
+	
+ 	cAuthor = fsDocAuthor
+ 	cDate = fsCreationShortDate
+ 	sFilepath = fsMyURL &amp; &quot;/templates/photo_logo.svg&quot;
+ 	sColor = fsAccentColour
+ 	sAccentColour = fsAccentColour
+ 	sBackgroundColour = fsBackgroundColour
+	writeAltCoverSvg (cTitle, cAuthor, cDate, sFilepath, sColor, sAccentColour, sBackgroundColour)	
+end sub
+
+sub writeInuksukHCCoverSvg ()
+	dim cTitle, cAuthor, cDate, sFilePath, sColor, sAccentColour, sBackgroundColour as string
+	cTitle = fsShortFileName()
+ 	cAuthor = fsDocAuthor
+ 	cDate = fsCreationShortDate
+ 	sFilepath = fsMyURL &amp; &quot;/templates/inuksuk_cover.svg&quot;
+ 	sColor = &quot;#ffffff&quot;
+ 	sAccentColour = &quot;#ff0000&quot;
+ 	sBackgroundColour = &quot;#000000&quot;
+	writeAltCoverSvg (cTitle, cAuthor, cDate, sFilepath, sColor, sAccentColour, sBackgroundColour)	
+end sub
+
+sub writeAltHCCoverSvg ()
+	dim cTitle, cAuthor, cDate, sFilePath, sColor, sAccentColour, sBackgroundColour as string
+	cTitle = fsShortFileName()
+ 	cAuthor = fsDocAuthor
+ 	cDate = fsCreationShortDate
+ 	sFilepath = fsMyURL &amp; &quot;/templates/logo_cover.svg&quot;
+ 	sColor = &quot;#ffffff&quot;
+ 	sAccentColour = &quot;#ff0000&quot;
+ 	sBackgroundColour = &quot;#000000&quot;
+	writeAltCoverSvg (cTitle, cAuthor, cDate, sFilepath, sColor, sAccentColour, sBackgroundColour)	
+end sub
+
+sub writeAltCoverSvg(optional cTitle, optional cAuthor, optional cDate, optional sFilepath, optional sColor, optional sAccentColour, optional sBackgroundColour, optional sDestinationFilePath)
+	&apos; eBook viewers are &quot;required&quot; to support SVG, but some don&apos;t
+	&apos; do it well. Use with caution, and check your image in several
+	&apos; viewers. for compatibility, use a pure vector image. 
+	&apos; Embedded bitmaps or jpegs may look okay in a web browser, but
+	&apos; they don&apos;t work with all ePub viewers. Special effects like 
+	&apos; shadow and blur don&apos;t work with many ePub readers. Animation
+	&apos; and interactve images are not supported in ePub 2 viewers. 
+	&apos; The mimetype is image/svg+xml not image/svg.
+	&apos; Try http://svg-edit.googlecode.com/svn/branches/2.5.1/editor/svg-editor.html
+	if ismissing (cTitle) then 
+		cTitle = fsShortFileName()
+	endif
+	if ismissing (cAuthor) then 
+		cAuthor = fsDocAuthor
+	endif
+	if ismissing (cDate) then 
+		cDate = fsCreationShortDate
+	endif
+	if ismissing (sFilepath) then 
+		sFilepath = fsMyURL &amp; &quot;/templates/logo_cover.svg&quot;
+	endif
+	if ismissing (sColor) then
+		sColor = &quot;#ffffff&quot;
+	endif
+	if ismissing (sAccentColour) then
+		sAccentColour = fsAccentColour
+	endif
+	if ismissing (sBackgroundColour) then
+		sBackgroundColour = fsBackgroundColour
+	endif
+	if isMissing (sDestinationFilePath) then
+		sDestinationFilePath = fsStagingDirectoryURL &amp; &quot;/OEBPS/images/cover.svg&quot;
+	endif
+	dim sA, CR as string
+	dim nFontSize as integer
+	dim nVerticalSpace as integer
+	nVerticalPos = 400
+	nFontSize = int((640 / len(cTitle)) +.5 ) 
+	if nFontSize &gt; 42 then
+		nFontSize = 42
+	endif
+	nVerticalSpace = int((800 / len(cTitle)) +.5 )
+	if nVerticalSpace &gt; 40 then 
+		 nVerticalSpace = 40
+	endif
+	CR = chr$(10)
+	sA = getTextFromFile(sFilePath, &quot;utf-8&quot;)
+	sB = &quot;&lt;g&gt;&quot; &amp; CR
+	sB = sB &amp;  &quot;&lt;title&gt;&quot; &amp; fs_BOOK_COVER(fs_cL) &amp; &quot;&lt;/title&gt;&quot; &amp; CR
+	sB = sB &amp;  &quot;&lt;g id=&apos;layer4&apos;&gt;&quot; &amp; CR
+	sB = sB &amp; &quot;&lt;text xml:space=&quot;&quot;preserve&quot;&quot; id=&quot;&quot;svg_1&quot;&quot; y=&quot;&quot;&quot; &amp; nVerticalPos &amp; &quot;&quot;&quot; x=&quot;&quot;50&quot;&quot; style=&quot;&quot;font-size:&quot; &amp; nFontSize &amp; &quot;;text-align:left;text-anchor:left;font-family:Times,&apos;Times New Roman&apos;,FreeSerif,Serif;fill:&quot; &amp; fsTextColour &amp; &quot;;stroke:&quot; &amp; fsTextColour &amp; &quot;;stroke-width:0px&quot;&quot; &quot; &amp; &quot;&gt;&quot; &amp; fsCleanForXtml(cTitle) &amp; &quot;&lt;/text&gt;&quot; &amp; CR
+	nVerticalPos= nVerticalPos + nVerticalSpace
+	nFontSize = int ( (nFontSize /1.4142135624) + .5)
+	sB = sB &amp; &quot;&lt;text xml:space=&quot;&quot;preserve&quot;&quot; id=&quot;&quot;svg_0&quot;&quot; y=&quot;&quot;&quot; &amp; nVerticalPos &amp; &quot;&quot;&quot; x=&quot;&quot;50&quot;&quot; style=&quot;&quot;font-size:&quot; &amp; nFontSize &amp; &quot;;text-align:left;text-anchor:left;font-family:Times,&apos;Times New Roman&apos;,FreeSerif,Serif;fill:&quot; &amp; fsTextColour &amp; &quot;;stroke:&quot; &amp; fsTextColour &amp; &quot;;stroke-width:0px&quot;&quot; &quot; &amp; &quot;&gt;&quot; &amp; fsCleanForXtml(cAuthor) &amp; &quot;&lt;/text&gt;&quot; &amp; CR
+	nVerticalPos = nVerticalPos + nVerticalSpace
+	sB = sB &amp; &quot;&lt;text xml:space=&quot;&quot;preserve&quot;&quot; id=&quot;&quot;svg_7&quot;&quot; y=&quot;&quot;&quot; &amp; nVerticalPos &amp; &quot;&quot;&quot; x=&quot;&quot;50&quot;&quot; style=&quot;&quot;font-size:&quot; &amp; nFontSize &amp; &quot;;text-align:left;text-anchor:left;font-family:Times,&apos;Times New Roman&apos;,FreeSerif,Serif;fill:&quot; &amp; fsTextColour &amp; &quot;;stroke:&quot; &amp; fsTextColour &amp; &quot;;stroke-width:0px&quot;&quot; &quot; &amp; &quot;&gt;&quot; &amp; fsCleanForXtml(cDate) &amp; &quot;&lt;/text&gt;&quot; &amp; CR
+	sB = sB &amp;  &quot;&lt;/g&gt;&quot; &amp; CR
+	sB = sB &amp;  &quot;&lt;/g&gt;&quot; &amp; CR
+	sA = fsReplaceText (sA, &quot;(AUTHOR)&quot;, cAuthor)
+	sA = fsReplaceText (sA, &quot;(DATE)&quot;, cDate)
+	sA = fsReplaceText (sA, &quot;(TITLE)&quot;, cTitle)
+	sA = fsReplaceText (sA, &quot;lightgreY&quot;, sAccentColour)
+	sA = fsReplaceText (sA, &quot;greY&quot;, sBackgroundColour)
+	sA = fsReplaceText (sA, &quot;whitE&quot;, sColor)
+	sA = fsReplaceText (sA, &quot;&lt;!-- This is the text below /--&gt;&quot;, sB)
+	CreateFile(sDestinationFilePath,sA,&quot;UTF-8&quot;)
+end sub
+</script:module>

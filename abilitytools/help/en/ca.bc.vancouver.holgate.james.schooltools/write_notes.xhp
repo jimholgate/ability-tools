@@ -1,0 +1,180 @@
+﻿<?xml version="1.0" encoding="UTF-8"?>
+<helpdocument version="1.0">
+    <meta>
+        <topic id="aplusschooltools/ca.bc.vancouver.holgate.james.schooltools/write_notes.xhp" indexer="include" status="PUBLISH">
+            <title id="write_notes" xml-lang="en-US">
+                Write Notes</title>
+            <filename>/ca.bc.vancouver.holgate.james.schooltools/write_notes.xhp</filename>
+        </topic>
+        <history>
+            <created date="2012-04-25T00:00:00">
+                James Holgate</created>
+            <lastedited date="2012-12-14T11:20:00">
+            </lastedited>
+        </history>
+    </meta>
+    <body>
+        <paragraph role="heading" id="write_notes1" xml-lang="en-US" level="1">
+            Using Ability Tools</paragraph>
+        <paragraph role="heading" id="write_notes1.0" xml-lang="en-US" level="2">
+            About
+        </paragraph>
+        <list>
+            <listitem>
+                This extension uses the presentation notes to read text aloud, to interact with viewers and to create electronic books.
+            </listitem>
+            <listitem>
+                You can export the presentation as an HTML document, a .zip archive or an ePub book.
+            </listitem>
+            <listitem>
+                Click the 
+                <emph>
+                    Notepad</emph>
+                 button to write presentation notes or questions.
+            </listitem>
+            <listitem>
+                The extension produces unencrypted ePub 2.0 format eBooks that are optimized for reading text aloud. The text in the title and text fields of the presentation are saved as alternative text.
+            </listitem>
+        </list>
+        <paragraph role="heading" id="write_notes1.3" xml-lang="en-US" level="2">
+            Write Notes
+        </paragraph>
+        <list>
+            <listitem>
+                In the Impress editor, go to the first slide and click the
+                <emph>
+                    Notepad</emph>
+                button on the menu bar.
+            </listitem>
+            <listitem>
+                Type text. To enlarge the view, click the 
+                <emph>
+                    Appearance</emph>
+                button. Click the
+                <emph>
+                    Read the note</emph>
+                button to read the text aloud. When you are done, click the
+                <emph>
+                    OK</emph>
+                button.
+            </listitem>
+            <listitem>
+                If you do not enter text in a note, the extension prompts you to enter some text when you audition the slideshow. If you want a blank slide note, enter a single space in the notes field.
+            </listitem>
+        </list>
+        <paragraph role="heading" id="write_notes1.1" xml-lang="en-US" level="2">
+            Audition a slideshow
+        </paragraph>
+        <list>
+            <listitem>
+                To read a slideshow, click the 
+                <emph>
+                    Read presentation</emph>
+                 button.
+            </listitem>
+            <listitem>
+                To display a presentation using alternate voices or web resources, click 
+		<emph>
+			Slide Show Tools</emph>
+		and select an option from the dialogue. Some toolbox options may require a good Internet connection. Caution. If you are using an online program or service, you may be responsible for connection or other charges. Some services send text in an unencrypted format. Third parties might be able to intercept the text. You affirm that you have read the terms of service for the online service provider and agree to abide by them. You understand that the terms of service may change from time to time, and it is your responsibility to ensure compliance. On-line services may be unavailable. Do not rely on them for essential services. Preview web resources before you use them in front of an audience.   
+            </listitem>
+        </list>
+        <paragraph role="heading" id="write_notes1.2" xml-lang="en-US" level="2">
+            How to read an ePub document
+        </paragraph>
+  	 <list>
+            <listitem>
+                On the desktop, use <link href="http://www.readium.org/" name="http://www.readium.org/">Readium</link> Extension for Chrome or Chromium or <link href="https://addons.mozilla.org/en-US/firefox/addon/epubreader/" name="https://addons.mozilla.org/en-US/firefox/addon/epubreader/">ePub Reader</link> Extension for Firefox. Alternatively, you can open <link href="http://www.magicscroll.net/" name="http://www.magicscroll.net/">MagicScroll</link> in a system browser like Internet Explorer or Safari.
+            </listitem>
+            <listitem>
+                Apple iOS mobile devices can use <link href="https://itunes.apple.com/en/app/ibooks/id364709193?mt=8" name="https://itunes.apple.com/en/app/ibooks/id364709193?mt=8">iBooks</link> to read ePub electronic books. On current versions of the Apple iOS, you can set up the system to read text aloud when you select some text. Use <emph>Settings - General - Accessibility - Speak Selection</emph>. Enable support for blind readers with VoiceOver. Use <emph>Settings - General - Accessiblity - Triple Click Home - VoiceOver</emph>. With VoiceOver turned on, tap an image to hear the alternative text. To read text aloud continuously, tap the centre of the screen, then swipe down with two fingers. To pause the reading, tap with two fingers. To flip through a book, tap the centre of the screen, then swipe horizontally with three fingers. 
+            </listitem>
+            <listitem>
+                The Android Play store includes several options for ePub books. The <link href="http://www.fbreader.org/" name="http://www.fbreader.org/">FBReader</link> program can read ePub books aloud with an optional plug-in. The <link href="http://dolphin-browser.com/" name="http://dolphin-browser.com/">Dolphin browser</link> has an ePub plug-in that can display ePub books. Select some text, then export the selected text into the <link href="https://play.google.com/store/apps/details?id=com.ideedle.software.talkadroidpro" name="https://play.google.com/store/apps/details?id=com.ideedle.software.talkadroidpro">Talkadroid</link> application to read it aloud. If you do not need speech synthesis, then <link href="http://www.bluefirereader.com/bluefire-reader.html" name="http://www.bluefirereader.com/bluefire-reader.html">BlueFire Reader</link> is a good general purpose eBook reader for Android.
+            </listitem>
+            <listitem>
+                Not all readers are available for all mobile devices. If a program does not appear in the download store, chances are that your device can’t use it.
+            </listitem>
+            <listitem>
+                You can transfer eBooks to devices by sending the eBooks via email, blog, or a “cloud” service. 
+            </listitem>
+            <listitem>
+                The free <link href="http://www.calibre-ebook.com" name="http://www.calibre-ebook.com">calibre-ebook</link> program can modify metadata and convert ePub documents to other formats. For Kindle devices, use calibre-ebook to export an ePub publication to the mobi format.
+            </listitem>
+        </list>
+        <paragraph role="heading" id="write_notes1.4" xml-lang="en-US" level="2">
+            Notepad Buttons
+        </paragraph>
+        <list>
+            <listitem>
+                <emph>
+                    Appearance</emph>
+                View the note with enlarged text.
+            </listitem>
+            <listitem>
+                <emph>
+                    Attach to an email message...</emph>
+                 Save the note then send it via email. To change the default email address, Click the 
+                <emph>
+                    Export Presentation...</emph>
+                 button from the normal presentation view.
+            </listitem>
+            <listitem>
+                <emph>
+                    Cancel</emph>
+                 Dismiss Notepad without saving changes to the slide note.
+            </listitem>
+            <listitem>
+                <emph>
+                    Encode</emph>
+                 Convert plain text to xhtml. Most of the time, you should just use plain text. The xhtml is only needed if you want  italics, bold text or hyperlinks.
+            </listitem>
+	    <listitem>
+                <emph>
+                    Language</emph>
+                 Set the language of the text.
+            </listitem>
+            <listitem>
+                <emph>
+                    OK</emph>
+                 Save changes to the slide note.
+            </listitem>
+            <listitem>
+                <emph>
+                    Open</emph>
+                 Import plain text or xhtml.
+            </listitem>
+           <listitem>
+                <emph>
+                    Paste the message</emph>
+                 Paste the message of the current slide to the Notepad.
+            </listitem>
+            <listitem>
+                <emph>
+                    Preview the note...</emph>
+                 Preview in an external viewer. Use this to check if xhtml code is correct. Chrome, Firefox and Safari can all show the position of a coding mistake. 
+            </listitem>
+            <listitem>
+                <emph>
+                    Read the note</emph>
+                 If you have selected some text, the computer reads the selection aloud. Otherwise, the computer reads the whole note. If your computer is able to read in a different language, you can use the 
+                <emph>
+		     Language</emph> 
+                 button to select the language and region.
+            </listitem>
+            <listitem>
+                <emph>
+                    Save</emph>
+                 Save the note as a file.
+            </listitem>
+            <listitem>
+                <emph>
+                    Save as...</emph>
+                 Save the note as a file with a different name.
+            </listitem>
+        </list>
+<section id="relatedtopics">
+<embed href="text/shared/guide/accessibility.xhp#accessibility"/>
+</section>
+    </body>
+</helpdocument>

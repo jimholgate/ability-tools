@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE library:library PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "library.dtd">
+<library:library xmlns:library="http://openoffice.org/2000/library" library:name="schooltools" library:readonly="false" library:passwordprotected="false">
+ <library:element library:name="schooltools"/>
+ <library:element library:name="userl18n"/>
+ <library:element library:name="userconfig"/>
+ <library:element library:name="modPhotoAlbum"/>
+ <library:element library:name="UUID"/>
+ <library:element library:name="zip"/>
+ <library:element library:name="userpreview"/>
+ <library:element library:name="branding"/>
+ <library:element library:name="mylanguage"/>
+ <library:element library:name="userFileExport"/>
+ <library:element library:name="myEnhancements"/>
+ <library:element library:name="quicktalkUtilities"/>
+</library:library>

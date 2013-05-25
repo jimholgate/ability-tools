@@ -1,0 +1,946 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="userconfig" script:language="StarBasic">REM  *****  BASIC  *****
+&apos; THIS IS FREE SOFTWARE; YOU CAN REDISTRIBUTE IT AND/OR MODIFY IT UNDER THE TERMS
+&apos; OF THE GNU GENERAL PUBLIC LICENSE AS PUBLISHED BY THE FREE SOFTWARE FOUNDATION; 
+&apos; EITHER VERSION 2 OF THE LICENSE,OR(AT YOUR OPTION)ANY LATER VERSION. THIS SCRIPT
+&apos; IS DISTRIBUTED IN THE HOPE THAT IT WILL BE USEFUL,BUT WITHOUT ANY WARRANTY; 
+&apos; WITHOUT EVEN THE IMPLIED WARRANTY OF MERCHANTABILITY OR FITNESS for A PARTICULAR PURPOSE. 
+&apos; SEE THE GNU GENERAL PUBLIC LICENSE for MORE DETAILS.
+
+&apos; YOU SHOULD HAVE RECEIVED A COPY OF THE GNU GENERAL PUBLIC LICENSE ALONG WITH THIS SOFTWARE; 
+&apos; IF NOT,WRITE TO THE FREE SOFTWARE FOUNDATION,INC.,59 TEMPLE PLACE,SUITE 330,BOSTON,MA
+&apos; 02111-1307  USA
+
+&apos; James Holgate acknowledges the work of Martin Brown &lt;martin.brown@3bview.com&gt; for the GPL code
+&apos; that saves and retrieves settings from the user&apos;s configuration directory.
+&apos; The GPL license is packaged with the extension. You will see it the first time
+&apos; you install the extension.
+
+option explicit
+Private f_dlgImpressToolsSetup As Variant
+
+sub ConfigureImpressImport
+	dim i as integer
+	dim n1 as integer
+	dim sA as string
+	dim sFile as string
+	dim msgs() As Variant
+	dim oComboBox
+	dim errorCode as integer 
+	dim config(fiCountConfigOptions) As Variant
+		&apos; Open up the dialog
+	DialogLibraries.LoadLibrary(&quot;schooltools&quot;)
+	f_dlgImpressToolsSetup=CreateUnoDialog( DialogLibraries.schooltools.schooltools2 )
+	if fbHelpIsInstalled then
+		f_dlgImpressToolsSetup.model.HelpURL=fsMyID &amp; &quot;/send_mail.xhp&quot;
+	else 
+		f_dlgImpressToolsSetup.model.HelpURL=&quot;&quot;
+	endif
+	
+	&apos;Load default settings, so any settings undefined by settings file are Not empty
+	config()=fvDefaultConfig(msgs(), errorCode)
+	&apos;Load the settings you used last time
+	sFile= fsConfigurationFileURI()
+	if fileExists (sFile) then
+		ss_config_parseFile (sFile, config(), errorCode)
+	endif									 
+	&apos;Now apply the settings To the dialog box
+	f_dlgImpressToolsSetup.GetControl(&quot;Destination1&quot;).Model.Text=config(fiExternalCommand)
+	f_dlgImpressToolsSetup.GetControl(&quot;Destination1&quot;).Model.helpText=fs_HOW_TO_USE_EMAIL(fs_cL)
+	f_dlgImpressToolsSetup.GetControl(&quot;Destination1&quot;).Visible=false
+	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox1&quot;).Visible=false
+	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox2&quot;).Visible=false
+	f_dlgImpressToolsSetup.GetControl(&quot;TextField2&quot;).Visible=false
+	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox0&quot;).Model.Text=config(fiNewArgument)
+	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox1&quot;).Model.Text=config(fiExternalArgument)
+	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox2&quot;).Model.Text=config(fiInternalArgument)
+	f_dlgImpressToolsSetup.GetControl(&quot;TextField2&quot;).Model.Text=fsReplaceImpressToolsTokens(config(fiRandomKey))
+	&apos;Update the labels with your language
+	
+	f_dlgImpressToolsSetup.Title = getBranding(bI_SPOKEN_BRANDING)
+	f_dlgImpressToolsSetup.GetControl(&quot;CommandButton1&quot;).Label = fs_OKAY(fs_cL)
+	f_dlgImpressToolsSetup.GetControl(&quot;CommandButton2&quot;).Label = fs_DIALOG_CANCEL(fs_cL)
+	f_dlgImpressToolsSetup.GetControl(&quot;ImageControl1&quot;).model.ImageURL=fsMyURL &amp; &quot;/images/&quot; &amp; getBranding(bI_IMPORT_PNG)
+	
+	select case fsGetOS()
+	case &quot;MAC&quot;,&quot;OSX&quot;
+		f_dlgImpressToolsSetup.GetControl(&quot;ImageControl1&quot;).model.helpText=getBranding(bI_SLOGAN)
+		f_dlgImpressToolsSetup.GetControl(&quot;CommandButton1&quot;).model.helpText = fs_OKAY(fs_cL)
+	case else 
+		f_dlgImpressToolsSetup.GetControl(&quot;ImageControl1&quot;).model.helpText= fs_F1_IS_HELP(fs_cL)
+		f_dlgImpressToolsSetup.GetControl(&quot;CommandButton1&quot;).model.helpText = fs_F1_IS_HELP(fs_cL)
+	end select
+	f_dlgImpressToolsSetup.GetControl(&quot;Label1&quot;).Text=fs_OPTIONS(fs_cL)
+	f_dlgImpressToolsSetup.GetControl(&quot;Label2&quot;).Visible=false
+	f_dlgImpressToolsSetup.GetControl(&quot;Label3&quot;).Visible=false
+	oComboBox=f_dlgImpressToolsSetup.getControl(&quot;ComboBox0&quot;)
+	&apos; REM first remove all old items from the list
+	n1=oComboBox.getItemCount()
+	oComboBox.removeItems( 0,n1)
+	i=0
+	for i = 0 to fiCountNewCommands
+		sA = fsNewCommands(i, fsGetSetting(&quot;language&quot;) ,I_BRANDED , 1)
+		
+		if len(sA) &lt;&gt; 0 then
+			oComboBox.addItem( sA, 0 )
+		endif
+	next
+	
+	if f_dlgImpressToolsSetup.Execute() &lt;&gt; 0 then
+		&apos;Replace the old settings file
+		config()=fvCurrentDialogConfig()
+		f_dlgImpressToolsSetup.Dispose()
+		if fileExists (sFile) then
+			if FileExists (sFile &amp; &quot;.bak&quot;) then
+				kill sFile &amp; &quot;.bak&quot;
+			endif
+			fileCopy sFile, sFile &amp; &quot;.bak&quot;
+		endif	
+		ss_config_writeFile(config(), sfile)
+		&apos;execute the program specified with the commands specified
+		ssActuate (config(),msgs(),errorCode, 1)
+		updateNewPresentationLanguage
+	endif
+end sub 
+
+sub ConfigureImpressTools
+	dim i as integer
+	dim n1 as integer
+	dim sA as string
+	dim sFile as string
+	dim msgs() As Variant
+	dim oComboBox
+	dim errorCode as integer 
+	dim config(fiCountConfigOptions) As Variant
+		&apos; Open up the dialog
+	DialogLibraries.LoadLibrary(&quot;schooltools&quot;)
+	f_dlgImpressToolsSetup=CreateUnoDialog( DialogLibraries.schooltools.schooltools2 )
+	if fbHelpIsInstalled then
+		f_dlgImpressToolsSetup.model.HelpURL=fsMyID &amp; &quot;/send_mail.xhp&quot;
+	else 
+		f_dlgImpressToolsSetup.model.HelpURL=&quot;&quot;
+	endif
+	&apos;Load default settings, so any settings undefined by settings file are Not empty
+	config()=fvDefaultConfig(msgs(), errorCode)
+	&apos;Load the settings you used last time
+	sFile= fsConfigurationFileURI()
+	if fileExists (sFile) then
+		ss_config_parseFile (sFile, config(), errorCode)
+	endif									 
+	&apos;Now apply the settings To the dialog box
+	f_dlgImpressToolsSetup.GetControl(&quot;Destination1&quot;).Model.Text=config(fiExternalCommand)
+	f_dlgImpressToolsSetup.GetControl(&quot;Destination1&quot;).Visible=false
+	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox1&quot;).Model.Text=config(fiExternalArgument)
+	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox0&quot;).Visible=false
+	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox0&quot;).Model.Text=config(fiNewArgument)
+	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox1&quot;).Visible=false
+	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox2&quot;).Model.Text=config(fiInternalArgument)
+	f_dlgImpressToolsSetup.GetControl(&quot;TextField2&quot;).Model.Text=fsReplaceImpressToolsTokens(config(fiRandomKey))
+	f_dlgImpressToolsSetup.GetControl(&quot;TextField2&quot;).Visible=false
+	&apos;Update the labels with your language
+	
+	f_dlgImpressToolsSetup.Title = getBranding(bI_SPOKEN_BRANDING)
+	f_dlgImpressToolsSetup.GetControl(&quot;CommandButton1&quot;).Label = fs_OKAY(fs_cL)
+	f_dlgImpressToolsSetup.GetControl(&quot;CommandButton2&quot;).Label = fs_DIALOG_CANCEL(fs_cL)
+	f_dlgImpressToolsSetup.GetControl(&quot;ImageControl1&quot;).model.ImageURL=fsMyURL &amp; &quot;/images/&quot; &amp; getBranding(bI_TOOLS_PNG)
+	
+	select case fsGetOS()
+	case &quot;MAC&quot;,&quot;OSX&quot;
+		f_dlgImpressToolsSetup.GetControl(&quot;ImageControl1&quot;).model.helpText=getBranding(bI_SLOGAN)
+		f_dlgImpressToolsSetup.GetControl(&quot;CommandButton1&quot;).model.helpText = fs_OKAY(fs_cL)
+	case else 
+		f_dlgImpressToolsSetup.GetControl(&quot;ImageControl1&quot;).model.helpText=fs_F1_IS_HELP(fs_cL)
+		f_dlgImpressToolsSetup.GetControl(&quot;CommandButton1&quot;).model.helpText = fs_F1_IS_HELP(fs_cL)
+	end select
+	f_dlgImpressToolsSetup.GetControl(&quot;Label1&quot;).Text= fs_OPTIONS(fs_cL)
+	f_dlgImpressToolsSetup.GetControl(&quot;Label2&quot;).Visible = false
+	f_dlgImpressToolsSetup.GetControl(&quot;Label3&quot;).Visible = false
+	oComboBox=f_dlgImpressToolsSetup.getControl(&quot;ComboBox2&quot;)
+	&apos; REM first remove all old items from the list
+	n1=oComboBox.getItemCount()
+	oComboBox.removeItems( 0,n1)
+	i=0
+	for i = 0 to fiCountCommands
+		sA = fsGetCommands(i, fsGetSetting(&quot;language&quot;), I_BRANDED , 2 )
+		if len(sA) &lt;&gt; 0 then
+			oComboBox.addItem( sA, 0 )
+		endif
+	next
+	if f_dlgImpressToolsSetup.Execute() &lt;&gt; 0 then
+		&apos;Replace the old settings file
+		config()=fvCurrentDialogConfig()
+		f_dlgImpressToolsSetup.Dispose()
+		if fileExists (sFile) then
+			if FileExists (sFile &amp; &quot;.bak&quot;) then
+				kill sFile &amp; &quot;.bak&quot;
+			endif
+			fileCopy sFile, sFile &amp; &quot;.bak&quot;
+		endif	
+		ss_config_writeFile(config(), sfile)
+		&apos;execute the program specified with the commands specified
+		ssActuate (config(),msgs(),errorCode, 2)
+	endif
+end sub 
+
+sub ConfigureImpressExport
+	dim i as integer
+	dim n1 as integer
+	dim sA as string
+	dim sFile as string
+	dim msgs() As Variant
+	dim oComboBox
+	dim errorCode as integer 
+	dim config(fiCountConfigOptions) As Variant
+		&apos; Open up the dialog
+	DialogLibraries.LoadLibrary(&quot;schooltools&quot;)
+	f_dlgImpressToolsSetup=CreateUnoDialog( DialogLibraries.schooltools.schooltools2 )
+	if fbHelpIsInstalled then
+		f_dlgImpressToolsSetup.model.HelpURL=fsMyID &amp; &quot;/send_mail.xhp&quot;
+	else 
+		f_dlgImpressToolsSetup.model.HelpURL=&quot;&quot;
+	endif
+	&apos;Load default settings, so any settings undefined by settings file are Not empty
+	config()=fvDefaultConfig(msgs(), errorCode)
+	&apos;Load the settings you used last time
+	sFile= fsConfigurationFileURI()
+	if fileExists (sFile) then
+		ss_config_parseFile (sFile, config(), errorCode)
+	endif									 
+	&apos;Now apply the settings To the dialog box
+	f_dlgImpressToolsSetup.GetControl(&quot;Destination1&quot;).Model.Text=config(fiExternalCommand)
+	f_dlgImpressToolsSetup.GetControl(&quot;Destination1&quot;).Model.helpText=fs_HOW_TO_USE_EMAIL(fs_cL)
+	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox0&quot;).Visible=false
+	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox0&quot;).Model.Text=config(fiNewArgument)
+	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox1&quot;).Model.Text=config(fiExternalArgument)
+	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox1&quot;).Model.helpText=fsReplaceImpressToolsTokens(config(fiExternalArgument))
+	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox2&quot;).Model.Text=config(fiInternalArgument)
+	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox2&quot;).Visible=false
+	f_dlgImpressToolsSetup.GetControl(&quot;TextField2&quot;).Model.Text=fsReplaceImpressToolsTokens(config(fiRandomKey))
+	f_dlgImpressToolsSetup.GetControl(&quot;TextField2&quot;).Model.helpText=fs_ABOUT_KEY(fs_cL)
+	&apos;Update the labels with your language
+	
+	f_dlgImpressToolsSetup.Title = getBranding(bI_SPOKEN_BRANDING)
+	f_dlgImpressToolsSetup.GetControl(&quot;CommandButton1&quot;).Label = fs_OKAY(fs_cL)
+	f_dlgImpressToolsSetup.GetControl(&quot;CommandButton2&quot;).Label = fs_DIALOG_CANCEL(fs_cL)
+	f_dlgImpressToolsSetup.GetControl(&quot;ImageControl1&quot;).model.ImageURL=fsMyURL &amp; &quot;/images/&quot; &amp; getBranding(bI_LOGO_PNG)
+	
+	select case fsGetOS()
+	case &quot;MAC&quot;,&quot;OSX&quot;
+		f_dlgImpressToolsSetup.GetControl(&quot;ImageControl1&quot;).model.helpText=getBranding(bI_SLOGAN)
+		f_dlgImpressToolsSetup.GetControl(&quot;CommandButton1&quot;).model.helpText = fs_OKAY(fs_cL)
+	case else 
+		f_dlgImpressToolsSetup.GetControl(&quot;ImageControl1&quot;).model.helpText=fs_F1_IS_HELP(fs_cL)
+		f_dlgImpressToolsSetup.GetControl(&quot;CommandButton1&quot;).model.helpText = fs_F1_IS_HELP(fs_cL)
+	end select
+	f_dlgImpressToolsSetup.GetControl(&quot;Label1&quot;).Text=fs_OPTIONS(fs_cL)
+	f_dlgImpressToolsSetup.GetControl(&quot;Label2&quot;).Text=fs_APPLICATION(fs_cL)
+	f_dlgImpressToolsSetup.GetControl(&quot;Label3&quot;).Text=fs_KEY(fs_cL)
+	oComboBox=f_dlgImpressToolsSetup.getControl(&quot;ComboBox1&quot;)
+	&apos; REM first remove all old items from the list
+	n1=oComboBox.getItemCount()
+	oComboBox.removeItems( 0,n1)
+	i=0
+	for i = 0 to fiCountExportCommands
+		sA = fsExportCommands(i, fsGetSetting(&quot;language&quot;) ,I_BRANDED , 3)
+		if len(sA) &lt;&gt; 0 then
+			oComboBox.addItem( sA, 0 )
+		endif
+	next
+	if f_dlgImpressToolsSetup.Execute() &lt;&gt; 0 then
+		&apos;Replace the old settings file
+		config()=fvCurrentDialogConfig()
+		f_dlgImpressToolsSetup.Dispose()
+		if fileExists (sFile) then
+			if FileExists (sFile &amp; &quot;.bak&quot;) then
+				kill sFile &amp; &quot;.bak&quot;
+			endif
+			fileCopy sFile, sFile &amp; &quot;.bak&quot;
+		endif	
+		ss_config_writeFile(config(), sfile)
+		&apos;execute the program specified with the commands specified
+		ssActuate (config(),msgs(),errorCode, 3)
+	endif
+end sub
+
+function fsLanguageCountryEnvironment
+	&apos; Use the user interface language to determine whether to return a western, an asian or a complex language type
+	dim cUI, cAsian, cComplex as string
+	cAsian = fsDefaultLocale(&quot;DefaultLocale_CJK&quot;)
+	cComplex = fsDefaultLocale(&quot;DefaultLocale_CTL&quot;)
+	cUI = fsDefaultLocale(&quot;UILocale&quot;)
+	if len(cComplex) &lt;&gt; 0 and instr(cComplex, cUI) = 1 then
+		fsLanguageCountryEnvironment = cComplex
+	elseif len(cAsian) &lt;&gt; 0 and instr(cAsian, cUI) = 1 then
+		fsLanguageCountryEnvironment = cAsian
+	else
+		fsLanguageCountryEnvironment = fsDefaultLocale(&quot;DefaultLocale&quot;)
+	endif
+end function
+
+sub updateNewPresentationLanguage
+	wait 3000
+	dim n as integer
+	dim sLang as string
+	dim sCountry as string
+	dim sA as string
+	sA =fsLanguageCountryEnvironment
+		if instr (sA, &quot;-&quot;) &lt;&gt; 0 then
+			sLang = left(sA, instr(sA,&quot;-&quot;) - 1)
+		else
+			sLang = fsGetSetting(&quot;language&quot;)
+		endif
+		if sLang = fsGetSetting(&quot;language&quot;) then
+			&apos; use the Unix LANG environment to determine the country
+			sCountry = mid(sA, instr(sA,&quot;-&quot;) + 1)
+		else
+			&apos; use the office program&apos;s locale setting for the country
+			sCountry = fsGetSetting(&quot;country&quot;)
+		endif
+	dim aLocale as new com.sun.star.lang.Locale
+	aLocale.Language = sLang
+	aLocale.Country = sCountry
+	&apos; If a document has only one page, then set its language to the system UI language.
+	&apos; We have to wait a few seconds until the new document displays.
+	for n = 0 to 5
+		wait 1000
+		if ThisComponent.getDrawPages().getCount() = 1 then	
+			ThisComponent.CharLocale = aLocale
+			exit for
+		endif
+	next
+end sub
+
+function fsConfigurationFileURI() as string
+	fsConfigurationFileURI=createUnoService(&quot;com.sun.star.util.PathSettings&quot;).userConfig &amp; &quot;/&quot; &amp; &quot;impresstools/schooltools-settings.ini&quot;
+end function 
+
+
+function fiExternalCommand as integer 
+	fiExternalCommand=0
+end function 
+
+function fiExternalArgument as integer 
+	fiExternalArgument=1
+end function 
+
+function fiInternalArgument as integer 
+	fiInternalArgument=3
+end function 
+
+function fiNewArgument as integer 
+	fiNewArgument=4
+end function
+
+function fiRandomKey as integer 
+	fiRandomKey=5
+end function 
+
+function fiCountConfigOptions
+	fiCountConfigOptions=fiRandomKey &apos; last Config Option
+end function
+
+function WinImpressToolsPath
+	if fileExists( fsProgramDirectoryx86() &amp; getBranding(bI_BRANDING)) then
+		WinImpressToolsPath=fsProgramDirectoryx86 &amp; getBranding(bI_BRANDING) &amp; &quot;\&quot; &amp; LCase(getBranding(bI_BRANDING)) &amp; &quot;-send.exe&quot;
+	else
+		WinImpressToolsPath=fsProgramDirectory &amp; getBranding(bI_BRANDING) &amp; &quot;\&quot; &amp; LCase(getBranding(bI_BRANDING)) &amp; &quot;-send.exe&quot;
+	endif
+	exit function
+end function
+
+function fsProgramDirectory as string
+	dim c as string
+	c=Environ(&quot;ProgramFiles&quot;)
+	if Instr(c,&quot;\&quot;) &lt;&gt; 0 then
+		fsProgramDirectory=c &amp; &quot;\&quot;
+	else
+		fsProgramDirectory=&quot;/usr/bin/&quot;
+	endif
+end function
+
+function fsProgramDirectoryx86 as string
+	dim c as string
+	c=Environ(&quot;ProgramFiles(x86)&quot;)
+	if Instr(c,&quot;\&quot;) &lt;&gt; 0 then
+		fsProgramDirectoryx86=c &amp; &quot;\&quot;
+	else
+		fsProgramDirectoryx86=&quot;/usr/bin/&quot;
+	endif
+end function
+
+function fsCommonProgramFiles as string
+	dim c as string
+	c=Environ(&quot;CommonProgramFiles&quot;)
+	if Instr(c,&quot;\&quot;) &lt;&gt; 0 then
+		fsCommonProgramFiles=c &amp; &quot;\&quot;
+	else
+		fsCommonProgramFiles=&quot;/usr/share/&quot;
+	endif
+end function
+
+function fsCommonProgramFilesx86 as string
+	dim c as string
+	c=Environ(&quot;CommonProgramFiles(x86)&quot;)
+	if Instr(c,&quot;\&quot;) &lt;&gt; 0 then
+		fsCommonProgramFilesx86=c &amp; &quot;\&quot;
+	else
+		fsCommonProgramFilesx86=&quot;/usr/share/&quot;
+	endif
+end function
+
+function fvDefaultConfig(msgs() As Variant, errorCode as integer) As Variant
+	&apos; The place To store the configuration data
+	dim config(fiCountConfigOptions) As Variant
+	dim sA as string
+	&apos; Create default values for variables
+	select case I_BRANDED
+	case 3
+		&apos; Customized export format by default - not ePub.
+		config(fiExternalCommand)=getBranding(bI_EMAIL)
+		config(fiNewArgument)= fsProgramPhraseToUserPhrase (&quot;(NEW_SLIDESHOW_FOR_MOBILE)&quot;, I_BRANDED, 1)
+		config(fiInternalArgument)= fsProgramPhraseToUserPhrase(&quot;(ADD_IMAGE_TO_PRESENTATION)&quot;, I_BRANDED, 2)
+		config(fiExternalArgument)= fsProgramPhraseToUserPhrase(&quot;(SEND_PDF_MOBILE_ZIP)&quot;, I_BRANDED, 3)	
+	case else 
+		&apos; by default, Linux supports a wide range of languages via espeak, the speech daemon, or SVOX pico
+		config(fiExternalCommand)=getBranding(bI_EMAIL)
+		config(fiNewArgument)= fsProgramPhraseToUserPhrase (&quot;(NEW_SLIDESHOW_FOR_MOBILE)&quot;, I_BRANDED, 1)
+		config(fiInternalArgument)= fsProgramPhraseToUserPhrase(&quot;(ADD_IMAGE_TO_PRESENTATION)&quot;, I_BRANDED, 2)
+		config(fiExternalArgument)= fsProgramPhraseToUserPhrase(&quot;(CREATE_HANDHELD_EPUB)&quot;, I_BRANDED, 3)
+	end select
+	config(fiRandomKey)=UUIDv4()			 
+	fvDefaultConfig()=config()										 
+end function
+
+function fbss_util_stringToBoolean(value as string) As Boolean 
+	&apos; Converts a stringTo a boolean value.
+	&apos; true=&gt; &quot;true&quot;
+	&apos; false=&gt; &quot;false&quot;
+	dim b As Boolean: b=false
+	dim v as string: v=Trim(value)
+	if strComp(v,&quot;true&quot;,0)=0 _
+		or strComp(v,&quot;yes&quot;,0)=0 _
+		or val(v) &lt;&gt; 0 then
+		b=true
+	endif
+	fbss_util_stringToBoolean=b
+end function 
+
+sub ss_config_parseLine(byval l as string,_
+						  key as string,_
+						  value as string)
+	&apos; Parses one line from the configuration file.
+	&apos;
+	&apos; Parameters:
+	&apos; l (in) line of input To parse
+	&apos; key (out) Place To put the key; &quot;&quot; if comment.
+	&apos; value (out) Place To put the value; &quot;&quot; if none.
+	&apos;
+	&apos; if the line is a comment line then the key will 
+	&apos; be &quot;&quot;.
+	&apos;	
+	&apos; Initialise return values
+	key=&quot;&quot;
+	value=&quot;&quot;
+	
+	&apos; Is this an empty line?
+	if Len(Trim(l))=0 then
+		&apos; Empty - ignore
+		
+	&apos; Is this a comment line?
+	elseif Left(Trim(l),1)=&quot;#&quot; then
+		&apos; Comment
+		
+	else 
+		&apos; Parse into key=value
+		dim iEq as integer
+		iEq=inStr(l,&quot;=&quot;)
+		if iEq=0 then
+			&apos; Not found - assume whole thing is key
+			key=l
+		else
+			key=Left(l,iEq - 1)
+			value=Mid(l,iEq + 1)
+		endif
+	endif
+end sub 
+
+sub ss_config_writeFile(config() As Variant,byval configFilePath as string)
+	&apos; Writes a configuration file from an array.
+	&apos; This function updated 2012-12-08 - always write as UTF-8
+	dim sA as string
+	dim CR as string
+	CR = chr$(10)
+	sA = &quot;# Configuration file for &quot; &amp; getBranding(bI_BRANDING) &amp; CR
+	sA = sA &amp; fsKeyIMPRESSTOOLS_PATH_STRING &amp; &quot;=&quot; &amp; config(fiExternalCommand) &amp; CR
+	sA = sA &amp; fsKeyIMPRESSTOOLS_COMMANDS_STRING &amp; &quot;=&quot; &amp; config(fiExternalArgument) &amp; CR
+	sA = sA &amp; fsKeyIMPRESSTOOLS_EXPORT_COMMANDS_STRING &amp; &quot;=&quot; &amp; config(fiInternalArgument) &amp; CR
+	sA = sA &amp; fsKeyIMPRESSTOOLS_NEW_COMMANDS_STRING &amp; &quot;=&quot; &amp; config(fiNewArgument)  &amp; CR
+	&apos; This program generates a random key that is 36 characters long and has a dash as the 9th character.
+	&apos; We will also accept as genuine a key that is 40 characters long
+	if (len(config(fiRandomKey)) = 36 or len(config(fiRandomKey)) = 40 ) and instr(config(fiRandomKey),&quot;-&quot;) = 9 then
+		sA = sA &amp; fsKeyIMPRESSTOOLS_RANDOM_KEY_STRING &amp; &quot;=&quot; &amp; config(fiRandomKey) &amp; CR
+	else  &apos;Replace the insecure key	 
+		sA = sA &amp; fsKeyIMPRESSTOOLS_RANDOM_KEY_STRING &amp; &quot;=&quot; &amp; UUIDv4()  &amp; CR
+		ShowDialog(fs_BAD_KEY(fs_cL))
+	endif
+	CreateFile(configFilePath, sA, &quot;UTF-8&quot;)
+end sub 
+
+function fsKeyIMPRESSTOOLS_PATH_STRING as string
+	fsKeyIMPRESSTOOLS_PATH_STRING=&quot;schooltools.executable.path.string&quot;
+end function 
+
+function fsKeyIMPRESSTOOLS_COMMANDS_STRING as string
+	fsKeyIMPRESSTOOLS_COMMANDS_STRING=&quot;schooltools.executable.argument.string&quot;
+end function
+
+function fsKeyIMPRESSTOOLS_EXPORT_COMMANDS_STRING as string
+	fsKeyIMPRESSTOOLS_EXPORT_COMMANDS_STRING=&quot;schooltools.executable.export.string&quot;
+end function
+
+function fsKeyIMPRESSTOOLS_NEW_COMMANDS_STRING as string
+	fsKeyIMPRESSTOOLS_NEW_COMMANDS_STRING=&quot;schooltools.executable.new.string&quot;
+end function
+
+function fsKeyIMPRESSTOOLS_RANDOM_KEY_STRING as string
+	 fsKeyIMPRESSTOOLS_RANDOM_KEY_STRING=&quot;schooltools.settings.random.key.string&quot;
+end function  
+
+sub ss_config_parseFile(byval configFilePath as string,_
+						  config() As Variant,_
+						  errorCode as integer)
+	&apos; Parses the configuration file into an array.
+	&apos; 
+	&apos; Parameters:
+	&apos; configFilePath (in) The path To the configuration file
+	&apos; config() (in out) The configuration settings To update with settings
+	&apos;                   from the file.
+	&apos; errorCode (in out) The Error parameter.
+	&apos;
+	dim sA as string
+	dim CR as string
+	dim CR2 as string
+	dim l as string
+	dim key as string
+	dim value as string
+	dim n1 as integer
+	dim n2 as integer
+	CR = chr$(13)
+	CR2 = chr$(10)
+	sA = getTextFromFile(configFilePath, &quot;UTF-8&quot;)
+	if instr(sA, CR2) &lt; instr(sA, CR) then
+		&apos; choose character return or line feed
+		CR = CR2
+	endif
+	l = sA
+	do while len (l) &gt; 0 
+		l = fsSuperTrim (left (sA, instr(sA, CR)))
+		sA = fsSuperTrim (mid(sA, instr(sA, CR) + 1 ))
+		ss_config_parseLine(l,key,value)
+		if Len(key) &gt; 0 then
+			select case key
+			case fsKeyIMPRESSTOOLS_PATH_STRING
+				config(fiExternalCommand)=value
+			case fsKeyIMPRESSTOOLS_COMMANDS_STRING
+				config(fiExternalArgument)=value
+			case fsKeyIMPRESSTOOLS_EXPORT_COMMANDS_STRING
+				config(fiInternalArgument)=value
+			case fsKeyIMPRESSTOOLS_NEW_COMMANDS_STRING
+				config(fiNewArgument)=value
+			case fsKeyIMPRESSTOOLS_RANDOM_KEY_STRING
+				config(fiRandomKey)=value
+			end select
+		endif
+	loop
+end sub
+
+function fvCurrentDialogConfig() As Variant
+	dim config(fiCountConfigOptions) As Variant
+	config(fiExternalCommand)=f_dlgImpressToolsSetup.GetControl(&quot;Destination1&quot;).model.Text
+	config(fiExternalArgument)=f_dlgImpressToolsSetup.GetControl(&quot;ComboBox1&quot;).model.Text
+	config(fiInternalArgument)=f_dlgImpressToolsSetup.GetControl(&quot;ComboBox2&quot;).model.Text
+	config(fiNewArgument)=f_dlgImpressToolsSetup.GetControl(&quot;ComboBox0&quot;).model.Text
+	config(fiRandomKey)=f_dlgImpressToolsSetup.GetControl(&quot;TextField2&quot;).model.Text
+	fvCurrentDialogConfig()=config()
+end function 
+
+function fsReplaceImpressToolsTokens(byval sA as string) as string
+	&apos;This function takes a stringwith tokens And replaces each token with
+	&apos;a useful string
+	dim sFind as string
+	dim sReplace as string
+	&apos;This file name in the form file:///home/laptop/Desktop/No%20Name.odp
+	sFind=&quot;(THIS_DOCUMENT_URL)&quot;
+	sReplace=ThisComponent.getURL()
+	sA=fsReplaceText(sA,sFind,sReplace)
+	
+	sFind=&quot;(SEND_PDF_ARCHIVE_ZIP)&quot;
+	sReplace=fsPdfZipURL
+	sA=fsReplaceText(sA,sFind,sReplace)
+	
+	sFind=&quot;(SEND_PDF_MOBILE_ZIP)&quot;
+	sReplace=fsPdfZipURL
+	sA=fsReplaceText(sA,sFind,sReplace)
+	
+	&apos;This file name in the form &apos;/home/laptop/Desktop/No Name.odp&apos;
+	sFind=&quot;(THIS_DOCUMENT_PATH)&quot;
+	sReplace=ConvertFromURL(ThisComponent.getURL())
+	sA=fsReplaceText(sA,sFind,sReplace)
+
+	&apos;This file name in the form &apos;No Name.odp&apos;
+	sFind=&quot;(THIS_DOCUMENT_NAME)&quot;
+	sReplace=fsShortFileName
+	sA=fsReplaceText(sA,sFind,sReplace)
+	
+	&apos;A useful subject line
+	sFind=&quot;(MESSAGE_SUBJECT)&quot;
+	sReplace=fs_MAIL_TOPIC(fs_cL)
+	sA=fsReplaceText(sA,sFind,sReplace)
+	
+	&apos;A useful Body line
+	sFind=&quot;(MESSAGE_BODY)&quot;
+	sReplace=fs_MAIL_BODY(fs_cL)
+	sA=fsReplaceText(sA,sFind,sReplace)
+	
+	&apos;Our default email address
+	sFind=&quot;(MESSAGE_RECIPIENT)&quot;
+	sReplace=getBranding(bI_EMAIL)
+	sA=fsReplaceText(sA,sFind,sReplace)
+	fsReplaceImpressToolsTokens=sA
+end function
+
+sub ssActuate(config() As Variant,msgs() As Variant,errorCode as integer, optional iButton as integer)
+	dim sProgram as string
+	dim sMail as string
+	dim sCommand as string
+	dim bWait
+	dim sA as string
+	dim sB as string
+	if ismissing (iButton) then
+		iButton = 2
+	endif
+	&apos;msgbox 
+	select case iButton
+	case 3 &apos; Export
+		sA = config(fiExternalArgument)
+		sA = fsExportPhraseToProgramPhrase (sA)
+	case 2 &apos; Tools
+		sA = config(fiInternalArgument)
+		sA = fsUserPhraseToProgramPhrase (sA)
+	case 1 &apos; New
+		sA = config(fiNewArgument)
+		sA = fsNewPhraseToProgramPhrase (sA)
+	case else 
+		ShowDialog (fs_NO_ACTION(fs_cL))
+		exit sub
+	end select
+	if B_DEBUG = false then
+		on Error goto ErrorHandler
+	else
+		msgBox (&quot;Debug mode - not for release - ssActuate&quot;,64,getBranding(bI_SPOKEN_BRANDING))
+	endif 
+	sProgram=&quot;&quot;
+	sCommand=&quot;&quot;
+	sProgram=config(fiExternalCommand)
+	sCommand=fsReplaceImpressToolsTokens(sA)
+	&apos;The user key shown in the dialogue box can help you manage your on-line settings.
+	sCommand=fsReplaceText(sCommand,&quot;(USER_KEY)&quot;,config(fiRandomKey))
+	&apos; We should use an email program. Let&apos;s decide on an address. 
+	if sProgram = &quot;&quot; then 
+		&apos;You left the field blank
+		sMail = getBranding(bI_EMAIL)
+	elseif instr(sProgram, &quot;@&quot;) &lt;&gt; 0 and instr(sProgram, &quot; &quot;) = 0 then
+		&apos;You entered your choice of an email address.
+		sMail=ltrim(rtrim(sProgram))
+	else 
+		&apos;You entered some text we don&apos;t know how to handle.
+		sMail = getBranding(bI_EMAIL)
+	endif
+	if instr(sA,&quot;(SEND_PDF_ARCHIVE_ZIP)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Create the PDF archive file with PNG images at 150 DPI, then mail it&quot;
+		sB = createPdfArchive (config(fiRandomKey))
+		mailDocument (sB, config(fiRandomKey), sMail)
+	elseif instr(sA,&quot;(SEND_PDF_MOBILE_ZIP)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Create a small mobile PDF with JPG images at 75 DPI, then mail it.&quot;
+		sB = createPdfMobile (config(fiRandomKey), sMail)
+		mailDocument (sB, config(fiRandomKey), sMail)
+	elseif instr(sA,&quot;(SEND_THIS_DOCUMENT_PATH)&quot;) &lt;&gt; 0 then	
+		&apos;msgBox &quot;Save and attach the file to an email message&quot;
+		&apos;Make sure the document is current
+		saveDocument
+		mailDocument (ThisComponent.getURL(), config(fiRandomKey), sMail)
+		elseif instr(sA,&quot;(SEND_HANDHELD_EPUB)&quot;) &lt;&gt; 0 then	
+		&apos;msgBox &quot;Send a small epub eBook&quot;
+		sB = makeCalibreEpub
+		mailDocument (sB, config(fiRandomKey), sMail)
+	elseif instr(sA,&quot;(SEND_TABLET_EPUB)&quot;) &lt;&gt; 0 then	
+		&apos;msgBox &quot;Send a high resolution ePub eBook&quot;
+		sB = makeAlternativeEpub
+		mailDocument (sB, config(fiRandomKey), sMail)
+	elseif instr(sA,&quot;(SEND_JSON_MOBILE_ZIP)&quot;) &lt;&gt; 0 then	
+		&apos;msgBox &quot;Send an archive file with JPG image files and a JSON index&quot;
+		sB = createJsonMobile
+		mailDocument (sB, config(fiRandomKey), sMail)
+	elseif instr(sA,&quot;(SEND_BRAILLE_HTM)&quot;) &lt;&gt; 0 then	
+		&apos;msgBox &quot;Send a html file for Braille that uses an optional Braille font&quot;
+		sB = previewBrailleFontHTML (false)
+		mailDocument (sB, config(fiRandomKey), sMail)
+	elseif instr(sA,&quot;(SEND_UNICODE_BRAILLE_HTM)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Send a html file for Braille using standard Unicode fonts&quot;
+		sB = previewBrailleUnicodeHTML (false)
+		mailDocument (sB, config(fiRandomKey), sMail)
+	elseif instr(sA,&quot;(SEND_DOCUMENT_HTM)&quot;) &lt;&gt; 0 then	
+		&apos;msgBox &quot;Send a html file for study&quot;
+		sB = previewRegularContrastHTML (false)
+		mailDocument (sB, config(fiRandomKey), sMail)
+	elseif instr(sA,&quot;(SEND_HIGH_CONTRAST_HTM)&quot;) &lt;&gt; 0 then	
+		&apos;msgBox &quot;Send a high contrast html file for study&quot;
+		sB = previewHighContrastHTML (false)
+		mailDocument (sB, config(fiRandomKey), sMail)
+	elseif TryHandlingLocally (sA , config(fiRandomKey)) then &apos; Do stuff offline only
+		exit sub
+	else &apos; We didn&apos;t find an action we could do...
+		ShowDialog(fs_NO_ACTION(fs_cL) &amp; &quot; &quot; &amp; sA
+		exit sub
+	endif
+	On Error Resume next
+	exit sub 
+	ErrorHandler:
+	msgBox (fs_UNKNOWN_ERROR(fs_cL),64,getBranding(bI_SPOKEN_BRANDING)) 
+end sub 
+
+function TryHandlingLocally (byval sA as string, byval myKey as string) as boolean
+	if NOT GlobalScope.BasicLibraries.isLibraryLoaded(&quot;Tools&quot;) then 
+		GlobalScope.BasicLibraries.loadLibrary(&quot;Tools&quot;)
+	endif
+	dim sB, s123 as string
+	sB = &quot;&quot;
+	s123 = &quot;&quot;
+	TryHandlingLocally = true
+	if instr(sA,&quot;(PLAY_PRESENTATION_ALOUD_OFFLINE)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Show audience a talking presentation with online links disabled.&quot;
+		readSlideShowNotes (ENABLE_SYSTEM_LANGUAGES)
+		if fileExists (fsSpeechSettingURL) then
+			kill fsSpeechSettingURL
+		endif
+		CreateFile(fsSpeechSettingURL,&quot;(PLAY_PRESENTATION_ALOUD_OFFLINE)&quot;,&quot;UTF-8&quot;)
+	elseif instr(sA,&quot;(PLAY_PRESENTATION_ALOUD)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Show audience a talking presentation with online links enabled.&quot;
+		readSlideShowNotes (ENABLE_ONLINE_RESOURCES)
+		if fileExists (fsSpeechSettingURL) then
+			kill fsSpeechSettingURL
+		endif
+		CreateFile(fsSpeechSettingURL,&quot;(PLAY_PRESENTATION_ALOUD)&quot;,&quot;UTF-8&quot;)
+	elseif instr(sA,&quot;(PLAY_PRESENTATION_ALOUD_SYSTEM_VOICE)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Show audience a talking presentation with the system default voice.&quot;
+		readSlideShowNotes (ENABLE_SYSTEM_SPEECH_ONLY)
+		if fileExists (fsSpeechSettingURL) then
+			kill fsSpeechSettingURL
+		endif
+		&apos; We don&apos;t create a file fsSpeechSettingURL with contents &quot;(PLAY_PRESENTATION_ALOUD_SYSTEM_VOICE)&quot;
+		&apos; It is faster to test for the absence of a file than it is to read the contents of the file.
+	elseif instr(sA,&quot;(PLAY_PRESENTATION_ALOUD_ONLINE_VOICE)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Only developers should use this to test extension with an online voice.&quot;
+		readSlideShowNotes (ENABLE_ONLINE_VOICES_ONLY)
+		if fileExists (fsSpeechSettingURL) then
+			kill fsSpeechSettingURL
+		endif
+		CreateFile(fsSpeechSettingURL,&quot;(PLAY_PRESENTATION_ALOUD_ONLINE_VOICE)&quot;,&quot;UTF-8&quot;)
+	elseif instr(sA,&quot;(PLAY_PRESENTATION_VERBOSE)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Play the full text of the presentation with no visuals.&quot;
+		ReadImpressVeryVerbose
+	elseif instr(sA,&quot;(PREVIEW_AS_AUDIBLE_BRAILLE)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Preview note as audible Braille&quot;
+		previewNoteAsAudibleBraille
+	elseif instr(sA,&quot;(CREATE_HANDHELD_EPUB)&quot;) &lt;&gt; 0 then	
+		&apos;msgBox &quot;Create a small epub eBook&quot;
+		sB = makeCalibreEpub
+	elseif instr(sA,&quot;(CREATE_TABLET_EPUB)&quot;) &lt;&gt; 0 then	
+		&apos;msgBox &quot;Create a high resolution ePub eBook&quot;
+		sB = makeAlternativeEpub
+	elseif instr(sA,&quot;(CREATE_PDF_MOBILE_ZIP)&quot;) &lt;&gt; 0 then	
+		&apos;msgBox &quot;Create a screen resolution PDF eBook&quot;
+		createPdfMobile (myKey)
+	elseif instr(sA,&quot;(CREATE_PDF_ARCHIVE_ZIP)&quot;) &lt;&gt; 0 then	
+		&apos;msgBox &quot;Create a high resolution PDF eBook&quot;
+		createPdfArchive (myKey)
+	elseif instr(sA,&quot;(CREATE_JSON_MOBILE_ZIP)&quot;) &lt;&gt; 0 then	
+		&apos;msgBox &quot;Create an archive file with JPG image files and a JSON index&quot;
+		sB = createJsonMobile
+	elseif instr(sA,&quot;(CREATE_BRAILLE_HTM)&quot;) &lt;&gt; 0 then	
+		&apos;msgBox &quot;Create a html file for Braille that uses an optional Braille font&quot;
+		sB = previewBrailleFontHTML
+	elseif instr(sA,&quot;(CREATE_UNICODE_BRAILLE_HTM)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Create a html file for Braille using standard Unicode fonts&quot;
+		sB = previewBrailleUnicodeHTML
+	elseif instr(sA,&quot;(CREATE_DOCUMENT_HTM)&quot;) &lt;&gt; 0 then	
+		&apos;msgBox &quot;Create a html file for study&quot;
+		sB = previewRegularContrastHTML
+	elseif instr(sA,&quot;(CREATE_HIGH_CONTRAST_HTM)&quot;) &lt;&gt; 0 then	
+		&apos;msgBox &quot;Create a high contrast html file for study&quot;
+		sB = previewHighContrastHTML
+	elseif instr(sA,&quot;(START_RECORDING_DESKTOP)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Record the presentation using an external program.&quot;
+		ScreenCaptureMovie
+	elseif instr(sA,&quot;(PREVIEW_TRANSCRIPT)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Show the presentation notes transcript.&quot;
+		s123 = fsSuperTrim(fsstripXMLTags(fsNotesTranscript, true))
+		WriteDbgString (s123)
+	elseif instr(sA,&quot;(PREVIEW_SUBTITLES)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Show the presentation subtitles&quot;
+		s123 = fsSuperTrim(fsstripXMLTags(fsQuickSubtitleDoc,true))
+		WriteDbgString (s123)
+	elseif instr(sA,&quot;(ADD_IMAGE_DIRECTORY_TO_PRESENTATION)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Import the photos in a directory to this slideshow.&quot;
+		AddImagesToPresentation
+	elseif instr(sA,&quot;(IMPORT_4_IMAGES_FROM_DIRECTORY)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Import the photos in a directory to a new slideshow.&quot;
+		rppPhotoAlbum (4)
+	elseif instr(sA,&quot;(IMPORT_8_IMAGES_FROM_DIRECTORY)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Import the photos in a directory to a new slideshow.&quot;
+		rppPhotoAlbum (8)
+	elseif instr(sA,&quot;(IMPORT_16_IMAGES_FROM_DIRECTORY)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Import the photos in a directory to a new slideshow.&quot;
+		rppPhotoAlbum (16)
+	elseif instr(sA,&quot;(IMPORT_32_IMAGES_FROM_DIRECTORY)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Import the photos in a directory to a new slideshow.&quot;
+		rppPhotoAlbum (32)
+	elseif instr(sA,&quot;(IMPORT_IMAGES_FROM_DIRECTORY)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Import the photos in a directory to a new slideshow.&quot;
+		rppPhotoAlbum
+	elseif instr(sA,&quot;(ADD_MECARD_TO_PRESENTATION)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;insert a 2D scanner code with a friend&apos;s contact information.&quot;
+		insertMecardInfo
+	elseif instr(sA,&quot;(ADD_CONTACT_TO_PRESENTATION)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Insert a photograph with business or personal contact information.&quot;
+		insertAddressCardInfo
+	elseif instr(sA,&quot;(ADD_EVENT_TO_PRESENTATION)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Insert an event - include basic calendar and contact information.&quot;
+		insertEventInfo
+	elseif instr(sA,&quot;(ADD_IMAGE_TO_PRESENTATION)&quot;) &lt;&gt; 0 then
+		&apos; msgBox &quot;Choose a photo. Add title, date and time for the photo.&quot;
+		insertImageInfo
+	elseif instr(sA,&quot;(ADD_WEBCAM_1_TO_PRESENTATION)&quot;) &lt;&gt; 0 then
+		&apos; msgBox &quot;Add a photo to the end of this slideshow.&quot;
+		insertWebCam (1, false)
+	elseif instr(sA,&quot;(ADD_WEBCAM_2_TO_PRESENTATION)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Add a photo to the end of this slideshow.&quot;
+		insertWebCam (2, false)
+	elseif instr(sA,&quot;(ADD_WEBCAM_3_TO_PRESENTATION)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Add a photo to the end of this slideshow.&quot;
+		insertWebCam (3, false)
+	elseif instr(sA,&quot;(ADD_WEBCAM_4_TO_PRESENTATION)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Add a photo to the end of this slideshow.&quot;
+		insertWebCam (4, false)
+	elseif instr(sA,&quot;(ADD_WEBCAM_5_TO_PRESENTATION)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Add a photo to the end of this slideshow.&quot;
+		insertWebCam (5, false)
+	elseif instr(sA,&quot;(ADD_WEBCAM_6_TO_PRESENTATION)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Add a photo to the end of this slideshow.&quot;
+		insertWebCam (6, false)
+	elseif instr(sA,&quot;(ADD_WEBCAM_7_TO_PRESENTATION)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Add a photo to the end of this slideshow.&quot;
+		insertWebCam (7, false)
+	elseif instr(sA,&quot;(ADD_WEBCAM_8_TO_PRESENTATION)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Add a photo to the end of this slideshow.&quot;
+		insertWebCam (8, false)
+	elseif instr(sA,&quot;(ADD_2DCODE_1_TO_PRESENTATION)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Add a QR code to the end of this slideshow.&quot;
+		insertWebCam (1, true)
+	elseif instr(sA,&quot;(ADD_2DCODE_2_TO_PRESENTATION)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Add a QR code to the end of this slideshow.&quot;
+		insertWebCam (2, true)
+	elseif instr(sA,&quot;(ADD_2DCODE_3_TO_PRESENTATION)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Add a QR code to the end of this slideshow.&quot;
+		insertWebCam (3, true)
+	elseif instr(sA,&quot;(ADD_2DCODE_4_TO_PRESENTATION)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Add a QR code to the end of this slideshow.&quot;
+		insertWebCam (4, true)
+	elseif instr(sA,&quot;(ADD_2DCODE_5_TO_PRESENTATION)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Add a QR code to the end of this slideshow.&quot;
+		insertWebCam (5, true)
+	elseif instr(sA,&quot;(ADD_2DCODE_6_TO_PRESENTATION)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Add a QR code to the end of this slideshow.&quot;
+		insertWebCam (6, true)
+	elseif instr(sA,&quot;(ADD_2DCODE_7_TO_PRESENTATION)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Add a QR code to the end of this slideshow.&quot;
+		insertWebCam (7, true)
+	elseif instr(sA,&quot;(ADD_2DCODE_8_TO_PRESENTATION)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Add a QR code to the end of this slideshow.&quot;
+		insertWebCam (8, true)
+	elseif instr(sA,&quot;(ADD_ASK_TAGS_TO_THIS_SLIDE_NOTE)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Convert current note to plain text and add &lt;ask&gt; to beginning and &lt;/ask&gt; to end of note.&quot;
+		SetPageNotesToQuestion
+	elseif instr(sA,&quot;(ADD_COMPUTER_CODE_TAGS_TO_THIS_SLIDE_NOTE)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Add tags to slide note that indicate that it includes computer code.&quot;
+		SetPageNotesToComputerCode
+	elseif instr(sA,&quot;(CONVERT_THIS_SLIDE_NOTE_TO_SIMPLE_XHTML)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Convert the text contents of the note to simple XHTML ready to add simple formatting and links.&quot;
+		SetPageNotesToSimpleXHTML
+	elseif instr(sA,&quot;(CONVERT_THIS_SLIDE_NOTE_TO_BULLETED_XHTML)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Convert the text contents of the note to bulleted XHTML ready to add simple formatting and links.&quot;
+		SetPageNotesToBulletedXHTML
+	elseif instr(sA,&quot;(CONVERT_THIS_SLIDE_NOTE_TO_NUMBERED_XHTML)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Convert the text contents of the note to numbered List XHTML ready to add simple formatting and links.&quot;
+		SetPageNotesToNumberedListXHTML
+	elseif instr(sA,&quot;(CONVERT_THIS_SLIDE_NOTE_TO_NO_XHTML)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Convert the XHTML in the note to plain text.&quot;
+		SetPageNotesToNoXHTML
+	elseif instr(sA,&quot;(THE_TALE_OF_BIG_BUCK_BUNNY)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Use a portrait book template.&quot;
+		BunnyKidsBook
+	elseif instr(sA,&quot;(NEW_FAMILY_HISTORY_EBOOK)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Use a family history template.&quot;		
+		FamilyHistoryBook
+	elseif instr(sA,&quot;(THE_ART_OF_BIG_BUCK_BUNNY)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Create a slideshow for an HDMI monitor.&quot;
+		BunnyArtBook
+	elseif instr(sA,&quot;(NEW_SLIDESHOW_PORTRAIT)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Create a new 3:4 slideshow.&quot;
+		newSlideShowPortrait
+	elseif instr(sA,&quot;(NEW_SLIDESHOW_SQUARE)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Create a new 1:1 slideshow.&quot;
+		newSlideShowSquare
+	elseif instr(sA,&quot;(NEW_SLIDESHOW_FOR_MOBILE)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Create a new narrow slideshow.&quot;
+		newSlideShowForMobile
+	elseif instr(sA,&quot;(NEW_SLIDESHOW_PHOTO)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Create a new Digital SLR slideshow.&quot;
+		newSlideShowPhoto
+	elseif instr(sA,&quot;(NEW_SLIDESHOW_HDMI)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Create a new HDMI slideshow.&quot;
+		newSlideShowHDMI
+	elseif instr(sA,&quot;(NEW_SLIDESHOW_ABOUT)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Create a new slideshow about the extension.&quot;
+		newSlideShowAbout
+	elseif instr(sA,&quot;(ADD_IDENTICA_2DCODE_TO_PRESENTATION)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Create a new slide with a Identi.ca 2D code.&quot;
+		insertIdentiCaKeyword
+	elseif instr(sA,&quot;(ADD_TWITTER_2DCODE_TO_PRESENTATION)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Create a new slide with a Twitter 2D code.&quot;
+		insertTwitterKeyword
+	elseif instr(sA,&quot;(EDIT_THIS_SLIDES_NOTES)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Edit this slide&apos;s notes using a custom editor.&quot;
+		SchoolToolsEditNotesDialog
+	else 
+		TryHandlingLocally = false
+	endif
+end function
+
+sub upDateschooltools2Destination1Appearance 
+	f_dlgImpressToolsSetup.GetControl(&quot;Destination1&quot;).Model.TextColor = RGB(0, 0, 0) 
+end sub 
+
+sub revertSchooltools2Destination1Appearance 
+		f_dlgImpressToolsSetup.GetControl(&quot;Destination1&quot;).Model.TextColor = RGB(255, 255, 255) 
+end sub 
+
+sub upDateschooltools2Destination1HelpText
+	f_dlgImpressToolsSetup.GetControl(&quot;Destination1&quot;).Model.helpText=f_dlgImpressToolsSetup.GetControl(&quot;Destination1&quot;).Model.Text
+end sub 
+
+sub upDateschooltools2ComboBox1HelpText
+	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox1&quot;).Model.helpText=fsReplaceImpressToolsTokens(f_dlgImpressToolsSetup.GetControl(&quot;ComboBox1&quot;).Model.Text)
+end sub 
+</script:module>

@@ -1,0 +1,66 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="UUID" script:language="StarBasic">REM  *****  BASIC  *****
+&apos;______________________________________________________________________________
+&apos;	
+&apos;	Version 4 UUID generator by Luca Calcinai
+&apos;	
+&apos;	This library is free software; you can redistribute it and/or
+&apos;	modify it under the terms of the GNU Lesser General Public
+&apos;	License As published by the Free Software Foundation.
+&apos;	
+&apos;	This library is distributed in the hope that it will be useful,
+&apos;	but WITHOUT ANY WARRANTY; without even the implied warranty of
+&apos;	MERCHANTABILITY or FITNESS for A PARTICULAR PURPOSE. See the GNU
+&apos;	Lesser General Public License for more details.
+&apos;	
+&apos;	Please email me with any bug reports, questions or comments:
+&apos;	writer2epub@gmail.com
+&apos;______________________________________________________________________________
+&apos;	
+&apos;	(definition from http://en.wikipedia.org/wiki/UUID)
+&apos;	Version 4 UUIDs use a scheme relying only on random numbers.
+&apos;	This algorithm sets the version number As well As two reserved bits.
+&apos;	All other bits are set using a random or pseudorandom data source.
+&apos;	Version 4 UUIDs have the form xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx
+&apos;	with hexadecimal digits x and hexadecimal digits 8, 9, A, or B for y.
+&apos;	e.g. f47ac10b-58cc-4372-a567-0e02b2c3d479.
+&apos;	
+&apos;______________________________________________________________________________
+&apos;
+&apos;
+&apos; Declarations:
+option explicit
+
+sub UUIDtest
+	msgbox &quot;this is a random generated UUID:&quot; &amp; chr(13) &amp; UUIDv4()
+end sub 
+
+function UUIDv4() as string
+
+	dim i as integer
+	
+	UUIDv4 = &quot;&quot;
+	for i=1 to 8
+		UUIDv4 = UUIDv4 &amp; hex(int(rnd()*16))
+	next i
+	UUIDv4 = UUIDv4 &amp; &quot;-&quot;
+	for i=1 to 4
+		UUIDv4 = UUIDv4 &amp; hex(int(rnd()*16))
+	next i
+	UUIDv4 = UUIDv4 &amp; &quot;-4&quot;
+	for i=1 to 3
+		UUIDv4 = UUIDv4 &amp; hex(int(rnd()*16))
+	next i
+	UUIDv4 = UUIDv4 &amp; &quot;-&quot;
+	UUIDv4 = UUIDv4 &amp; hex((int(rnd()*4))+8)
+	for i=1 to 3
+		UUIDv4 = UUIDv4 &amp; hex(int(rnd()*16))
+	next i
+	UUIDv4 = UUIDv4 &amp; &quot;-&quot;
+	for i=1 to 12
+		UUIDv4 = UUIDv4 &amp; hex(int(rnd()*16))
+	next i
+
+end function
+</script:module>

@@ -1,0 +1,430 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
+<script:module xmlns:script="http://openoffice.org/2000/script" script:name="schooltools" script:language="StarBasic">REM  *****  BASIC  *****
+option explicit
+&apos;This extension for LibreOffice and OpenOffice.org will allow you 
+&apos;to quickly publish open document presentations using email or another program.
+&apos;You can use the speaker&apos;s notes to read the notes aloud during the 
+&apos;presentation.  Applications for Android and iOS tablets and mobile phones can use bandwidth 
+&apos;sparingly by using the device&apos;s built in speech synthesis to read the text aloud.
+
+function B_DEBUG 
+	&apos;Set B_DEBUG to true when testing the extension.
+	&apos;Set it to false when releasing the extension.
+	&apos;B_DEBUG=true 
+    B_DEBUG=false &apos;release
+end function 
+
+sub ToolBar1Pressed
+	&apos; Import stuff
+	ConfigureImpressImport
+end sub
+
+sub ToolBar2Pressed
+	&apos;Work on stuff
+	SetupImpressTools(2)
+end sub
+
+sub ToolBar3Pressed
+	&apos;Export and Publish stuff
+	SetupImpressTools(3)
+end sub
+
+sub ToolBar11Pressed
+	dim cAttachmentURL as string
+	cAttachmentURL = ThisComponent.getURL()
+	if fBextensionOK (&quot;odp&quot;, cAttachmentURL) then 
+		SchoolToolsEditNotesDialog
+	else 
+		ShowDialog(fs_SAVE_BEFORE_SENDING(fs_cL))
+	endif
+end sub
+
+sub ToolBar12Pressed
+	dim cAttachmentURL , sA as string
+	cAttachmentURL = ThisComponent.getURL()
+	if fBextensionOK (&quot;odp&quot;, cAttachmentURL) then 
+		doToolBar12ReadNotes
+	else 
+		ShowDialog(fs_SAVE_BEFORE_SENDING(fs_cL))
+	endif
+end sub
+
+function fb_Online_Resource_CarteBlanche
+	dim sA as string
+	fb_Online_Resource_CarteBlanche = false
+	if fileExists (fsSpeechSettingURL) then
+		sA = getTextFromFile(fsSpeechSettingURL, &quot;UTF-8&quot;)
+		select case trim (sA)
+		case &quot;(PLAY_PRESENTATION_ALOUD)&quot;, &quot;(PLAY_PRESENTATION_ALOUD_ONLINE_VOICE)&quot;
+			fb_Online_Resource_CarteBlanche = true
+		end select
+	endif
+end function
+
+sub doToolBar12ReadNotes
+	dim sA as string
+	if fileExists (fsSpeechSettingURL) then
+		sA = getTextFromFile(fsSpeechSettingURL, &quot;UTF-8&quot;)
+		if instr(sA, &quot;(PLAY_PRESENTATION_ALOUD_OFFLINE)&quot;) &gt; 0 then
+			&apos; Additional languages only work out of the box on Linux. For other platforms, you need to install
+			&apos; system voice resources. Use the OSX Speech Control panel to download additional voices. If you
+			&apos; are using Windows 8 professional, you need to download a new GUI language to speak the language.
+			readSlideShowNotes (ENABLE_SYSTEM_LANGUAGES)
+		elseif instr(sA, &quot;(PLAY_PRESENTATION_ALOUD)&quot;) &gt; 0 then
+			&apos; This opens URLs automatically. Only use if you know the contents of the presentation.
+			readSlideShowNotes (ENABLE_ONLINE_RESOURCES)
+		elseif instr(sA, &quot;(PLAY_PRESENTATION_ALOUD_ONLINE_VOICE)&quot;) &gt; 0 then
+			&apos; Only developers should use this to test extension with an online voice.
+			readSlideShowNotes (ENABLE_ONLINE_VOICES_ONLY)
+		else
+			&apos; Using the default language should work on pretty much any computer that can talk.
+			readSlideShowNotes (ENABLE_SYSTEM_SPEECH_ONLY)
+		endif
+	else
+		readSlideShowNotes (ENABLE_SYSTEM_SPEECH_ONLY)
+	endif
+end sub
+
+function I_DEMO
+	&apos;Set B_DEMO to a non-zero value to demonstrate proposed features.
+	&apos;Set it to 0 when releasing the extension.	
+	&apos;I_DEMO=1 &apos; enable an input field in about.html in zip archive. Test text to speech with Google Chrome.
+	I_DEMO=0 &apos; release
+end function
+
+function I_BRANDED
+	&apos;Set I_BRANDED to the appropriate number when releasing the extension for a client.
+	on error goto BrandingErr
+	if fileExists ( fsMyURL &amp; &quot;/images/my-securityguard.png&quot;) then 
+		&apos; Custom interface for a Webcam client
+		I_BRANDED = 4
+	elseif fileExists ( fsMyURL &amp; &quot;/images/my-publisher.png&quot;) then 
+		&apos; Custom interface for a TTS publisher client
+		I_BRANDED = 3
+	elseif fileExists ( fsMyURL &amp; &quot;/images/my-preview.png&quot;) then
+		&apos; Simplified interface for kids
+		I_BRANDED = 2 &apos; Ability Tools preview
+	else
+		&apos; Advanced interface for content creators
+		I_BRANDED = 1 &apos; Ability Tools full
+	endif 
+	exit function
+	BrandingErr:
+	I_BRANDED = 1 &apos; Ability Tools full
+end function
+
+sub SetupImpressTools (optional iToolType)
+	&apos; Use this with Tools - Add-ons menu item 
+	&apos; This simply calls the ConfigureImpressTools dialog. We need to insist
+	&apos; on saving the presentation as an odp file before doing anything else 
+	&apos; PowerPoint presentations do not use the same document object model
+	&apos; so we can&apos;t read or write strings in the presentation.
+	if ismissing (iToolType) then
+		iToolType = 2
+	endif
+	if NOT GlobalScope.BasicLibraries.isLibraryLoaded(&quot;Tools&quot;) then 
+		GlobalScope.BasicLibraries.loadLibrary(&quot;Tools&quot;)
+	endif
+	dim cAttachmentURL as string
+	cAttachmentURL = ThisComponent.getURL()
+	if fBextensionOK (&quot;odp&quot;, cAttachmentURL) then 
+		select case iToolType
+		case 3
+			ConfigureImpressExport()
+		case 2
+			ConfigureImpressTools()
+		case else 
+			ShowDialog(fs_NO_ACTION(fs_cL))
+		end select 
+	else 
+		ShowDialog(fs_SAVE_BEFORE_SENDING(fs_cL))
+	endif
+end sub 
+
+sub mailDocument (sGetURL,sKey,sMail)
+	if len (sGetURL) = 0 then
+		exit sub
+	endif
+	if B_DEBUG = false then
+		on Error goto mailDocError
+	else
+		msgBox (&quot;Debug mode - not for release - mailDocument&quot;,64,getBranding(bI_SPOKEN_BRANDING)) 
+	endif
+	dim cEmailAddress as string
+	dim cSubject as string
+	dim cBody as string
+	dim oMailer as object
+	dim oMailClient as object
+	dim oMessage as object
+	dim attach_file(0)
+	dim cAttachmentURL as string
+	dim oXComponent as object
+	if sGetURL=&quot;&quot; then
+		cAttachmentURL = ThisComponent.getURL()
+	else
+		cAttachmentURL = sGetURL
+	endif
+	saveDocument
+	cEMailAddress=sMail
+	cSubject = fs_MAIL_TOPIC(fs_cL) &amp; &quot; : &quot; &amp; sKey
+	cBody = fs_MAIL_BODY(fs_cL)
+	select case fsGetOS()
+	case &quot;WINDOWS&quot;
+		oMailer=createUnoService(&quot;com.sun.star.system.SimpleSystemMail&quot;)
+		oMailClient=oMailer.querySimpleMailClient()
+		oMessage=oMailClient.createSimpleMailMessage()
+		oMessage.setRecipient(cEMailAddress)
+		oMessage.setSubject(cSubject)	
+		attach_file(0)=cAttachmentURL
+		oMessage.setAttachement(attach_file()) &apos; not a typo 
+		oMailClient.sendSimpleMailMessage(oMessage, 0)
+	case &quot;MAC&quot;,&quot;OSX&quot;
+		&apos; SimpleCommand Mail fails to include address and subject, so we do
+		&apos; it with an osascript. We can&apos;t use the Tool - Options - Mail setting
+		&apos; showDialog (&quot;sGetURL,sKey,sMail: &quot; &amp;  sGetURL &amp; &quot; &quot;&amp;  sKey &amp; &quot; &quot; &amp;sMail)
+		OSXMail (cAttachmentURL,cSubject,cEMailAddress)
+	case else 
+		oMailer=createUnoService(&quot;com.sun.star.system.SimpleCommandMail&quot;)
+		oMailClient=oMailer.querySimpleMailClient()
+		oMessage=oMailClient.createSimpleMailMessage()
+		oMessage.setRecipient(cEMailAddress)
+		oMessage.setSubject(cSubject)	
+		attach_file(0)=cAttachmentURL
+		oMessage.setAttachement(attach_file()) &apos; not a typo 
+		oMailClient.sendSimpleMailMessage(oMessage, 0)
+		&apos;ShowDialog(fs_PLEASE_WAIT(fs_cL)) &apos; Linux may start the email program slowly...
+	end select
+	exit sub 
+	mailDocError:
+	msgBox (fs_UNKNOWN_ERROR(fs_cL),64,getBranding(bI_SPOKEN_BRANDING)) 
+	on Error goto 0
+end sub 
+
+function ShowDialog(optional sA, optional bCancelButton)
+	if ismissing (sA) then 
+		sA = &quot;TEST&quot;
+	endif
+	if ismissing (bCancelButton) then 
+		bCancelButton = false
+	endif
+	DialogLibraries.LoadLibrary(&quot;schooltools&quot;)
+	dim oDlg as object
+	dim oDlgModel as object
+	oDlg=CreateUnoDialog(GlobalScope.DialogLibraries.schooltools.schooltools )
+	oDlgModel = oDlg.Model 
+	oDlg.Title = getBranding(bI_SPOKEN_BRANDING)
+	oDlg.GetControl(&quot;CommandButton1&quot;).Label = fs_DIALOG_OK(fs_cL)
+	oDlg.GetControl(&quot;TextField1&quot;).Text=sA
+	oDlg.GetControl(&quot;ImageControl1&quot;).model.ImageURL=fsMyURL &amp; &quot;/images/&quot; &amp; getBranding(bI_LOGO_PNG)
+	if bCancelButton = false then
+		oDlg.GetControl(&quot;CommandButton2&quot;).Visible =false
+	else 
+		oDlg.GetControl(&quot;CommandButton2&quot;).Label = fs_DIALOG_CANCEL(fs_cL)
+	endif
+	if I_BRANDED=1 then
+		oDlg.GetControl(&quot;Label1&quot;).Text=getBranding(bI_SPOKEN_BRANDING)
+	else
+		oDlg.GetControl(&quot;Label1&quot;).Text=getBranding(bI_SPOKEN_BRANDING)
+	endif
+	select case fsGetOS()
+	case &quot;MAC&quot;,&quot;OSX&quot;
+		oDlg.GetControl(&quot;ImageControl1&quot;).model.helpText=getBranding(bI_SLOGAN)
+	case else 
+		oDlg.GetControl(&quot;ImageControl1&quot;).model.helpText=fs_F1_IS_HELP(fs_cL)
+	end select
+	if fbHelpIsInstalled then
+		oDlg.model.HelpURL=fsMyID &amp; &quot;/write_notes.xhp&quot;
+	else 
+		oDlg.model.HelpURL=&quot;&quot;
+	endif
+	ShowDialog = oDlg.execute() 
+end function
+
+sub OpenMyPage
+	dim oSvc As object
+	oSvc=createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
+	oSvc.execute(getBranding(bI_HOMEPAGE),&quot;&quot;,0)
+end sub 
+
+function fsGetPackageDirURL(sIdentifier as string) as string
+	dim oPIP As object
+	oPIP=GetDefaultContext().getByName( _
+		 &quot;/singletons/com.sun.star.deployment.PackageInformationProvider&quot;)
+	fsGetPackageDirURL=oPIP.getPackageLocation(sIdentifier)
+end function
+
+function fsGetOS() as string    
+	  select case getGUIType
+	  case 1: 
+	    fsGetOS=&quot;WINDOWS&quot;
+	  case 3: 
+	    fsGetOS=&quot;MAC&quot;
+	  case 4: 
+	    if Instr(Environ(&quot;URE_BOOTSTRAP&quot;),&quot;MacOS&quot;)&lt;&gt;0 then &apos; aka uname Darwin
+			fsGetOS=&quot;OSX&quot;  
+	    else 
+			fsGetOS=&quot;UNIX&quot;
+	    endif
+	  case else 
+		fsGetOS=&quot;UNKNOWN&quot;	  
+	  end select
+end function
+
+sub saveDocument
+&apos;We save the current version of the document
+&apos;Note that native OSX Lion programs save as you go, but
+&apos;programs like LibreOffice use the traditional warning
+&apos;to save unsaved changes when you attempt to close the 
+&apos;window.
+	dim oDoc as object
+	dim oDispatcher as object
+	dim s1 
+	oDoc   = ThisComponent.CurrentController.Frame
+	oDispatcher = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
+	oDispatcher.executeDispatch(oDoc, &quot;.uno:Save&quot;, &quot;&quot;, 0, array())
+end sub
+
+sub OSXMail (byval sGetURL,byval sKey,byval sRecipient)
+	&apos; To use accented file names, we need to make sure the script is saved in UTF-8. Compiled osascripts 
+	&apos; don&apos;t correctly interpret accented characters. This is why we create a script in UTF-8 each time.
+	
+	dim sSubject , sFile , sAttachment, sB, sQ as string
+	dim bWait as boolean
+	dim errorCode
+	bWait = false
+	sQ = Chr(34)
+	sSubject = sKey
+	sAttachment = ConvertFromURL(sGetURL)
+	sFile=fsTemporaryOSXVoiceScript
+	if isPureASCII (sAttachment) = false then
+		ShowDialog(fs_BAD_MAC_FILENAME(fs_cL) &amp; chr$(13) &amp; chr$(13) &amp; sAttachment)
+		&apos; The system might take a second or so to process this...
+		wait 1000
+		&apos; exit sub
+	endif
+	if fileExists (sFile) then
+		kill sFile
+	endif
+	sB =  OSMailScript ( sRecipient, sSubject, sAttachment)
+	&apos;showdialog (sB)
+	CreateFile(sFile,sB,&quot;utf-8&quot;)
+	errorCode=Shell (&quot;osascript&quot;, 0, sQ &amp; sFile &amp; sQ, bWait)
+end sub 
+
+function OSMailScript (byval sRecipient as string, byval sSubject as string, byval sFileAttachment as string)
+	dim s32 as string
+	dim CR as string
+	CR = chr$(13)
+	sRecipient = fsReplaceText(sRecipient,chr$(34),&quot;\&quot; &amp; chr$(34) )
+	sSubject = fsReplaceText(sSubject,chr$(34),&quot;\&quot; &amp; chr$(34) )
+	sFileAttachment = fsReplaceText(sFileAttachment,chr$(34), &quot;\&quot; &amp; chr$(34) )
+	s32 = &quot;#!/usr/bin/osascript&quot; &amp; CR
+	s32 = s32 &amp; &quot;-- &quot; &amp; getBranding(bI_SPOKEN_BRANDING) &amp; &quot; created this osascript using &quot; &amp; fsGetSetting(&quot;ooname&quot;)&amp; &quot; &quot; &amp; fsNow &amp; CR
+	s32 = s32 &amp; &quot;-- The script is adapted from https://github.com/eelco/mailfile/blob/master/mailfile &quot; &amp; CR
+	s32 = s32 &amp; &quot;-- Send an attachment to the recipient. if the file path isn&apos;t good, no file is attached.&quot; &amp; CR
+	s32 = s32 &amp; &quot;on run argv&quot; &amp; CR
+	s32 = s32 &amp; &quot;	set pwd to system attribute &quot;&quot;PWD&quot;&quot;&quot; &amp; CR
+	s32 = s32 &amp; &quot;   tell application &quot;&quot;Mail&quot;&quot;&quot; &amp; CR
+	s32 = s32 &amp; &quot;		try&quot; &amp; CR
+	s32 = s32 &amp; &quot;			set MySubject to &quot;&quot;&quot; &amp; sSubject &amp; &quot;&quot;&quot; &quot; &amp; CR
+	s32 = s32 &amp; &quot;			set composeMessage to make new outgoing message at beginning with properties {visible:true, subject:MySubject}&quot;&amp; CR
+	s32 = s32 &amp; &quot;		end try&quot; &amp; CR
+	s32 = s32 &amp; &quot;		tell composeMessage&quot; &amp; CR
+	s32 = s32 &amp; &quot;			set recipientAddr to &quot;&quot;&quot; &amp; sRecipient &amp; &quot;&quot;&quot;&quot; &amp; CR
+	s32 = s32 &amp; &quot;			make new to recipient at end of to recipients with properties {address:recipientAddr}&quot; &amp; CR
+	s32 = s32 &amp; &quot;			set fileName to &quot;&quot;&quot; &amp; sFileAttachment &amp; &quot;&quot;&quot; &quot; &amp; CR
+	s32 = s32 &amp; &quot;			if fileName does not start with &quot;&quot;/&quot;&quot; then&quot; &amp; CR
+	s32 = s32 &amp; &quot;				set fileName to pwd &amp; &quot;&quot;/&quot;&quot; &amp; fileName&quot; &amp; CR
+	s32 = s32 &amp; &quot;			end if&quot; &amp; CR
+	s32 = s32 &amp; &quot;			tell content&quot; &amp; CR
+	s32 = s32 &amp; &quot;				make new attachment with properties {file name:fileName} at after the last paragraph&quot; &amp; CR
+	s32 = s32 &amp; &quot;			end tell&quot; &amp; CR
+	s32 = s32 &amp; &quot;		end tell&quot; &amp; CR
+	s32 = s32 &amp; &quot;		activate&quot; &amp; CR
+	s32 = s32 &amp; &quot;	end tell&quot; &amp; CR
+	s32 = s32 &amp; &quot;end run&quot; &amp; CR
+	OSMailScript = s32
+end function
+
+function fbHelpIsInstalled as boolean
+	dim sA as string
+	sA=fsPathSettings(&quot;Help&quot;) &amp; &quot;/&quot;
+	if fileExists( sA &amp; fsGetSetting(&quot;language&quot;)) then
+		fbHelpIsInstalled=true
+	elseif fileExists(sA &amp; &quot;en&quot;) then
+		fbHelpIsInstalled=true
+	elseif fileExists(sA &amp; &quot;fr&quot;) then
+		fbHelpIsInstalled=true
+	elseif fileExists(sA &amp; &quot;de&quot;) then
+		fbHelpIsInstalled=true
+	else
+		fbHelpIsInstalled=false
+	endif
+end function
+
+function fsPathSettings(sPathType as string,Optional bshowall As Boolean,Optional ListIndex as integer) as string
+	&apos; Gets a special configured PathSetting
+	dim oSettings,oPathSettings As object
+	dim sPath as string
+	dim PathList() as string
+	dim MaxIndex as integer
+	dim oPS As object
+	oPS=createUnoService(&quot;com.sun.star.util.PathSettings&quot;)
+
+  	if Not ismissing(bShowall) then
+		if bShowAll then
+			ShowPropertyValues(oPS)
+			exit function
+		endif
+	endif
+ 	sPath=oPS.getPropertyValue(sPathType)
+	if Not ismissing(ListIndex) then
+		&apos; Share And User-Directory
+		if Instr(1,sPath,&quot;;&quot;) &lt;&gt; 0 then
+			PathList=arrayoutofString(sPath,&quot;;&quot;,MaxIndex)
+			if ListIndex &lt;=MaxIndex then
+				sPath=PathList(ListIndex)
+			else
+				Msgbox( fsStringLanguage( fiL10nSTRING_CANNOT_BE_ANALYZED,fsGetLanguage()),48,_
+					fsStringLanguage( fiL10nADDON_READ_THE_SELECTION,fsGetLanguage()))
+			endif
+		endif
+	endif
+	if Instr(1,sPath,&quot;;&quot;)=0 then
+		fsPathSettings=ConvertToUrl(sPath)
+	else
+		fsPathSettings=sPath
+	endif
+end function
+
+function isPureASCII (byval sA)
+	sA= fsEscapeStr (sA)
+	sA = fsReplaceText(sA,&quot;%09&quot;, &quot;&quot;)
+	sA = fsReplaceText(sA,&quot;%0A&quot;, &quot;&quot;)
+	sA = fsReplaceText(sA,&quot;%0D&quot;, &quot;&quot;)
+	sA = fsReplaceText(sA,&quot;%20&quot;, &quot;&quot;)
+	sA = fsReplaceText(sA,&quot;%22&quot;, &quot;&quot;)
+	sA = fsReplaceText(sA,&quot;%25&quot;, &quot;&quot;)
+	sA = fsReplaceText(sA,&quot;%26&quot;, &quot;&quot;)
+	sA = fsReplaceText(sA,&quot;%2F&quot;, &quot;&quot;)
+	sA = fsReplaceText(sA,&quot;%2B&quot;, &quot;&quot;)
+	sA = fsReplaceText(sA,&quot;%3B&quot;, &quot;&quot;)
+	sA = fsReplaceText(sA,&quot;%3C&quot;, &quot;&quot;)
+	sA = fsReplaceText(sA,&quot;%3E&quot;, &quot;&quot;)
+	sA = fsReplaceText(sA,&quot;%3F&quot;, &quot;&quot;)
+	sA = fsReplaceText(sA,&quot;%5B&quot;, &quot;&quot;)
+	sA = fsReplaceText(sA,&quot;%5C&quot;, &quot;&quot;)
+	sA = fsReplaceText(sA,&quot;%5D&quot;, &quot;&quot;)
+	sA = fsReplaceText(sA,&quot;%5E&quot;, &quot;&quot;)
+	sA = fsReplaceText(sA,&quot;%60&quot;, &quot;&quot;)
+	sA = fsReplaceText(sA,&quot;%7B&quot;, &quot;&quot;)
+	sA = fsReplaceText(sA,&quot;%7C&quot;, &quot;&quot;)
+	sA = fsReplaceText(sA,&quot;%7D&quot;, &quot;&quot;)
+	if instr (sA,&quot;%&quot;) &lt;&gt; 0 then
+		isPureASCII = false
+	else
+		isPureASCII = true
+	endif
+end function
+</script:module>

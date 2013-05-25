@@ -1,0 +1,89 @@
+.at-bibliography {
+margin-left: 1.5em;
+text-indent: -1.5em;
+}
+.at-highlighted {
+background-color: yellow;
+color: black;
+}
+.at-information {
+margin-left: 0px; 
+}
+.at-manuscript {
+line-height: 2;
+margin-left: 0px;
+font-size: 125%;
+font-family: courier, "courier new", monotype;
+}
+.at-novel {
+margin-left: 0px;
+text-indent: 1.5em;
+text-align: justify;
+margin-bottom: 1.5 px
+margin-top: 1.5 px
+}
+.at-poetry {
+margin-left: 7%;
+line-height: 1.2;
+}
+.at-swiss {
+margin-left: 0px;
+font-size: 125%;
+font-family: arial, helvetica, sans-serif;
+}
+.body {
+display: block;
+white-space: pre-wrap;
+}
+.calibre {
+display: block;
+line-height: 1.2;
+}
+.calibre1 {
+height: auto;
+width: auto;
+}
+.s {
+display: block;
+font-size: 0.77419em;
+font-style: italic;
+font-variant: normal;
+font-weight: normal;
+letter-spacing: 0;
+text-align: center;
+text-indent: 0%;
+text-transform: none;
+}
+.t {
+text-align: center;
+text-transform: none;
+}
+.u33 {
+display: block;
+font-size: 1.29167em;
+font-family: arial, helvetica, sans-serif;
+font-variant: bold;
+font-weight: bold;
+letter-spacing: 0;
+line-height: 1.2;
+text-align: center;
+text-indent: 0%;
+text-transform: none;
+background-color: lightgreY;
+}
+.u34 {
+display: block;
+font-size: 0.77419em;
+font-family: 'courier new', courier, monospace;
+font-variant: normal;
+font-weight: normal;
+letter-spacing: 0;
+line-height: 1.2;
+text-align: left;
+text-indent: 0%;
+text-transform: none;
+white-space: pre;
+}
+span.ccache1 {
+display:none;
+}
