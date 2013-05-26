@@ -9,7 +9,7 @@
         <history>
             <created date="2012-04-25T00:00:00">
                 James Holgate</created>
-            <lastedited date="2012-12-14T11:20:00">
+            <lastedited date="2013-05-26T09:23:00">
             </lastedited>
         </history>
     </meta>
@@ -80,13 +80,13 @@
         </paragraph>
   	 <list>
             <listitem>
-                Sur le bureau, utilisez <link href="http://www.readium.org/" name="http://www.readium.org/">Readium</link> Extension pour Chrome ou Chromium ou <link href="https://addons.mozilla.org/en-US/firefox/addon/epubreader/" name="https://addons.mozilla.org/en-US/firefox/addon/epubreader/">ePub Reader</link> Extension pour Firefox. Alternativement, vous pouvez ouvrir <link href="http://www.magicscroll.net/" name="http://www.magicscroll.net/">MagicScroll</link> dans un navigateur comme Internet Explorer ou Safari.
+                Sur le bureau, utilisez <link href="http://www.readium.org/" name="http://www.readium.org/">Readium</link> Extension pour Chrome ou Chromium ou <link href="https://addons.mozilla.org/en-US/firefox/addon/epubreader/" name="https://addons.mozilla.org/en-US/firefox/addon/epubreader/">ePub Reader</link> Extension pour Firefox. Alternativement, vous pouvez ouvrir <link href="https://play.google.com/books" name="https://play.google.com/books">Google Play Books</link> ou <link href="http://www.magicscroll.net/" name="http://www.magicscroll.net/">MagicScroll</link> dans un navigateur comme Internet Explorer ou Safari.
             </listitem>
             <listitem>
                 Pour la plupart des utilisateurs d’Apple iOS, <link href="https://itunes.apple.com/fr/app/ibooks/id364709193?mt=8" name="https://itunes.apple.com/fr/app/ibooks/id364709193?mt=8">iBooks</link> est un bon choix. Sur les versions actuelles de l’iOS, vous pouvez lire le texte à haute voix en sélectionnant un texte. Utiliser <emph>Réglages - Général - Accessibilité - Énoncer la sélection</emph>. Activer le support pour les lecteurs aveugles avec VoiceOver. Utiliser <emph>Réglages - Général - Accessibilité - Triple clic - VoiceOver</emph>. Avec VoiceOver activé, appuyez sur une image pour entendre le texte de remplacement. Pour lire le texte à haute voix en continu, appuyez sur le centre de l’écran, puis balayez vers le bas avec deux doigts. Pour mettre en pause la lecture, appuyez avec deux doigts. Pour parcourir un livre, appuyez sur le centre de l’écran, puis faites glisser horizontalement avec trois doigts.
             </listitem>
             <listitem>
-                Le magasin Android a plusieurs options pour livres ePub. Le programme <link href="http://www.fbreader.org/" name="http://www.fbreader.org/">FBReader</link> peut lire à haute voix des livres ePub avec un plug-in optionnel. Le navigateur <link href="http://dolphin-browser.com/" name="http://dolphin-browser.com/">Dolphin</link> a une ePub plug-in pour ePub. Vous pouvez sélectionner du texte, puis utiliser l’application <link href="https://play.google.com/store/apps/details?id=com.ideedle.software.talkadroidpro" name="https://play.google.com/store/apps/details?id=com.ideedle.software.talkadroidpro">Talkadroid</link> pour lire la sélection à haute voix. Si vous n’avez pas besoin de synthèse vocale, le lecteur <link href="http://www.bluefirereader.com/bluefire-reader.html" name="http://www.bluefirereader.com/bluefire-reader.html">BlueFire</link> est un bon choix.
+                Le magasin Android a plusieurs options pour livres ePub. <link href="https://play.google.com/books" name="https://play.google.com/books"> Google Play Books</link> peut montrer des livres que vous avez téléchargés. Google Play Books est aussi capable de lire la plupart des livres à haute voix. Le programme <link href="http://www.fbreader.org/" name="http://www.fbreader.org/">FBReader</link> peut lire à haute voix des livres ePub avec un plug-in optionnel. Le navigateur <link href="http://dolphin-browser.com/" name="http://dolphin-browser.com/">Dolphin</link> a une ePub plug-in pour ePub. Vous pouvez sélectionner du texte, puis utiliser l’application <link href="https://play.google.com/store/apps/details?id=com.ideedle.software.talkadroidpro" name="https://play.google.com/store/apps/details?id=com.ideedle.software.talkadroidpro">Talkadroid</link> pour lire la sélection à haute voix. Si vous n’avez pas besoin de synthèse vocale, le lecteur <link href="http://www.bluefirereader.com/bluefire-reader.html" name="http://www.bluefirereader.com/bluefire-reader.html">BlueFire</link> est un bon choix.
             </listitem>
             <listitem>
                 Vous pouvez transférer des livres électroniques aux appareils mobiles via e-mail, blog, ou un service « nuage » .
