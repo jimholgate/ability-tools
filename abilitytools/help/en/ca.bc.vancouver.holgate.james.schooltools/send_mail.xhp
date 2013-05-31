@@ -49,7 +49,10 @@
         </paragraph>
         <list>
             <listitem>
-                You can set a default destination for publishing. The extension remembers the destination. You can set up some online services to save emailed documents so that they are available on all your computers and mobile devices. Students creating presentations can easily email their presentations to their teacher or to the classroom blogging email address so that their presentation automatically appears on the blog.
+                You can set a default destination for publishing. The extension remembers the destination.
+            </listitem>
+            <listitem>
+                Some on-line document storage, blogging, and group project services can use a special email address to upload documents. The documents are available on connected computers and mobile devices.
             </listitem>
             <listitem>
                 To set a destination, enter an email address.
