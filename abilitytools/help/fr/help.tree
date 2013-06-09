@@ -1,16 +1,16 @@
 <?xml version="1.0" encoding="UTF-8"?> 
 <tree_view version="24-Aug-2004">
-    <help_section application="aplusschooltools" id="aplusschooltools01" title="Utiles d'habilité">
-        <node id="aplusschooltools0101" title="Installation de Utiles d'habilité">
+    <help_section application="aplusschooltools" id="aplusschooltools01" title="Outils d’habilité">
+        <node id="aplusschooltools0101" title="Installation de Outils d’habilité">
             <topic id="aplusschooltools/ca.bc.vancouver.holgate.james.schooltools/install.xhp">Installation</topic>
         </node>
-        <node id="aplusschooltools0102" title="La utilisation d'Utiles d'habilité">
-            <topic id="aplusschooltools/ca.bc.vancouver.holgate.james.schooltools/write_notes.xhp">Ecrire les notes</topic>
+        <node id="aplusschooltools0102" title="La utilisation d’Outils d’habilité">
+            <topic id="aplusschooltools/ca.bc.vancouver.holgate.james.schooltools/write_notes.xhp">Écrire les notes</topic>
             <topic id="aplusschooltools/ca.bc.vancouver.holgate.james.schooltools/assistant.xhp">Assistant</topic>
             <topic id="aplusschooltools/ca.bc.vancouver.holgate.james.schooltools/send_mail.xhp">Envoi des présentations</topic>
         </node>
         <node id="aplusschooltools0103" title="Outils d'habilité en-ligne">
-            <topic id="aplusschooltools/ca.bc.vancouver.holgate.james.schooltools/online.xhp">On-line Information</topic>
+            <topic id="aplusschooltools/ca.bc.vancouver.holgate.james.schooltools/online.xhp">Outils d’habilité en-ligne</topic>
         </node>
     </help_section>
 </tree_view>

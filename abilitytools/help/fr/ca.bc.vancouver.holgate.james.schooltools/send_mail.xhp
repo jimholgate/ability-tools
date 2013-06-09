@@ -15,13 +15,13 @@
     </meta>
     <body>
         <paragraph role="heading" id="send_mail1" xml-lang="fr-FR" level="1">
-            La utilisation des Outils d'habilité</paragraph>
+            La utilisation des Outils d’habilité</paragraph>
         <paragraph role="heading" id="send_mail1.1" xml-lang="fr-FR" level="2">
             Envoi des présentations
         </paragraph>
         <list>
             <listitem>
-                Une fois que vous avez ajouté des notes à vos diapositives de la présentation, enregistrez votre document dans le format %PRODUCTNAME  normale (.odp).
+                Une fois que vous avez ajouté des notes à vos diapositives de la présentation, enregistrez votre document dans le format %PRODUCTNAME normale (.odp).
             </listitem>
             <listitem>
                 Utilisez un nom significatif pour le document, parce que l'extension va utiliser le nom pour le titre des documents.

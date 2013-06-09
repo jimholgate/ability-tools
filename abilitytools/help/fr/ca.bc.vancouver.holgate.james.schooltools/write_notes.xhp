@@ -29,7 +29,7 @@
             <listitem>
                 Cliquer sur 
                 <emph>
-                    Notepad</emph>
+                    Bloc Notes</emph>
                  et rédiger les notes et les questions.
             </listitem>
             <listitem>
@@ -43,7 +43,7 @@
             <listitem>
                 Dans l’éditeur de Impress, cliquez sur le bouton 
                 <emph>
-                    Notepad</emph>
+                    Bloc Notes</emph>
                 dans la barre de menu.
             </listitem>
             <listitem>
@@ -66,13 +66,13 @@
             <listitem>
                 Utiliser le bouton 
                 <emph>
-                    Lire le diaporama</emph>.
+                    Lire le projet</emph>.
             </listitem>
             <listitem>
                 Pour afficher une présentation en utilisant d’autres langues ou ressources Web, cliquez sur 
 		<emph>
-			Outils du Diaporama</emph>
-		et choisir une option du dialogue. Attention. Vous allez peut-être permettre à l’extension « Outil d’Habilité » d’envoyer du texte en clair à un programme ou service en ligne. Vous pouvez être responsable pour les frais de raccordement et de service. Vous affirmez que vous avez lu les conditions de service pour le prestataire de services en ligne, et s’engagent à les respecter. Vous comprenez que les conditions de service peuvent changer de temps en temps, et il est de votre responsabilité de veiller à la conformité. Les services en ligne peuvent être indisponibles. Ne comptez pas sur eux pour les services essentiels. Vérifiez les ressources Web avant de les utiliser devant un auditoire.   
+			Outils du Projet</emph>
+		et choisir une option du dialogue. Attention. Vous allez peut-être permettre à l’extension « Outils d’Habilité » d’envoyer du texte en clair à un programme ou service en ligne. Vous pouvez être responsable pour les frais de raccordement et de service. Vous affirmez que vous avez lu les conditions de service pour le prestataire de services en ligne, et s’engagent à les respecter. Vous comprenez que les conditions de service peuvent changer de temps en temps, et il est de votre responsabilité de veiller à la conformité. Les services en ligne peuvent être indisponibles. Ne comptez pas sur eux pour les services essentiels. Vérifiez les ressources Web avant de les utiliser devant un auditoire.   
             </listitem>
         </list>
         <paragraph role="heading" id="write_notes1.2" xml-lang="fr-FR" level="2">
@@ -139,7 +139,7 @@
                     Joindre à un messagerie...</emph>
 		Enregistrer la note, puis l’envoyer par e-mail. Pour modifier l’adresse de messagerie par défaut, cliquez sur le bouton
                 <emph>
-                    Exporter le Diaporama...</emph>
+                    Exporter le projet...</emph>
                  en mode présentation normale.
             </listitem>
          	<listitem>
@@ -158,7 +158,7 @@
             <listitem>
                 <emph>
                     OK</emph>
-                 Enregistrer les modifications à la note dans la présentation..
+                 Enregistrer les modifications à la note dans la présentation.
             </listitem>
             <listitem>
                 <emph>
