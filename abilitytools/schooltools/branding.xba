@@ -110,10 +110,10 @@ function getBranding(i as integer, optional sLanguage ) as string
 			sBranding(0) = &quot;shackleton&quot; &apos; This is used in determining file locations - one word in English
 			sBranding(1) = &quot;convert@shackleton.com&quot;
 			sBranding(2) = &quot;http://code.google.com/p/ability-tools/&quot;
-			sBranding(3) = &quot;Outils d&apos;habilité pour Shackleton &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp;&quot;!&quot;
+			sBranding(3) = &quot;Outils d’Habilité pour Shackleton &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp;&quot;!&quot;
 			sBranding(4) = &quot;my-publisher.png&quot;
-			sBranding(5) = &quot;Outils d&apos;habilité pour Shackleton peut produire les présentations parlantes.&quot;
-			sBranding(6) = &quot;Outils d&apos;habilité pour Shackleton&quot;
+			sBranding(5) = &quot;Outils d’Habilité pour Shackleton peut produire les présentations parlantes.&quot;
+			sBranding(6) = &quot;Outils d’Habilité pour Shackleton&quot;
 			sBranding(7) = &quot;brand-preview.png&quot;
 			sBranding(8) = &quot;googl-code-ability-tools.png&quot;
 			sBranding(9) = &quot;my-publisher.png&quot;
@@ -127,10 +127,10 @@ function getBranding(i as integer, optional sLanguage ) as string
 			sBranding(0) = &quot;AbilityTools&quot; &apos; This is used in determining file locations - one word in English
 			sBranding(1) = &quot;prof@mon-ecole.&quot; &amp; lcase (fsDocCountry)
 			sBranding(2) = &quot;http://code.google.com/p/ability-tools/&quot;
-			sBranding(3) = &quot;Outils d&apos;habilité édition d&apos;essai &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp;&quot;!&quot;
+			sBranding(3) = &quot;Outils d’Habilité édition d&apos;essai &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp;&quot;!&quot;
 			sBranding(4) = &quot;brand-preview.png&quot;
-			sBranding(5) = &quot;Outils d&apos;habilité édition d&apos;essai peut produire les documents accessibles.&quot;
-			sBranding(6) = &quot;Outils d&apos;habilité édition d&apos;essai&quot;
+			sBranding(5) = &quot;Outils d’Habilité édition d’essai peut produire les documents accessibles.&quot;
+			sBranding(6) = &quot;Outils d’Habilité édition d’essai&quot;
 			sBranding(7) = &quot;brand_42.png&quot;
 			sBranding(8) = &quot;googl-code-ability-tools.png&quot;
 			sBranding(9) = &quot;brand-import-preview.png&quot;
@@ -144,10 +144,10 @@ function getBranding(i as integer, optional sLanguage ) as string
 			sBranding(0) = &quot;AbilityTools&quot; &apos; This is used in determining file locations - one word in English
 			sBranding(1) = &quot;prof@mon-ecole.&quot; &amp; lcase (fsDocCountry)
 			sBranding(2) = &quot;http://code.google.com/p/ability-tools/&quot;
-			sBranding(3) = &quot;Outils d&apos;Habilité pour &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp;&quot;!&quot;
+			sBranding(3) = &quot;Outils d’Habilité pour &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp;&quot;!&quot;
 			sBranding(4) = &quot;brand.png&quot;
-			sBranding(5) = &quot;L&apos;Outils d&apos;Habilité peut produire les documents accessibles.&quot;
-			sBranding(6) = &quot;Outils d&apos;Habilité&quot;
+			sBranding(5) = &quot;L&apos;Outils d’Habilité peut produire les documents accessibles.&quot;
+			sBranding(6) = &quot;Outils d’Habilité&quot;
 			sBranding(7) = &quot;brand_42.png&quot;
 			sBranding(8) = &quot;googl-code-ability-tools.png&quot;
 			sBranding(9) = &quot;brand-import.png&quot;
@@ -344,7 +344,7 @@ function fsAboutSchoolToolsFrench
 	s1 = s1 &amp; &quot;&lt;h1 class=&quot;&quot;western&quot;&quot; align=center&gt;&lt;img src=&quot;&quot;https://sites.google.com/site/abilitytools/_/rsrc/1347215129769/config/customLogo.gif&quot;&quot; &quot; &amp; chr$(10)
 	s1 = s1 &amp; &quot;name=&quot;&quot;graphics1&quot;&quot; align=bottom border=0&gt;&lt;/p&gt;&quot; &amp; chr$(10)
 	s1 = s1 &amp; &quot;&lt;h1 class=&quot;&quot;western&quot;&quot; align=center&gt;&lt;a href=&quot;&quot;http://code.google.com/p/ability-tools/&quot;&quot;&gt;http://code.google.com/p/ability-tools/&lt;/a&gt;&lt;/h1&gt;&quot; &amp; chr$(10)
-	s1 = s1 &amp; &quot;&lt;p class=&quot;&quot;western&quot;&quot; align=left&gt;&lt;b&gt;Outils d&apos;Habilité&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;&lt;p class=&quot;&quot;western&quot;&quot; align=left&gt;&lt;b&gt;Outils d’Habilité&quot; &amp; chr$(10)
 	s1 = s1 &amp; &quot;&lt;/b&gt; peuvent utiliser &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp; &quot; pour la création des présentations qui parlent. &quot; &amp; chr$(10)
 	s1 = s1 &amp; &quot;Entrez le texte dans les notes de la présentation. &quot; &amp; chr$(10)
 	s1 = s1 &amp; &quot;Avec une application compatible, appareils mobiles peuvent lire vos notes avec la synthèse de la parole intégrée. &quot; &amp; chr$(10)
@@ -355,7 +355,7 @@ function fsAboutSchoolToolsFrench
 	s1 = s1 &amp; &quot;Le directoire META-INF contient une liste de fichiers dans le document « manifest.xml » . &quot; &amp; chr$(10)
 	s1 = s1 &amp; &quot;&lt;/p&gt;&quot; &amp; chr$(10)
 	s1 = s1 &amp; &quot;&lt;p class=&quot;&quot;western&quot;&quot; align=left&gt;&quot; &amp; chr$(10)
-	s1 = s1 &amp; &quot;Merci d&apos;utiliser Outils d&apos;Habilité.&quot; &amp; chr$(10)
+	s1 = s1 &amp; &quot;Merci d&apos;utiliser Outils d’Habilité.&quot; &amp; chr$(10)
 	s1 = s1 &amp; &quot;&lt;/p&gt;&quot; &amp; chr$(10)
 	s1 = s1 &amp; fsNotesListHTML()		
 	s1 = s1 &amp; &quot;&lt;/body&gt;&quot; &amp; chr$(10)
