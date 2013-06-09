@@ -1706,9 +1706,9 @@ function fsgetSlideAltContentText(byval i, optional bCleanit)
 		sB = fsCleanForXtml (sB)
 	endif
 	if sB = &quot;&quot; then
-		sB = fs_SLIDE(fs_cL)
+		sB = fs_SLIDE(fsDocLanguage) &amp; &quot; &quot; &amp; trim(str(i+1))
 	endif
-	fsgetSlideAltContentText = sB
+	fsgetSlideAltContentText = sB 
 end function
 
 sub writeEpubChapter (sUUID)

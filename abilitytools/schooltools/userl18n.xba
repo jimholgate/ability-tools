@@ -566,13 +566,86 @@ function fs_NO_ONLINE_LANGUAGE (cL)
 		fs_NO_ONLINE_LANGUAGE = getBranding ( bI_SPOKEN_BRANDING ) &amp; &quot; is not able to read this. Check the language.&quot;
 	end select
 end function
-
-function fs_SLIDE (cL)
+function fs_SLIDE(cL)
 	select case cL
-	case &quot;fr&quot;
-		fs_SLIDE = &quot;Diapositive&quot;
-	case else
-		fs_SLIDE = &quot;Slide&quot;
+	case &quot;af&quot; &apos;afrikaans
+		fs_SLIDE= &quot;Slide&quot;
+	case &quot;bg&quot; &apos;bulgarian
+		fs_SLIDE= &quot;лайд&quot;
+	case &quot;ca&quot; &apos;catalan
+		fs_SLIDE= &quot;Diapositive&quot;
+	case &quot;cs&quot; &apos;czech
+		fs_SLIDE= &quot;Snímek&quot;
+	case &quot;da&quot; &apos;danish
+		fs_SLIDE= &quot;dias&quot;
+	case &quot;de&quot; &apos;german
+		fs_SLIDE= &quot;Folie&quot;
+	case &quot;el&quot; &apos;greek
+		fs_SLIDE= &quot;Διαφάνεια&quot;
+	case &quot;en&quot; &apos;english
+		fs_SLIDE= &quot;Slide&quot;
+	case &quot;es&quot; &apos;spanish
+		fs_SLIDE= &quot;Apositiva&quot;
+	case &quot;et&quot; &apos;estonian
+		fs_SLIDE= &quot;Slaidi&quot;
+	case &quot;fi&quot; &apos;finnish
+		fs_SLIDE= &quot;Diaan&quot;
+	case &quot;fr&quot; &apos;french
+		fs_SLIDE= &quot;Diapositive&quot;
+	case &quot;ga&quot; &apos;irish
+		fs_SLIDE= &quot;sleamhnán&quot;
+	case &quot;hi&quot; &apos;hindi
+		fs_SLIDE= &quot;स्लाइड&quot;
+	case &quot;hu&quot; &apos;hungarian
+		fs_SLIDE= &quot;Dián&quot;
+	case &quot;id&quot; &apos;indonesian
+		fs_SLIDE= &quot;Slide&quot;
+	case &quot;is&quot; &apos;icelandic
+		fs_SLIDE= &quot;Slide&quot;
+	case &quot;it&quot; &apos;italian
+		fs_SLIDE= &quot;Diapositiva&quot;
+	case &quot;ja&quot;, &quot;jp&quot; &apos;japanese
+		fs_SLIDE= &quot;スライド&quot;
+	case &quot;ko&quot; &apos;korean
+		fs_SLIDE= &quot;슬라이드&quot;
+	case &quot;lv&quot; &apos;latvian
+		fs_SLIDE= &quot;Slide&quot;
+	case &quot;lt&quot; &apos;lithuanian
+		fs_SLIDE= &quot;Slīdēt&quot;
+	case &quot;mt&quot; &apos;maltese
+		fs_SLIDE= &quot;Slide&quot;
+	case &quot;nl&quot; &apos;dutch
+		fs_SLIDE= &quot;Dia&quot;
+	case &quot;no&quot;, &quot;nb&quot;, &quot;nn&quot; &apos;norwegian	
+		fs_SLIDE= &quot;Lysbilde&quot;
+	case &quot;pl&quot; &apos;polish
+		fs_SLIDE= &quot;Slajdów&quot;
+	case &quot;pt&quot; &apos;portuguese
+		fs_SLIDE= &quot;Slide&quot;
+	case &quot;ro&quot; &apos;romanian
+		fs_SLIDE= &quot;Diapozitiv&quot;
+	case &quot;ru&quot; &apos;russian
+		fs_SLIDE= &quot;Слайд&quot;
+	case &quot;sk&quot; &apos;slovak
+		fs_SLIDE= &quot;Snímka&quot;
+	case &quot;sl&quot; &apos;slovenian
+		fs_SLIDE= &quot;Diapozitiv&quot;
+	case &quot;sv&quot; &apos;swedish
+		fs_SLIDE= &quot;Bild&quot;
+	case &quot;tl&quot; &apos;tagalog
+		fs_SLIDE= &quot;Slide&quot;
+	case &quot;tr&quot; &apos;turkish
+		fs_SLIDE= &quot;Slayt&quot;
+	case &quot;uk&quot; &apos;ukrainian
+		fs_SLIDE= &quot;слайдів&quot;
+	case &quot;zh&quot; &apos;Chinese
+		if Fsgetsetting(&quot;Country&quot;) &lt;&gt; &quot;tw&quot; then
+			fs_SLIDE= &quot;幻燈片&quot;
+		else
+			fs_SLIDE= &quot;幻灯片&quot;
+		endif
+	case else &apos;Simple English
+		fs_SLIDE= &quot;Slide&quot;
 	end select
 end function
 
