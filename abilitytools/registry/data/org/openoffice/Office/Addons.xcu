@@ -139,6 +139,38 @@
 				<value>_self</value>
 			</prop>
 		</node>
+		<node oor:name="schooltools.AddonMenu.m021" oor:op="replace">
+			<prop oor:name="Context" oor:type="xs:string">
+				<value>com.sun.star.presentation.PresentationDocument</value>
+			</prop>
+				<prop oor:name="URL" oor:type="xs:string">
+					<value>vnd.sun.star.script:schooltools.schooltools.ToolBar11Pressed?language=Basic&amp;location=application</value>
+				</prop>
+			<prop oor:name="Title" oor:type="xs:string">
+				<value>Notepad...</value>
+				<value xml:lang="en">Notepad...</value>
+				<value xml:lang="fr">Bloc Notes...</value>
+			</prop>
+			<prop oor:name="Target" oor:type="xs:string">
+				<value>_self</value>
+			</prop>
+		</node>
+		<node oor:name="schooltools.AddonMenu.m022" oor:op="replace">
+			<prop oor:name="Context" oor:type="xs:string">
+				<value>com.sun.star.presentation.PresentationDocument</value>
+			</prop>
+				<prop oor:name="URL" oor:type="xs:string">
+					<value>vnd.sun.star.script:schooltools.schooltools.ToolBar12Pressed?language=Basic&amp;location=application</value>
+				</prop>
+				<prop oor:name="Title" oor:type="xs:string">
+					<value>Read Project</value>
+					<value xml:lang="en">Read Project</value>
+					<value xml:lang="fr">Lire le Projet</value>
+				</prop>
+			<prop oor:name="Target" oor:type="xs:string">
+				<value>_self</value>
+			</prop>
+		</node>
 		<node oor:name="schooltools.AddonMenu.m05" oor:op="replace">
 			<prop oor:name="Context" oor:type="xs:string">
 				<value>com.sun.star.presentation.PresentationDocument</value>
