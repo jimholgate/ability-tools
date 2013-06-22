@@ -13,13 +13,16 @@ sub textMagnifierButton
 		if f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Enabled then
 			setNoteLanguage (f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Text)
 		endif
-		sB = fsSaveSchoolToolFile(getBranding( bI_SPOKEN_BRANDING ), &quot;ODF Presentation (.odp)&quot;,&quot;*.odp&quot;)
+		sB = left (sA, iGetBreakPoint(sA, 30))
+		if len(sB) = 0 then 
+			sB = getBranding( bI_SPOKEN_BRANDING )
+		endif
+		sB = fsSaveSchoolToolFile(sB , &quot;ODF Presentation (.odp)&quot;,&quot;*.odp&quot;)
 		if len (sB) &lt;&gt; 0 then
 			fsSaveAsPresentation(sB)
 		endif
 	endif
 end sub
-
 
 Function fsGetTextSelection() As String
 	Dim oDoc   As Object
