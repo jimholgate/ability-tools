@@ -3,7 +3,7 @@
     <meta>
         <topic id="aplusschooltools/ca.bc.vancouver.holgate.james.schooltools/write_notes.xhp" indexer="include" status="PUBLISH">
             <title id="write_notes" xml-lang="fr-FR">
-                Ecrire les notes</title>
+                Écrire les notes</title>
             <filename>/ca.bc.vancouver.holgate.james.schooltools/write_notes.xhp</filename>
         </topic>
         <history>
@@ -15,7 +15,7 @@
     </meta>
     <body>
         <paragraph role="heading" id="write_notes1" xml-lang="fr-FR" level="1">
-            La utilisation d’Outils d’Habilité</paragraph>
+            La utilisation de l’extension Outils d’Habilité</paragraph>
         <paragraph role="heading" id="write_notes1.0" xml-lang="fr-FR" level="2">
             Apropos
         </paragraph>
@@ -33,7 +33,7 @@
                  et rédiger les notes et les questions.
             </listitem>
             <listitem>
-                L’extension produit les livres electroniques qui sont optimisés pour la lecture de textes à haute voix. L’extension utilise le texte dans la diapositive comme texte alternatif pour l’image de la diapositive dans le livre.
+                L’extension produit les livres electroniques optimisés pour la lecture de textes à haute voix. L’extension utilise le texte dans la diapositive comme texte alternatif pour l’image de la diapositive dans le livre.
             </listitem>
         </list>
         <paragraph role="heading" id="write_notes1.3" xml-lang="fr-FR" level="2">
@@ -41,7 +41,7 @@
         </paragraph>
         <list>
             <listitem>
-                Dans l’éditeur de Impress, cliquez sur le bouton 
+                Dans l’éditeur %PRODUCTNAME Impress, cliquez sur le bouton 
                 <emph>
                     Bloc Notes</emph>
                 dans la barre de menu.
@@ -56,7 +56,7 @@
                     OK</emph>.
             </listitem>
             <listitem>
-                Si vous n’entrez pas de texte dans une note, l’extension vont vous inviter à ecrire du texte lorsque vous écoutez le diaporama. Si vous désirez une note blanc, entrez un espace unique dans la note.
+                Si vous n’entrez pas de texte dans une note, l’extension vont vous inviter à écrire du texte lorsque vous écoutez le diaporama. Si vous désirez une note blanc, entrez un espace unique dans la note.
             </listitem>
         </list>
         <paragraph role="heading" id="write_notes1.1" xml-lang="fr-FR" level="2">

@@ -865,7 +865,9 @@ function fsSchoolToolsInputBox(optional sMsg as string, optional sTitle as strin
 	else
 		fsSchoolToolsInputBox=&quot;&quot;
 		on error resume next
-		ThisComponent.Presentation.End
+		if ThisComponent.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) then
+			ThisComponent.Presentation.End
+		endif
 	endif
 end function
 
@@ -1065,7 +1067,7 @@ end function
 
 function fsGuessNoteLanguage
 	on error goto fsGuessNoteLanguageErr
-	  	if fBextensionOK (&quot;odp&quot;, ThisComponent.getURL()) then 
+	  	if fBextensionOK (&quot;odp&quot;, ThisComponent.getURL()) and thisComponent.SupportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) then 
 			&apos; You saved the document, so we use the language you chose for the slide note
 			fsGuessNoteLanguage = fsLanguageOfNote1 (fnCurrentCard)
 		else
@@ -1074,6 +1076,7 @@ function fsGuessNoteLanguage
 		exit function
 		fsGuessNoteLanguageErr:
 		fsGuessNoteLanguage = fsLanguageCountryEnvironment
+		
 end function
 
 sub updateLanguageDisplay
