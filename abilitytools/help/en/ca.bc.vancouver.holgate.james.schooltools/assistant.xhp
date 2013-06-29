@@ -9,16 +9,16 @@
         <history>
             <created date="2013-01-04T09:00:00">
                 James Holgate</created>
-            <lastedited date="2013-01-04T10:40:00">
+            <lastedited date="2013-06-29T10:40:00">
             </lastedited>
         </history>
     </meta>
     <body>
         <bookmark branch="hid/ca.bc.vancouver.holgate.james.schooltools_openoffice_aplusschooltools:schooltools0006" xml-lang="en-US" id="BOOKMARK0006"/>
         <paragraph role="heading" id="online1" xml-lang="en-US" level="1">
-            Ability Tools Assistant</paragraph>
+            Using Ability Tools</paragraph>
         <paragraph role="heading" id="online1.1" xml-lang="en-US" level="2">
-            Information
+            Assistant
         </paragraph>
         <paragraph>
             Ability Tool Assistants can help you write about your contacts or your photos. You can use the Assistant to help you review books, products or services. Fill in the dialogue, then choose a photo. The Assistants create documents embedded with machine-readable xhtml microformat code, so they are ready to publish in a blog or in an electronic book. Read the documentation for your blogging platform to find out how to edit source or how to embed xhtml code in your blog. You can find out more about microformats and xhtml at the microformats.org wiki.
