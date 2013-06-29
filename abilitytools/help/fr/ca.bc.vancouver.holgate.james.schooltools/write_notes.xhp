@@ -9,13 +9,13 @@
         <history>
             <created date="2012-04-25T00:00:00">
                 James Holgate</created>
-            <lastedited date="2013-05-26T09:23:00">
+            <lastedited date="2013-06-29T09:23:00">
             </lastedited>
         </history>
     </meta>
     <body>
         <paragraph role="heading" id="write_notes1" xml-lang="fr-FR" level="1">
-            La utilisation de l’extension Outils d’Habilité</paragraph>
+            Utilisation</paragraph>
         <paragraph role="heading" id="write_notes1.0" xml-lang="fr-FR" level="2">
             Apropos
         </paragraph>
@@ -102,7 +102,7 @@
             <listitem>
                 <emph>
                     Annuler</emph>
-                 Fermer Notepad sans enregistrer les modifications à la note dans la présentation.
+                 Fermer le dialogue sans enregistrer les modifications à la note dans la présentation.
             </listitem>
             <listitem>
                 <emph>
