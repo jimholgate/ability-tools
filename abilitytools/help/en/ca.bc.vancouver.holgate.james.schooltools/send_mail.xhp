@@ -9,7 +9,7 @@
         <history>
             <created date="2012-04-25T00:00:00">
                 James Holgate</created>
-            <lastedited date="2012-08-29T10:40:00">
+            <lastedited date="2013-06-29T10:40:00">
             </lastedited>
         </history>
     </meta>
@@ -21,19 +21,19 @@
         </paragraph>
         <list>
             <listitem>
-                Once you have added notes to your presentation slides, save your document in the normal %PRODUCTNAME .odp presentation format.
+                Once you have added notes to your presentation, save it in the %PRODUCTNAME ODF Presentation (.odp) format.
             </listitem>
             <listitem>
-                Use a meaningful name for the document, because it will be the name of the published presentation. Some email programs have problems with attaching files with names that include accents, Asian or complex characters. If your email program does not successfully attach a file, try renaming it with no special characters.
+                Use a meaningful name for the document, because it will be the name of the published project. Some email programs have problems with attaching files with names that include accents, Asian or complex characters. If your email program does not successfully attach a file, try renaming it with no special characters.
             </listitem>
             <listitem>
                 Click the
                 <emph>
-                    Export Presentation</emph>
+                    Export Project</emph>
                 button on the menu bar.
             </listitem>
             <listitem>
-                You can use your system's email program to publish the presentation.
+                The extension can use your system’s email program to publish the project.
             </listitem>
             <listitem>
                 For example, to publish an ePub 2 electronic book, export the presentation using the ePub format. You can use the 
@@ -49,7 +49,7 @@
         </paragraph>
         <list>
             <listitem>
-                You can set a default destination for publishing. The extension remembers the destination.
+                You can set a default email destination for publishing. The extension remembers the destination.
             </listitem>
             <listitem>
                 Some on-line document storage, blogging, and group project services can use a special email address to upload documents. The documents are available on connected computers and mobile devices.
@@ -58,7 +58,7 @@
                 To set a destination, enter an email address.
             </listitem>
             <listitem>
-                The extension will use your system's default email program.
+                The extension will use your system’s default email program.
             </listitem>
         </list>
         <paragraph role="heading" id="send_mail1.3" xml-lang="en-US" level="2">
@@ -66,7 +66,7 @@
         </paragraph>
         <list>
             <listitem>
-                The options shown in the Options menu of the main dialog describe what the tools do. The tools that are available to you depend on which tools are available on your platform and what other programs and support files you have installed. 
+                The tools that are available to you depend on which tools are available on your platform and what other programs and support files you have installed. 
             </listitem>
             <listitem>
                 If you have obtained the extension from a third-party distributor, the options may be more or less complete than the standard version. For example, a third party distributor may add a custom export format for their product, or remove features that are not useful in the context that the extension is being used. Because the software is licensed under several open licenses, distributors can change the software without the author’s permission, subject to the licensing terms of the software.
