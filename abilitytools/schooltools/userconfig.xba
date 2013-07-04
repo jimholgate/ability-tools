@@ -20,6 +20,7 @@
 option explicit
 Private f_dlgImpressToolsSetup As Variant
 
+
 sub ConfigureImpressImport
 	dim i as integer
 	dim n1 as integer
@@ -50,7 +51,9 @@ sub ConfigureImpressImport
 	f_dlgImpressToolsSetup.GetControl(&quot;Destination1&quot;).Model.helpText=fs_HOW_TO_USE_EMAIL(fs_cL)
 	f_dlgImpressToolsSetup.GetControl(&quot;Destination1&quot;).Visible=false
 	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox1&quot;).Visible=false
+	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox1&quot;).model.enabled=false
 	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox2&quot;).Visible=false
+	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox2&quot;).model.enabled=false
 	f_dlgImpressToolsSetup.GetControl(&quot;TextField2&quot;).Visible=false
 	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox0&quot;).Model.Text=config(fiNewArgument)
 	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox1&quot;).Model.Text=config(fiExternalArgument)
@@ -133,8 +136,10 @@ sub ConfigureImpressTools
 	f_dlgImpressToolsSetup.GetControl(&quot;Destination1&quot;).Visible=false
 	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox1&quot;).Model.Text=config(fiExternalArgument)
 	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox0&quot;).Visible=false
+	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox0&quot;).model.enabled=false
 	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox0&quot;).Model.Text=config(fiNewArgument)
 	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox1&quot;).Visible=false
+	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox1&quot;).model.enabled=false
 	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox2&quot;).Model.Text=config(fiInternalArgument)
 	f_dlgImpressToolsSetup.GetControl(&quot;TextField2&quot;).Model.Text=fsReplaceImpressToolsTokens(config(fiRandomKey))
 	f_dlgImpressToolsSetup.GetControl(&quot;TextField2&quot;).Visible=false
@@ -211,11 +216,13 @@ sub ConfigureImpressExport
 	f_dlgImpressToolsSetup.GetControl(&quot;Destination1&quot;).Model.Text=config(fiExternalCommand)
 	f_dlgImpressToolsSetup.GetControl(&quot;Destination1&quot;).Model.helpText=fs_HOW_TO_USE_EMAIL(fs_cL)
 	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox0&quot;).Visible=false
+	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox0&quot;).model.enabled=false
 	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox0&quot;).Model.Text=config(fiNewArgument)
 	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox1&quot;).Model.Text=config(fiExternalArgument)
 	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox1&quot;).Model.helpText=fsReplaceImpressToolsTokens(config(fiExternalArgument))
 	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox2&quot;).Model.Text=config(fiInternalArgument)
 	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox2&quot;).Visible=false
+	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox2&quot;).model.enabled=false
 	f_dlgImpressToolsSetup.GetControl(&quot;TextField2&quot;).Model.Text=fsReplaceImpressToolsTokens(config(fiRandomKey))
 	f_dlgImpressToolsSetup.GetControl(&quot;TextField2&quot;).Model.helpText=fs_ABOUT_KEY(fs_cL)
 	&apos;Update the labels with your language
@@ -223,7 +230,7 @@ sub ConfigureImpressExport
 	f_dlgImpressToolsSetup.Title = getBranding(bI_SPOKEN_BRANDING)
 	f_dlgImpressToolsSetup.GetControl(&quot;CommandButton1&quot;).Label = fs_OKAY(fs_cL)
 	f_dlgImpressToolsSetup.GetControl(&quot;CommandButton2&quot;).Label = fs_DIALOG_CANCEL(fs_cL)
-	f_dlgImpressToolsSetup.GetControl(&quot;ImageControl1&quot;).model.ImageURL=fsMyURL &amp; &quot;/images/&quot; &amp; getBranding(bI_LOGO_PNG)
+	f_dlgImpressToolsSetup.GetControl(&quot;ImageControl1&quot;).model.ImageURL=fsMyURL &amp; &quot;/images/&quot; &amp; getBranding(bI_EXPORT_PNG)
 	
 	select case fsGetOS()
 	case &quot;MAC&quot;,&quot;OSX&quot;

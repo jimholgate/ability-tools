@@ -70,6 +70,10 @@ function bI_TOOLS_PNG
 	bI_TOOLS_PNG = 10
 end function
 
+function bI_EXPORT_PNG 
+	bI_EXPORT_PNG = 11
+end function
+
 function hI_ABOUT_HTML &apos; full text of info page included with zipped packages
 	hI_ABOUT_HTML = 1
 end function
@@ -101,7 +105,7 @@ function getBranding(i as integer, optional sLanguage ) as string
 			sBranding(8) = &quot;googl-code-ability-tools.png&quot;
 			sBranding(9) = &quot;my-webcam.png&quot;
 			sBranding(10) = &quot;my-webcam.png&quot;
-			sBranding(11) = &quot;&quot;
+			sBranding(11) = &quot;my-webcam.png&quot;
 			sBranding(12) = &quot;&quot;
 			sBranding(13) = &quot;&quot;
 			sBranding(14) = &quot;&quot;
@@ -118,7 +122,7 @@ function getBranding(i as integer, optional sLanguage ) as string
 			sBranding(8) = &quot;googl-code-ability-tools.png&quot;
 			sBranding(9) = &quot;my-publisher.png&quot;
 			sBranding(10) = &quot;my-publisher.png&quot;
-			sBranding(11) = &quot;&quot;
+			sBranding(11) = &quot;my-publisher.png&quot;
 			sBranding(12) = &quot;&quot;
 			sBranding(13) = &quot;&quot;
 			sBranding(14) = &quot;&quot;
@@ -135,12 +139,12 @@ function getBranding(i as integer, optional sLanguage ) as string
 			sBranding(8) = &quot;googl-code-ability-tools.png&quot;
 			sBranding(9) = &quot;brand-import-preview.png&quot;
 			sBranding(10) = &quot;brand-tools-preview.png&quot;
-			sBranding(11) = &quot;&quot;
+			sBranding(11) = &quot;brand-export-preview.png&quot;
 			sBranding(12) = &quot;&quot;
 			sBranding(13) = &quot;&quot;
 			sBranding(14) = &quot;&quot;
 			sBranding(15) = &quot;&quot;
-		elseif I_BRANDED=1 then
+		else &apos; I_BRANDED=1 or unknown
 			sBranding(0) = &quot;AbilityTools&quot; &apos; This is used in determining file locations - one word in English
 			sBranding(1) = &quot;prof@mon-ecole.&quot; &amp; lcase (fsDocCountry)
 			sBranding(2) = &quot;http://code.google.com/p/ability-tools/&quot;
@@ -152,7 +156,7 @@ function getBranding(i as integer, optional sLanguage ) as string
 			sBranding(8) = &quot;googl-code-ability-tools.png&quot;
 			sBranding(9) = &quot;brand-import.png&quot;
 			sBranding(10) = &quot;brand-tools.png&quot;
-			sBranding(11) = &quot;&quot;
+			sBranding(11) = &quot;brand-export.png&quot;
 			sBranding(12) = &quot;&quot;
 			sBranding(13) = &quot;&quot;
 			sBranding(14) = &quot;&quot;
@@ -171,7 +175,7 @@ function getBranding(i as integer, optional sLanguage ) as string
 			sBranding(8) = &quot;googl-code-ability-tools.png&quot;
 			sBranding(9) = &quot;my-webcam.png&quot;
 			sBranding(10) = &quot;my-webcam.png&quot;
-			sBranding(11) = &quot;&quot;
+			sBranding(11) = &quot;my-webcam.png&quot;
 			sBranding(12) = &quot;&quot;
 			sBranding(13) = &quot;&quot;
 			sBranding(14) = &quot;&quot;
@@ -188,7 +192,7 @@ function getBranding(i as integer, optional sLanguage ) as string
 			sBranding(8) = &quot;googl-code-ability-tools.png&quot;
 			sBranding(9) = &quot;my-publisher.png&quot;
 			sBranding(10) = &quot;my-publisher.png&quot;
-			sBranding(11) = &quot;&quot;
+			sBranding(11) = &quot;my-publisher.png&quot;
 			sBranding(12) = &quot;&quot;
 			sBranding(13) = &quot;&quot;
 			sBranding(14) = &quot;&quot;
@@ -205,7 +209,7 @@ function getBranding(i as integer, optional sLanguage ) as string
 			sBranding(8) = &quot;googl-code-ability-tools.png&quot;
 			sBranding(9) = &quot;brand-import-preview.png&quot;
 			sBranding(10) = &quot;brand-tools-preview.png&quot;
-			sBranding(11) = &quot;&quot;
+			sBranding(11) = &quot;brand-export-preview.png&quot;
 			sBranding(12) = &quot;&quot;
 			sBranding(13) = &quot;&quot;
 			sBranding(14) = &quot;&quot;
@@ -222,7 +226,7 @@ function getBranding(i as integer, optional sLanguage ) as string
 			sBranding(8) = &quot;googl-code-ability-tools.png&quot;
 			sBranding(9) = &quot;brand-import.png&quot;
 			sBranding(10) = &quot;brand-tools.png&quot;
-			sBranding(11) = &quot;&quot;
+			sBranding(11) = &quot;brand-export.png&quot;
 			sBranding(12) = &quot;&quot;
 			sBranding(13) = &quot;&quot;
 			sBranding(14) = &quot;&quot;

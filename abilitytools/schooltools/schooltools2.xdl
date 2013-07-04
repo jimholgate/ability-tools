@@ -7,7 +7,7 @@
  </dlg:styles>
  <dlg:bulletinboard>
   <dlg:img dlg:style-id="0" dlg:id="ImageControl1" dlg:tab-index="0" dlg:left="0" dlg:top="0" dlg:width="200" dlg:height="58" dlg:scale-image="false">
-   <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:schooltools.userl18n.DialogLogo_MouseUp?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:schooltools.schooltools.Dialog2PictureClicked?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:img>
   <dlg:button dlg:id="CommandButton1" dlg:tab-index="1" dlg:left="151" dlg:top="150" dlg:width="43" dlg:height="18" dlg:default="true" dlg:value="OK" dlg:button-type="ok"/>
   <dlg:text dlg:id="Label2" dlg:tab-index="5" dlg:left="5" dlg:top="67" dlg:width="190" dlg:height="11" dlg:value="Destination"/>

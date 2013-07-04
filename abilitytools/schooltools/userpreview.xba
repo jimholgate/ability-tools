@@ -218,7 +218,7 @@ sub readSlideShowNote (Optional nSpeechResources)
 			readTheNotesScript(sA, nSpeechResources, nPage)
 		endif
 	else 
-		ShowDialog(fs_SAVE_BEFORE_SENDING(fs_cL))
+		ShowDialog(fs_SAVE_BEFORE_PROCEEDING(fs_cL))
 	endif
 end sub 
 

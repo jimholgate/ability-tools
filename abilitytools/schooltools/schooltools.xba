@@ -8,6 +8,8 @@ option explicit
 &apos;presentation.  Applications for Android and iOS tablets and mobile phones can use bandwidth 
 &apos;sparingly by using the device&apos;s built in speech synthesis to read the text aloud.
 
+Private oDlg as Variant
+
 function B_DEBUG 
 	&apos;Set B_DEBUG to true when testing the extension.
 	&apos;Set it to false when releasing the extension.
@@ -36,7 +38,7 @@ sub ToolBar11Pressed
 	if fBextensionOK (&quot;odp&quot;, cAttachmentURL) then 
 		SchoolToolsEditNotesDialog
 	else 
-		ShowDialog(fs_SAVE_BEFORE_SENDING(fs_cL))
+		ShowDialog(fs_SAVE_BEFORE_PROCEEDING(fs_cL))
 	endif
 end sub
 
@@ -46,8 +48,22 @@ sub ToolBar12Pressed
 	if fBextensionOK (&quot;odp&quot;, cAttachmentURL) then 
 		doToolBar12ReadNotes
 	else 
-		ShowDialog(fs_SAVE_BEFORE_SENDING(fs_cL))
+		ShowDialog(fs_SAVE_BEFORE_PROCEEDING(fs_cL))
 	endif
+end sub
+
+sub Dialog2PictureClicked
+	if f_dlgImpressToolsSetup.GetControl(&quot;ComboBox0&quot;).model.Enabled then 
+			synthesizeSpeech(f_dlgImpressToolsSetup.GetControl(&quot;ComboBox0&quot;).model.Text, fsLanguageCountryEnvironment)
+	elseif f_dlgImpressToolsSetup.GetControl(&quot;ComboBox1&quot;).model.Enabled then
+		synthesizeSpeech(f_dlgImpressToolsSetup.GetControl(&quot;ComboBox1&quot;).model.Text, fsLanguageCountryEnvironment)
+	elseif f_dlgImpressToolsSetup.GetControl(&quot;ComboBox2&quot;).model.Enabled then
+		synthesizeSpeech(f_dlgImpressToolsSetup.GetControl(&quot;ComboBox2&quot;).model.Text, fsLanguageCountryEnvironment)
+	endif
+end sub
+
+sub Dialog1PictureClicked
+	synthesizeSpeech(oDlg.GetControl(&quot;TextField1&quot;).Text, fsLanguageCountryEnvironment)
 end sub
 
 function fb_Online_Resource_CarteBlanche
@@ -138,7 +154,7 @@ sub SetupImpressTools (optional iToolType)
 			ShowDialog(fs_NO_ACTION(fs_cL))
 		end select 
 	else 
-		ShowDialog(fs_SAVE_BEFORE_SENDING(fs_cL))
+		ShowDialog(fs_SAVE_BEFORE_PROCEEDING(fs_cL))
 	endif
 end sub 
 
@@ -209,7 +225,7 @@ function ShowDialog(optional sA, optional bCancelButton)
 		bCancelButton = false
 	endif
 	DialogLibraries.LoadLibrary(&quot;schooltools&quot;)
-	dim oDlg as object
+	&apos; oDlg is a private object accessible to other functions when the dialog is showing
 	dim oDlgModel as object
 	oDlg=CreateUnoDialog(GlobalScope.DialogLibraries.schooltools.schooltools )
 	oDlgModel = oDlg.Model 

@@ -109,7 +109,7 @@ end function
 function fs_HOMEPAGE (cL)
 	select case cL
 	case &quot;fr&quot;
-		fs_HOMEPAGE = &quot;Page d&apos;accueil&quot;
+		fs_HOMEPAGE = &quot;Page d’accueil&quot;
 	case else
 		fs_HOMEPAGE = &quot;Home page&quot;
 	end select
@@ -218,18 +218,18 @@ end function
 function fs_EXPECTED_XHTML (cL)
 	select case cL
 	case &quot;fr&quot;
-		fs_EXPECTED_XHTML = &quot;Ce n&apos;est pas un document XHTML. Pour les documents ePub, vous devez utiliser XHTML. Vous pouvez installer l’éxtension Writer2xhtml, et utiliser la commande « Fichier -. Exporter ... - XHTML ». Pour plus d&apos;informations, consultez http://www.w3.org/TR/xhtml1/ &quot;
+		fs_EXPECTED_XHTML = &quot;Ce n’est pas un document XHTML. Pour les documents ePub, vous devez utiliser XHTML. Vous pouvez installer l’éxtension Writer2xhtml, et utiliser la commande « Fichier -. Exporter ... - XHTML ». Pour plus d’informations, consultez http://www.w3.org/TR/xhtml1/ &quot;
 	case else
 		fs_EXPECTED_XHTML = &quot;This is not an XHTML document. You must use valid XHTML in ePub documents. To create XHTML with Writer, install Writer2xhtml, then use “File - Export... - XHTML”. For more information, consult http://www.w3.org/TR/xhtml1/&quot;		
 	end select
 end function
 
-function fs_SAVE_BEFORE_SENDING (cL)
+function fs_SAVE_BEFORE_PROCEEDING (cL)
 	select case cL
 	case &quot;fr&quot;
-		fs_SAVE_BEFORE_SENDING = &quot;Enregister le document au format &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp; &quot;.odp avant de le publier.&quot;
+		fs_SAVE_BEFORE_PROCEEDING = &quot;Il faut enregister le document au format &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp; &quot; ODF présentation (.odp).&quot;
 	case else
-		fs_SAVE_BEFORE_SENDING = &quot;Please save the presentation as a &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp; &quot;.odp file before publishing it.&quot;
+		fs_SAVE_BEFORE_PROCEEDING = &quot;Please save this as a &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp; &quot; ODF presentation (.odp) file.&quot;
 	end select
 end function
 
@@ -245,7 +245,7 @@ end function
 function fs_WEBCAMTITLE (cL)
 	select case cL
 	case &quot;fr&quot;
-		fs_WEBCAMTITLE = &quot;Titre de l&apos;image ou de la page&quot;
+		fs_WEBCAMTITLE = &quot;Titre de l’image ou de la page&quot;
 	case else
 		fs_WEBCAMTITLE = &quot;Title of the image or page&quot;
 	end select
@@ -256,7 +256,7 @@ function fs_UNKNOWN_ERROR (cL)
 	case &quot;fr&quot;
 		fs_UNKNOWN_ERROR = fsGetSetting(&quot;ooname&quot;) &amp; &quot; ne peut pas utiliser un client auxiliaire. Verifiez la configuration.&quot;
 	case else
-		fs_UNKNOWN_ERROR = fsGetSetting(&quot;ooname&quot;) &amp; &quot; couldn&apos;t use a program or script with these settings. Check the settings.&quot;
+		fs_UNKNOWN_ERROR = fsGetSetting(&quot;ooname&quot;) &amp; &quot; couldn’t use a program or script with these settings. Check the settings.&quot;
 	end select
 end function
 
@@ -318,7 +318,7 @@ end function
 function fs_UNFIXABLE_XHTML (cL)
 	select case cL
 	case &quot;fr&quot;
-		fs_UNFIXABLE_XHTML = &quot;Désolé. Votre code XHTML n&apos;est pas valide. Les délimiteurs ne correspondent pas ou les délimiteurs sont incompatibles avec le format de publication.&quot;
+		fs_UNFIXABLE_XHTML = &quot;Désolé. Votre code XHTML n’est pas valide. Les délimiteurs ne correspondent pas ou les délimiteurs sont incompatibles avec le format de publication.&quot;
 	case else
 		fs_UNFIXABLE_XHTML = &quot;Your XHTML code does not appear to be valid. Mismatched or unrecognized delimiters.&quot;
 	end select
@@ -381,7 +381,7 @@ end function
 function fs_BAD_MAC_FILENAME (cL)
 	select case cL
 	case &quot;fr&quot;
-		fs_BAD_MAC_FILENAME = &quot;Le nom de fichier ou chemin d&apos;accès contient des caractères spéciaux. Ces caractères peuvent être incompatibles avec votre programme de messagerie. Si nécessaire, essayez de joindre le fichier directement à partir du programme de messagerie.&quot;
+		fs_BAD_MAC_FILENAME = &quot;Le nom de fichier ou chemin d’accès contient des caractères spéciaux. Ces caractères peuvent être incompatibles avec votre programme de messagerie. Si nécessaire, essayez de joindre le fichier directement à partir du programme de messagerie.&quot;
 	case else
 		fs_BAD_MAC_FILENAME = &quot;The filename or path contains special characters. These characters may be incompatible with your email program. if necessary, try attaching the file directly from the email program.&quot;
 	end select
@@ -462,9 +462,9 @@ end function
 function fs_WRITE_DRAW_SAVE (cL)
 	select case cL
 	case &quot;fr&quot;
-		fs_WRITE_DRAW_SAVE = &quot;Utiliser le bloc-notes pour ecrire des textes. Faire des diapositives. Enregistrez la présentation. Exportez le diaporama.&quot;
+		fs_WRITE_DRAW_SAVE = &quot;Utiliser le bloc-notes pour ecrire des textes. Faire des diapositives. Enregistrez la présentation. Publiez le projet.&quot;
 	case else
-		fs_WRITE_DRAW_SAVE = &quot;Use the notepad to write text. Add images and text to slides. Save the presentation. Export it.&quot;
+		fs_WRITE_DRAW_SAVE = &quot;Use the notepad to write text. Add images and text to slides. Save the presentation. Publish it.&quot;
 	end select
 end function
 
@@ -552,7 +552,7 @@ end function
 function fs_DOWNLOAD_FAILED (cL)
 	select case cL
 	case &quot;fr&quot;
-		fs_DOWNLOAD_FAILED = &quot;Téléchargement d&apos;un fichier a échoué.&quot;
+		fs_DOWNLOAD_FAILED = &quot;Téléchargement d’un fichier a échoué.&quot;
 	case else
 		fs_DOWNLOAD_FAILED = &quot;Downloading from the Internet failed.&quot;
 	end select
@@ -680,13 +680,12 @@ end function
 function fs_TITLE_NOT_UNIQUE (cL)
 	select case cL
 	case &quot;fr&quot;
-		fs_TITLE_NOT_UNIQUE = &quot;Le titre n&apos;est pas unique&quot;
+		fs_TITLE_NOT_UNIQUE = &quot;Le titre n’est pas unique&quot;
 	case else
 		fs_TITLE_NOT_UNIQUE = &quot;The title is not unique&quot;
 	end select
 end function
 
-&apos; 
 function fs_EXPORT_SELECTION (cL)
 	select case cL
 	case &quot;fr&quot;
@@ -708,9 +707,9 @@ end function
 function fs_INVALID_LINK (cL)
 	select case cL
 	case &quot;fr&quot;
-		fs_INVALID_LINK = &quot;La présentation a une image avec une référence non valide. Il peut être corrigé avec &quot;&quot; Edition - lien ... &quot;&quot; ou avec l&apos;extension Présentation Minimizer. &quot;
+		fs_INVALID_LINK = &quot;La présentation a une image avec une référence non valide. Il peut être corrigé avec &quot;&quot; Edition - lien ... &quot;&quot; ou avec l’extension Présentation Minimizer. &quot;
 	case else
-		fs_INVALID_LINK = &quot;The presentation includes an image that can’t be exported. You may be able to correct the problem with &quot;&quot; Edit - links ... - Break Link&quot;&quot; or by using the Presentation Minimizer Extension.&quot;
+		fs_INVALID_LINK = &quot;The presentation includes an image that can’t be published. You may be able to correct the problem with &quot;&quot; Edit - links ... - Break Link&quot;&quot; or by using the Presentation Minimizer Extension.&quot;
 	end select
 end function
 
@@ -1234,7 +1233,7 @@ end function
 function fs_WEBCAM (cL)
 	select case cL
 	case &quot;fr&quot;
-		fs_WEBCAM = &quot;URL de l&apos;image à insérer. Vérifiez que le lien reste bon.&quot;
+		fs_WEBCAM = &quot;URL de l’image à insérer. Vérifiez que le lien reste bon.&quot;
 	case else
 		fs_WEBCAM = &quot;URL of the image or resource to insert. Make sure the link is good.&quot;
 	end select
