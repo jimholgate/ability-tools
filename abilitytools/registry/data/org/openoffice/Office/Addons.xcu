@@ -96,9 +96,9 @@
 						<value>vnd.sun.star.script:schooltools.schooltools.ToolBar3Pressed?language=Basic&amp;location=application</value>
 					</prop>
 			<prop oor:name="Title" oor:type="xs:string">
-				<value>Export project</value>
-				<value xml:lang="en">Export Project</value>
-				<value xml:lang="fr">Exporter le projet</value>
+				<value>Share Project</value>
+				<value xml:lang="en">Share Project</value>
+				<value xml:lang="fr">Partager le projet</value>
 			</prop>
 				<prop oor:name="Target" oor:type="xs:string">
 						<value>_self</value>
@@ -179,9 +179,9 @@
 				<value>vnd.sun.star.script:schooltools.schooltools.ToolBar3Pressed?language=Basic&amp;location=application</value>
 			</prop>
 			<prop oor:name="Title" oor:type="xs:string">
-				<value>Export Project...</value>
-				<value xml:lang="en">Export Project...</value>
-				<value xml:lang="fr">Exporter le Projet...</value>
+				<value>Share Project...</value>
+				<value xml:lang="en">Share Project...</value>
+				<value xml:lang="fr">Partager le projet...</value>
 			</prop>
 			<prop oor:name="Target" oor:type="xs:string">
 				<value>_self</value>

@@ -1414,8 +1414,8 @@ sub SchoolToolsPasteToTextEditor ()
 	sB = f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text 
 	select case left (sB, 4)
 	case &quot;&lt;div&quot;
-		if len (sA) = 0 then
-			If ThisComponent.SupportsService(&quot;com.sun.star.sheet.SpreadsheetDocument&quot;) Then
+		if len (sA) &lt; 2 then
+			if ThisComponent.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) then
 				nPage=ThisComponent.getCurrentController.getCurrentPage().Number-1
 			else
 				nPage= -1
@@ -1427,8 +1427,8 @@ sub SchoolToolsPasteToTextEditor ()
 				sA &amp; chr(10) &amp; &quot;&lt;/div&gt;&quot; &amp; chr(10)
 		endif
 	case else
-		if len (sA) = 0 then
-			If ThisComponent.SupportsService(&quot;com.sun.star.sheet.SpreadsheetDocument&quot;) Then
+		if len (sA) &lt; 2 then
+			if ThisComponent.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) then
 				nPage=ThisComponent.getCurrentController.getCurrentPage().Number-1
 			else
 				nPage= -1
@@ -2157,6 +2157,7 @@ function ImpressAssembleHTML (Optional nStyle)
 	select case nStyle
 	case 5 &apos; styled for Unicode braille (no abbreviations) - this uses Unicode fonts that include Braille glyphs. We need to translate the characters
 		sA = sA &amp; &quot;&lt;style type=&quot;&quot;text/css&quot;&quot;&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;/*&lt;![CDATA[*/&quot; &amp; CR
 		sA = sA &amp; &quot;h1,h2,h3,h4,h5,p,li,strong,b,i,br,body {background-color:white; text-transform:lowercase; color:black; font-family: braille, &quot;&quot;dejavu sans&quot;&quot;, &quot;&quot;segoe ui symbol&quot;&quot;, &quot;&quot;apple symbols&quot;&quot;, monospace; font-weight:normal; font-size:64px; }&quot; &amp; CR		
 		sA = sA &amp; &quot;a { text-decoration: none; }&quot; &amp; CR
 		sA = sA &amp; &quot;span:hover, strong:hover, b:hover{ background-color:yellow; }&quot; &amp; CR
@@ -2165,9 +2166,11 @@ function ImpressAssembleHTML (Optional nStyle)
 		sA = sA &amp; &quot;h3 { margin-left:1em; }&quot; &amp; CR
 		sA = sA &amp; &quot;h4 { margin-left:1em; }&quot; &amp; CR
 		sA = sA &amp; &quot;hr{ visibility:hidden; }&quot; &amp; CR
+		sA = sA &amp; &quot;/*]]&gt;*/&quot; &amp; CR
 		sA = sA &amp; &quot;&lt;/style&gt;&quot; &amp; CR
 	case 4 &apos; styled for braille (no abbreviations)
 		sA = sA &amp; &quot;&lt;style type=&quot;&quot;text/css&quot;&quot;&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;/*&lt;![CDATA[*/&quot; &amp; CR
 		sA = sA &amp; &quot;h1,h2,h3,h4,h5,p,li,strong,b,i,br,body {background-color:white; text-transform:lowercase; color:black; font-family: Braille, SimBraille, &quot;&quot;Swell Braille&quot;&quot;, monospace; font-weight:normal; font-size:64px; }&quot; &amp; CR
 		sA = sA &amp; &quot;span:hover, strong:hover, b:hover{ text-transform:lowercase; background-color:yellow; font-family: Courier, &quot;&quot;Courier New&quot;&quot;, monospace; font-weight:normal; paddingBottom=25%; letter-spacing:.125em; font-size:64px; }&quot; &amp; CR	
 		sA = sA &amp; &quot;a { text-decoration: none; }&quot; &amp; CR
@@ -2176,9 +2179,11 @@ function ImpressAssembleHTML (Optional nStyle)
 		sA = sA &amp; &quot;h3 { margin-left:1em; }&quot; &amp; CR
 		sA = sA &amp; &quot;h4 { margin-left:1em; }&quot; &amp; CR
 		sA = sA &amp; &quot;hr{ visibility:hidden; }&quot; &amp; CR
+		sA = sA &amp; &quot;/*]]&gt;*/&quot; &amp; CR
 		sA = sA &amp; &quot;&lt;/style&gt;&quot; &amp; CR
 	case 103 &apos; styled for visually impaired - with highlighting of current selection
 		sA = sA &amp; &quot;&lt;style type=&quot;&quot;text/css&quot;&quot;&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;/*&lt;![CDATA[*/&quot; &amp; CR
 		sA = sA &amp; &quot;body { background-color:black; color:white; font-family: Arial, Helvetica, sans-serif; font-size:x-large }&quot; &amp; CR
 		sA = sA &amp; &quot;h1 { background-color:white; color:black; voice-rate: slow; rest-before: medium  }&quot; &amp; CR
 		sA = sA &amp; &quot;a { background-color:yellow; color:black; voice-rate: slow; rest-before: medium  }&quot; &amp; CR
@@ -2186,22 +2191,30 @@ function ImpressAssembleHTML (Optional nStyle)
 		sA = sA &amp; &quot;h1:hover, span:hover { background-color:red; }&quot; &amp; CR
 		sA = sA &amp; &quot;h2:hover,h3:hover,p:hover,li:hover { background-color:red; }&quot; &amp; CR
 		sA = sA &amp; &quot;div:hover { background-color:darkblue; }&quot; &amp; CR
+		sA = sA &amp; &quot;/*]]&gt;*/&quot; &amp; CR
 		sA = sA &amp; &quot;&lt;/style&gt;&quot; &amp; CR
 	case 3 &apos; styled for visually impaired
 		sA = sA &amp; &quot;&lt;style type=&quot;&quot;text/css&quot;&quot;&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;/*&lt;![CDATA[*/&quot; &amp; CR
 		sA = sA &amp; &quot;body { background-color:black; color:white; font-family: Arial, Helvetica, sans-serif; font-size:x-large }&quot; &amp; CR
 		sA = sA &amp; &quot;h1 { background-color:white; color:black; voice-rate: slow; rest-before: medium  }&quot; &amp; CR
 		sA = sA &amp; &quot;a { background-color:yellow; color:black; voice-rate: slow; rest-before: medium  }&quot; &amp; CR
+		sA = sA &amp; &quot;/*]]&gt;*/&quot; &amp; CR
 		sA = sA &amp; &quot;&lt;/style&gt;&quot; &amp; CR
 	case 2 &apos; styled with extension theme
 		sA = sA &amp; &quot;&lt;style type=&quot;&quot;text/css&quot;&quot;&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;/*&lt;![CDATA[*/&quot; &amp; CR
 		sA = sA &amp; &quot;body { background-color:&quot; &amp; fsBackgroundColour &amp; &quot;; color:&quot; &amp; fsTextColour &amp; &quot;; font-family: Arial, Helvetica, sans-serif }&quot; &amp; CR
 		sA = sA &amp; &quot;h1 { background-color:&quot; &amp; fsAccentColour &amp; &quot;; color:&quot; &amp; fsTextColour &amp; &quot; }&quot; &amp; CR
+		sA = sA &amp; &quot;/*]]&gt;*/&quot; &amp; CR
 		sA = sA &amp; &quot;&lt;/style&gt;&quot;
 	case 1 &apos; styled with helvetica, otherwise default
 		sA = sA &amp; &quot;&lt;style type=&quot;&quot;text/css&quot;&quot;&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;/*&lt;![CDATA[*/&quot; &amp; CR
 		sA = sA &amp; &quot;body {font-family: arial, helvetica, sans-serif }&quot; &amp; CR
+		sA = sA &amp; &quot;/*]]&gt;*/&quot; &amp; CR
 		sA = sA &amp; &quot;&lt;/style&gt;&quot;
+
 	case else  &apos;default style
 		&apos;
 	end select

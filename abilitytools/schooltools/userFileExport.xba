@@ -10,7 +10,7 @@ function createPdfArchive (MyKey as string)
 	dim sFile as string
 	sFile = fsSaveSchoolToolFile(fsShortFileName(), &quot;zip archive(.zip)&quot;, &quot;*.zip&quot;)
 	if len (sFile) = 0 then
-		createPdfArchive = sFile
+		createPdfArchive = sFilera
 		exit function
 	endif
 	if fileExists (sFile) then

@@ -9,7 +9,7 @@
         <history>
             <created date="2012-04-25T00:00:00">
                 James Holgate</created>
-            <lastedited date="2013-06-29T14:00:00">
+            <lastedited date="2013-07-07T04:53:24">
             </lastedited>
         </history>
     </meta>
@@ -21,16 +21,16 @@
         </paragraph>
         <list>
             <listitem>
-                This extension uses the presentation notes to read text aloud, to interact with viewers and to create electronic books.
-            </listitem>
-            <listitem>
-                You can export the presentation as an HTML document, a .zip archive or an ePub book.
-            </listitem>
-            <listitem>
                 Click the 
                 <emph>
                     Notepad</emph>
                  button to write presentation notes or questions.
+            </listitem>
+            <listitem>
+                This extension uses the presentation notes to read text aloud, to interact with viewers and to create electronic books.
+            </listitem>
+            <listitem>
+                You can share the presentation as an HTML document, a .zip archive or an ePub book.
             </listitem>
             <listitem>
                 The extension produces unencrypted ePub 2.0 format eBooks that are optimized for reading text aloud. The text in the title and text fields of the presentation are saved as alternative text.
@@ -116,7 +116,7 @@
                     Attach to an email message...</emph>
                  Save the note then send it via email. To change the default email address, Click the 
                 <emph>
-                    Export Presentation...</emph>
+                    Share Presentation...</emph>
                  button from the normal presentation view.
             </listitem>
             <listitem>

@@ -9,7 +9,7 @@
         <history>
             <created date="2012-04-25T00:00:00">
                 James Holgate</created>
-            <lastedited date="2013-06-29T09:23:00">
+            <lastedited date="2013-07-07T04:53:24">
             </lastedited>
         </history>
     </meta>
@@ -21,16 +21,16 @@
         </paragraph>
         <list>
             <listitem>
-                Lire une présentation à haut voix. Publier une présentation dans un format qu’on peut utiliser sur les appareils mobiles.
-            </listitem>
-            <listitem>
-                Exporter comme un document html, zip ou ePub.
-            </listitem>
-            <listitem>
                 Cliquer sur 
                 <emph>
                     Bloc Notes</emph>
                  et rédiger les notes et les questions.
+            </listitem>
+            <listitem>
+                Lire une présentation à haut voix. Partager une présentation dans un format qu’on peut utiliser sur les appareils mobiles.
+            </listitem>
+            <listitem>
+                Exporter comme un document html, zip ou ePub.
             </listitem>
             <listitem>
                 L’extension produit les livres electroniques optimisés pour la lecture de textes à haute voix. L’extension utilise le texte dans la diapositive comme texte alternatif pour l’image de la diapositive dans le livre.
@@ -139,7 +139,7 @@
                     Joindre à un messagerie...</emph>
 		Enregistrer la note, puis l’envoyer par e-mail. Pour modifier l’adresse de messagerie par défaut, cliquez sur le bouton
                 <emph>
-                    Exporter le projet...</emph>
+                    Partager le projet...</emph>
                  en mode présentation normale.
             </listitem>
          	<listitem>

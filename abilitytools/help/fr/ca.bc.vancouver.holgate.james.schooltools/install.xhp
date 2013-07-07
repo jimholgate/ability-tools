@@ -9,7 +9,7 @@
         <history>
             <created date="2012-04-25T00:00:00">
                 James Holgate</created>
-            <lastedited date="2013-06-29T10:40:00">
+            <lastedited date="2013-07-07T04:53:24">
             </lastedited>
         </history>
     </meta>
@@ -20,26 +20,26 @@
             Apropos</paragraph>
         <list>
             <listitem>
-                 Cette extension permet d'exporter et de publier des présentations et des livres électroniques. Utilisez le dialogue Bloc Notes pour ajouter votre texte à la présentation. L'extension peut lire vos notes à haute voix pendant que vous présentiez. L'extension permet d'exporter votre présentation sous forme d'un document ePub, HTML ou sous forme de texte en Braille non compressé. Des applications comme iBooks, Overdrive pour iOS ou FBReader et Google Play Reader pour Android peuvent lire vos documents électroniques à haute voix.
+                 Cette extension permet d’partager et de publier des présentations et des livres électroniques. Utilisez le dialogue Bloc Notes pour ajouter votre texte à la présentation. L’extension peut lire vos notes à haute voix pendant que vous présentiez. L’extension permet d’partager votre présentation sous forme d’un document ePub, HTML ou sous forme de texte en Braille non compressé. Des applications comme iBooks, Overdrive pour iOS ou FBReader et Google Play Reader pour Android peuvent lire vos documents électroniques à haute voix.
             </listitem>
         </list>
         <paragraph role="heading" id="install1.2" xml-lang="fr-FR" level="2">
             Installation</paragraph>
         <list>
             <listitem>
-                On peut utiliser l'application e-mail de défaut de votre système.  
+                On peut utiliser l’application e-mail de défaut de votre système.  
             </listitem>
             <listitem>
-                Vérifiez que l'application %PRODUCTNAME est à jour. 
+                Vérifiez que l’application %PRODUCTNAME est à jour. 
             </listitem>
             <listitem>
-                Obtenez la version la plus récente de l'extension.
+                Obtenez la version la plus récente de l’extension.
             </listitem>
             <listitem>
-                Ouvrez l'extension. Approuver la licence.
+                Ouvrez l’extension. Approuver la licence.
             </listitem>
             <listitem>
-                Redémarrez l'application %PRODUCTNAME.
+                Redémarrez l’application %PRODUCTNAME.
             </listitem>
         </list>
 <section id="relatedtopics">
