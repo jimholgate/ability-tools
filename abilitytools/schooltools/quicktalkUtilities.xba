@@ -175,17 +175,6 @@ Function fsgetCursorWord As String
 	selectAWord()
 End Function
 
-Function fsReplaceText(sA As String,sFind As String,sReplace As String) As String
-	&apos;This Function replaces each instance of the sFind String in the sA String with the sReplace String
-	While Instr(sA,sFind) &lt;&gt; 0 
-		fsReplaceText=Left(sA,Instr(sA,sFind)-1) &amp; _
-			sReplace &amp; _
-			Mid(sA,Instr(sA,sFind)+Len(sFind),Len(sA)-Instr(sA,sFind)+Len(sFind)
-		sA=fsReplaceText
-	Wend
-	fsReplaceText=sA
-End Function
-
 Sub selecttoEnd
 	dim document   as object
 	dim dispatcher as object
