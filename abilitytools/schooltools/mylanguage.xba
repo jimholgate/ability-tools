@@ -426,10 +426,6 @@ function asianComplexWindowsSpeech(sA, Optional sLang, Optional bAddCode)
 	asianComplexWindowsSpeech = sA
 end function
 
-sub previewSlideShowNotes (sA, Optional sLang)
-	msgBox &quot;Stub! Under construction!&quot;
-end sub
-
 sub simpleSpeech( byval sA, Optional sLang as string, Optional nSpeechResources as boolean )
 	&apos; We use the system voice and do not write any files. This is the best option for legacy 
 	&apos; operating systems, slow computers, or installations that have scripting disabled.
