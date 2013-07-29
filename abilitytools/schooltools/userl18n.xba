@@ -233,12 +233,86 @@ function fs_SAVE_BEFORE_PROCEEDING (cL)
 	end select
 end function
 
-function fs_LINK (cL)
+function fs_LINK(cL)
 	select case cL
-	case &quot;fr&quot;
-		fs_LINK = &quot;Hyperlien&quot;
-	case else
-		fs_LINK = &quot;Link&quot;
+	case &quot;af&quot; &apos;afrikaans
+		fs_LINK= &quot;hyperlink&quot;
+	case &quot;bg&quot; &apos;bulgarian
+		fs_LINK= &quot;хипервръзка&quot;
+	case &quot;ca&quot; &apos;catalan
+		fs_LINK= &quot;hiperenllaç&quot;
+	case &quot;cs&quot; &apos;czech
+		fs_LINK= &quot;hypertextový&quot;
+	case &quot;da&quot; &apos;danish
+		fs_LINK= &quot;hyperlink&quot;
+	case &quot;de&quot; &apos;german
+		fs_LINK= &quot;link&quot;
+	case &quot;el&quot; &apos;greek
+		fs_LINK= &quot;υπερσυνδέσμου&quot;
+	case &quot;en&quot; &apos;english
+		fs_LINK= &quot;link&quot;
+	case &quot;es&quot; &apos;spanish
+		fs_LINK= &quot;enlance&quot;
+	case &quot;et&quot; &apos;estonian
+		fs_LINK= &quot;hüperlink&quot;
+	case &quot;fi&quot; &apos;finnish
+		fs_LINK= &quot;hyperlinkki&quot;
+	case &quot;fr&quot; &apos;french
+		fs_LINK= &quot;hyperlien&quot;
+	case &quot;ga&quot; &apos;irish
+		fs_LINK= &quot;hyperlink&quot;
+	case &quot;hi&quot; &apos;hindi
+		fs_LINK= &quot;हाइपरलिंक&quot;
+	case &quot;hu&quot; &apos;hungarian
+		fs_LINK= &quot;hivatkozás&quot;
+	case &quot;id&quot; &apos;indonesian
+		fs_LINK= &quot;hyperlink&quot;
+	case &quot;is&quot; &apos;icelandic
+		fs_LINK= &quot;tengil&quot;
+	case &quot;it&quot; &apos;italian
+		fs_LINK= &quot;hyperlink&quot;
+	case &quot;ja&quot;, &quot;jp&quot; &apos;japanese
+		fs_LINK= &quot;ハイパーリンク&quot;
+	case &quot;ko&quot; &apos;korean
+		fs_LINK= &quot;하이퍼 링크&quot;
+	case &quot;lv&quot; &apos;latvian
+		fs_LINK= &quot;hipersaite&quot;
+	case &quot;lt&quot; &apos;lithuanian
+		fs_LINK= &quot;hipersaitas&quot;
+	case &quot;mt&quot; &apos;maltese
+		fs_LINK= &quot;hyperlink&quot;
+	case &quot;nl&quot; &apos;dutch
+		fs_LINK= &quot;hyperlink&quot;
+	case &quot;no&quot;, &quot;nb&quot;, &quot;nn&quot; &apos;norwegian	
+		fs_LINK= &quot;hyperlink&quot;
+	case &quot;pl&quot; &apos;polish
+		fs_LINK= &quot;hiperłącze&quot;
+	case &quot;pt&quot; &apos;portuguese
+		fs_LINK= &quot;hyperlink&quot;
+	case &quot;ro&quot; &apos;romanian
+		fs_LINK= &quot;hyperlink&quot;
+	case &quot;ru&quot; &apos;russian
+		fs_LINK= &quot;гиперссылка&quot;
+	case &quot;sk&quot; &apos;slovak
+		fs_LINK= &quot;hypertextové prepojenie&quot;
+	case &quot;sl&quot; &apos;slovenian
+		fs_LINK= &quot;hiperpovezave&quot;
+	case &quot;sv&quot; &apos;swedish
+		fs_LINK= &quot;hyperlänk&quot;
+	case &quot;tl&quot; &apos;tagalog
+		fs_LINK= &quot;hyperlink&quot;
+	case &quot;tr&quot; &apos;turkish
+		fs_LINK= &quot;köprü&quot;
+	case &quot;uk&quot; &apos;ukrainian
+		fs_LINK= &quot;гіперпосилання&quot;
+	case &quot;zh&quot; &apos;Chinese
+		if Fsgetsetting(&quot;Country&quot;) &lt;&gt; &quot;tw&quot; then
+			fs_LINK= &quot;超链接&quot;
+		else
+			fs_LINK= &quot;超鏈接&quot;
+		endif
+	case else &apos;Simple English
+		fs_LINK= &quot;link&quot;
 	end select
 end function
 
