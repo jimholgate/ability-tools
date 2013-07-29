@@ -509,7 +509,7 @@ function fsOrgMicroformatsVeventXhtml (csummary, optional cNow, optional iVerbos
 		&quot;; &quot; &amp; fsCleanForXtml(fsEditorInfo(&quot;o&quot;, false)) &amp; _
 		&quot;;&lt;/span&gt;&quot; &amp; chr$(10)
 		if len(cURL) &lt;&gt; 0 then 
-			sA = sA &amp; &quot;&lt;a class=&quot;&quot;url&quot;&quot; href=&quot;&quot;&quot; &amp; cURL &amp; &quot;&quot;&quot;&gt;&quot; &amp; fs_IMAGE_CREDITS (fs_cL) &amp; &quot;&lt;/a&gt;&quot;
+			sA = sA &amp; &quot;&lt;a class=&quot;&quot;url&quot;&quot; href=&quot;&quot;&quot; &amp; cURL &amp; &quot;&quot;&quot;&gt;&quot; &amp; fs_IMAGE_CREDITS (fsDocLanguage) &amp; &quot;&lt;/a&gt;&quot;
 		endif
 		sA = sA &amp; &quot;&lt;/div&gt;&quot; &amp; chr$(10) &amp; _
 		&quot;&lt;/div&gt;&quot;		
@@ -635,7 +635,7 @@ function fsOrgMicroformatsVcardXhtml (sFullName, _
 		if len (cimagepath) &lt;&gt; 0 and instr(trim(cimagepath),&quot;http&quot;) = 1 then
 			&apos; You seem to have entered a link to a person&apos;s on-line photo or webpage.
 			if rppIsGraphicFile ( cimagepath ) then
-				sA = sA &amp; &quot;&lt;div&gt;&quot; &amp; fs_IMAGE_CREDITS (fs_cL) &amp; &quot;: &lt;a href=&quot;&quot;&quot; &amp; cimagepath &amp; &quot;&quot;&quot; class=&quot;&quot;photo&quot;&quot;&gt;&quot; &amp; GetFileNameWithoutExtension(cimagepath) &amp; &quot;&lt;/a&gt;&lt;/div&gt;&quot; &amp; chr$(10)
+				sA = sA &amp; &quot;&lt;div&gt;&quot; &amp; fs_IMAGE_CREDITS (fsDocLanguage) &amp; &quot;: &lt;a href=&quot;&quot;&quot; &amp; cimagepath &amp; &quot;&quot;&quot; class=&quot;&quot;photo&quot;&quot;&gt;&quot; &amp; GetFileNameWithoutExtension(cimagepath) &amp; &quot;&lt;/a&gt;&lt;/div&gt;&quot; &amp; chr$(10)
 			else
 				sA = sA &amp; &quot;&lt;div&gt;&quot; &amp; fs_HOMEPAGE (fs_cL) &amp; &quot;: &lt;a href=&quot;&quot;&quot; &amp; cimagepath &amp; &quot;&quot;&quot; class=&quot;&quot;url&quot;&quot;&gt;&quot; &amp; GetFileNameWithoutExtension(cimagepath) &amp; &quot;&lt;/a&gt;&lt;/div&gt;&quot; &amp; chr$(10)
 			endif
@@ -678,7 +678,7 @@ function fsOrgMicroformatsVcardXhtml (sFullName, _
 		if len (cimagepath) &lt;&gt; 0 and instr(trim(cimagepath),&quot;http&quot;) = 1 then
 			&apos; You seem to have entered a link to a person&apos;s on-line photo or webpage.
 			if rppIsGraphicFile ( cimagepath ) then
-				sA = sA &amp; &quot;&lt;div&gt;&quot; &amp; fs_IMAGE_CREDITS (fs_cL) &amp; &quot;: &lt;a href=&quot;&quot;&quot; &amp; cimagepath &amp; &quot;&quot;&quot; class=&quot;&quot;photo&quot;&quot;&gt;&quot; &amp; GetFileNameWithoutExtension(cimagepath) &amp; &quot;&lt;/a&gt;&lt;/div&gt;&quot; &amp; chr$(10)
+				sA = sA &amp; &quot;&lt;div&gt;&quot; &amp; fs_IMAGE_CREDITS (fsDocLanguage) &amp; &quot;: &lt;a href=&quot;&quot;&quot; &amp; cimagepath &amp; &quot;&quot;&quot; class=&quot;&quot;photo&quot;&quot;&gt;&quot; &amp; GetFileNameWithoutExtension(cimagepath) &amp; &quot;&lt;/a&gt;&lt;/div&gt;&quot; &amp; chr$(10)
 			else
 				sA = sA &amp; &quot;&lt;div&gt;&quot; &amp; fs_HOMEPAGE (fs_cL) &amp; &quot;: &lt;a href=&quot;&quot;&quot; &amp; cimagepath &amp; &quot;&quot;&quot; class=&quot;&quot;url&quot;&quot;&gt;&quot; &amp; GetFileNameWithoutExtension(cimagepath) &amp; &quot;&lt;/a&gt;&lt;/div&gt;&quot; &amp; chr$(10)
 			endif
@@ -2724,5 +2724,14 @@ Function getOOoSetupNode(sNodePath$)
 	args(0).Value = sNodePath
 	getOOoSetupNode = aConfigProvider.createInstanceWithArguments(&quot;com.sun.star.configuration.ConfigurationAccess&quot;, args())
 End Function
+
+sub zzDebugOpenUserDirectory
+	&apos; open the file directory containing the extension using the system graphical file explorer
+	dim oSvc2
+	dim iNO_SYSTEM_ERROR_MESSAGE as integer
+	iNO_SYSTEM_ERROR_MESSAGE = 1
+	oSvc2 = createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
+	oSvc2.execute(fsMyURL,&quot;&quot;,iNO_SYSTEM_ERROR_MESSAGE)
+end sub
 
 </script:module>

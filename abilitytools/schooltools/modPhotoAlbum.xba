@@ -635,7 +635,7 @@ sub insertWebCam (optional byval iCameraNo, optional byval bMake2D, optional byv
 	case else 
 		
 		sA = &quot;&quot;
-		sSocialBrand = fs_IMAGE_CREDITS(fs_cL)
+		sSocialBrand = fs_IMAGE_CREDITS(fsDocLanguage)
 		sSocialSearch = &quot;&quot;
 		if instr (sURL, &quot;file:&quot;) &lt;&gt; 1 then
 			if bMake2D = true then
@@ -673,7 +673,7 @@ sub insertWebCam (optional byval iCameraNo, optional byval bMake2D, optional byv
 			sC = fs_POWERBYGOGLE (fs_cL) 
 		else
 			bMake2D = false
-			sC = getBranding(bI_SPOKEN_BRANDING) &amp; &quot; - &quot; &amp; fs_IMAGE_CREDITS (fs_cL)  &amp; &quot; &quot; &amp; iCameraNo
+			sC = getBranding(bI_SPOKEN_BRANDING) &amp; &quot; - &quot; &amp; fs_IMAGE_CREDITS (fsDocLanguage)  &amp; &quot; &quot; &amp; iCameraNo
 			sC = sC &amp; &quot; - &quot; &amp; left(fsNow(),instr(fsNow(),&quot;T&quot;) - 1)
 		endif
 	case else 
@@ -715,7 +715,7 @@ sub insertWebCam (optional byval iCameraNo, optional byval bMake2D, optional byv
 			select case iCameraNo
 			case 1, 2, 3, 4, 5, 6, 7, 8
 				&apos; Webcam - label the slide with date and time if the branding is for a security application
-				sB = fs_LINK (fs_cL) &amp; &quot; &quot; &amp; iCameraNo &amp; &quot; - &quot; &amp; fsNow()
+				sB = fs_LINK (fsDocLanguage) &amp; &quot; &quot; &amp; iCameraNo &amp; &quot; - &quot; &amp; fsNow()
 				oSlides (oSlides.Count - 1).Name = sB
 				if I_BRANDED = 4 and (instr(sA, &quot;http://chart.apis.google.com&quot;)) = 0 and fb_Online_Resource_CarteBlanche() = false then
 					if bVerbose = true then
