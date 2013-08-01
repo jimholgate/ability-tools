@@ -7,6 +7,20 @@ function fs_cL
     fs_cL= fsGetSetting(&quot;language&quot;)
 end function
 
+function fs_USEINTERFACELANGUAGE (cL)
+	&apos;These are languages used for speech in dialog boxes
+	&apos;Add a region that uses &quot;conventional&quot; computer pronunciation
+	&apos;examples supported by SVOX Pico synthesis include
+	&apos;en-US, fr-FR, es-ES, de-DE, it-IT etc.
+	select case cL
+	case &quot;fr&quot;
+		fs_USEINTERFACELANGUAGE = &quot;fr-FR&quot;
+	case else
+		fs_USEINTERFACELANGUAGE = &quot;en-US&quot;
+	end select
+end function
+
+
 function fs_PUBLISH (cL)
 	select case cL
 	case &quot;fr&quot;

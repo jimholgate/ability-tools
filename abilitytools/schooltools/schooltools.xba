@@ -54,16 +54,16 @@ end sub
 
 sub Dialog2PictureClicked
 	if f_dlgImpressToolsSetup.GetControl(&quot;ComboBox0&quot;).model.Enabled then 
-			synthesizeSpeech(f_dlgImpressToolsSetup.GetControl(&quot;ComboBox0&quot;).model.Text, fsLanguageCountryEnvironment)
+			synthesizeSpeech(f_dlgImpressToolsSetup.GetControl(&quot;ComboBox0&quot;).model.Text, fs_USEINTERFACELANGUAGE (fs_cL))
 	elseif f_dlgImpressToolsSetup.GetControl(&quot;ComboBox1&quot;).model.Enabled then
-		synthesizeSpeech(f_dlgImpressToolsSetup.GetControl(&quot;ComboBox1&quot;).model.Text, fsLanguageCountryEnvironment)
+		synthesizeSpeech(f_dlgImpressToolsSetup.GetControl(&quot;ComboBox1&quot;).model.Text, fs_USEINTERFACELANGUAGE (fs_cL))
 	elseif f_dlgImpressToolsSetup.GetControl(&quot;ComboBox2&quot;).model.Enabled then
-		synthesizeSpeech(f_dlgImpressToolsSetup.GetControl(&quot;ComboBox2&quot;).model.Text, fsLanguageCountryEnvironment)
+		synthesizeSpeech(f_dlgImpressToolsSetup.GetControl(&quot;ComboBox2&quot;).model.Text, fs_USEINTERFACELANGUAGE (fs_cL))
 	endif
 end sub
 
 sub Dialog1PictureClicked
-	synthesizeSpeech(oDlg.GetControl(&quot;TextField1&quot;).Text, fsLanguageCountryEnvironment)
+	synthesizeSpeech(oDlg.GetControl(&quot;TextField1&quot;).Text, fs_USEINTERFACELANGUAGE (fs_cL))
 end sub
 
 function fb_Online_Resource_CarteBlanche
