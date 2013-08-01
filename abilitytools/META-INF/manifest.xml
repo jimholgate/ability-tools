@@ -3,6 +3,7 @@
     <!--Add-on configuration: UI strings in different languages and path of icons-->
     <manifest:file-entry manifest:full-path="registry/data/org/openoffice/Office/Addons.xcu" manifest:media-type="application/vnd.sun.star.configuration-data"/>
     <manifest:file-entry manifest:full-path="registry/data/org/openoffice/Office/CalcWindowState.xcu" manifest:media-type="application/vnd.sun.star.configuration-data"/>
+    <manifest:file-entry manifest:full-path="registry/data/org/openoffice/Office/DrawWindowState.xcu" manifest:media-type="application/vnd.sun.star.configuration-data"/>
     <manifest:file-entry manifest:full-path="registry/data/org/openoffice/Office/ImpressWindowState.xcu" manifest:media-type="application/vnd.sun.star.configuration-data"/>
     <manifest:file-entry manifest:full-path="registry/data/org/openoffice/Office/WriterGlobalWindowState.xcu" manifest:media-type="application/vnd.sun.star.configuration-data"/>
     <manifest:file-entry manifest:full-path="registry/data/org/openoffice/Office/WriterWebWindowState.xcu" manifest:media-type="application/vnd.sun.star.configuration-data"/>
