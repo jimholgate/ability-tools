@@ -2,6 +2,9 @@
 <manifest:manifest>
     <!--Add-on configuration: UI strings in different languages and path of icons-->
     <manifest:file-entry manifest:full-path="registry/data/org/openoffice/Office/Addons.xcu" manifest:media-type="application/vnd.sun.star.configuration-data"/>
+    <manifest:file-entry manifest:full-path="registry/data/org/openoffice/Office/CalcWindowState.xcu" manifest:media-type="application/vnd.sun.star.configuration-data"/>
+    <manifest:file-entry manifest:full-path="registry/data/org/openoffice/Office/ImpressWindowState.xcu" manifest:media-type="application/vnd.sun.star.configuration-data"/>
+    <manifest:file-entry manifest:full-path="registry/data/org/openoffice/Office/WriterWindowState.xcu" manifest:media-type="application/vnd.sun.star.configuration-data"/>
     <!--Basic library: Path to Basic scripts-->
     <manifest:file-entry manifest:full-path="schooltools/" manifest:media-type="application/vnd.sun.star.basic-library"/>
     <!--Description: Show description when extension manager dialog is showing-->
