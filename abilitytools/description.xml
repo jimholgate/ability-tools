@@ -1,6 +1,6 @@
 ﻿<?xml version="1.0" encoding="UTF-8"?>
 <description xmlns="http://openoffice.org/extensions/description/2006" xmlns:d="http://openoffice.org/extensions/description/2006"  xmlns:xlink="http://www.w3.org/1999/xlink">
-    <version value="0.3.110" />
+    <version value="0.3.112" />
     <identifier value="ca.bc.vancouver.holgate.james.schooltools" />
     <display-name>
         <name lang="en">Ability Tools</name>
@@ -21,8 +21,8 @@
         <high-contrast xlink:href="images/brand_42h.png" />
     </icon>
     <publisher>
-        <name xlink:href="http://sites.google.com/site/readtextextension/" lang="en">James Holgate</name>
-        <name xlink:href="http://sites.google.com/site/readtextextension/" lang="fr">James Holgate</name>
+        <name xlink:href="https://sites.google.com/site/abilitytools/" lang="en">James Holgate</name>
+        <name xlink:href="https://sites.google.com/site/abilitytools/" lang="fr">James Holgate</name>
     </publisher>
     <extension-description>
         <src xlink:href="description/component.txt.en" lang="en" />
