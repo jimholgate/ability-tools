@@ -438,7 +438,12 @@ function AddGraphic (oAlbum, byval sURL, oDrawPage, optional byval bDoBreak, opt
 
 	&apos;Add graphic placeholder
 	
-	oGraph.GraphicURL = sURL 
+	oGraph.GraphicURL = sURL
+	&apos; For LibreOffice 4.1 we need to make the graphic object transparent for PNGs
+	&apos; with transparent parts or else we see the default background and line shape
+	&apos; in the transparent parts of the image.
+	oGraph.FillStyle = 0
+	oGraph.LineStyle = 0
 	oDrawPage.add(oGraph)
 	&apos; 
 	&apos;
