@@ -9,6 +9,7 @@
     <platform value="all" />
     <dependencies>
         <OpenOffice.org-minimal-version value="3.3" d:name="OpenOffice.org 3.3" />
+        <OpenOffice.org-maximal-version value="3.5" d:name="OpenOffice.org 3.5" />
     </dependencies>
     <registration>
         <simple-license  accept-by="admin" suppress-on-update="true" >
