@@ -93,7 +93,6 @@ Function fsRetrieveCalcActiveCellProperty(strA) As String
 		Case Else
 			s1r=oSelection.getString()
 	End Select
-	EndIf
 	&apos;restore the old selection (but loosing the previous active cell)
 	ThisComponent.CurrentController.Select(oOldSelection)
 		fsRetrieveCalcActiveCellProperty=sCellContent
@@ -145,25 +144,23 @@ Function fsDrawProperty(strA) As String
 	oController=oDoc.getCurrentController()
 	oSelection=oController.getSelection() 
 	If oSelection.supportsService(&quot;com.sun.star.text.TextCursor&quot;) Then
-	Select Case strA
-		Case &quot;country&quot;
-			s1r=oSelection.CharLocale.Country  
-		Case &quot;language&quot;
-			s1r=oSelection.CharLocale.Language
-		Case &quot;asian-language&quot;
-			s1r=oSelection.CharLocaleAsian.Language
-		Case &quot;complex-language&quot;
-			s1r=oSelection.CharLocaleComplex.Language
-		Case &quot;asian-country&quot;
-			s1r=oSelection.CharLocaleAsian.Country
-		Case &quot;complex-country&quot;
-			s1r=oSelection.CharLocaleComplex.Country
-		Case Else
-			s1r=oSelection.getString()
-	End Select
-	EndIf
+		Select Case strA
+			Case &quot;country&quot;
+				s1r=oSelection.CharLocale.Country  
+			Case &quot;language&quot;
+				s1r=oSelection.CharLocale.Language
+			Case &quot;asian-language&quot;
+				s1r=oSelection.CharLocaleAsian.Language
+			Case &quot;complex-language&quot;
+				s1r=oSelection.CharLocaleComplex.Language
+			Case &quot;asian-country&quot;
+				s1r=oSelection.CharLocaleAsian.Country
+			Case &quot;complex-country&quot;
+				s1r=oSelection.CharLocaleComplex.Country
+			Case Else
+				s1r=oSelection.getString()
 		End Select
-	End If
+	EndIf
 	fsDrawProperty=s1r
 End Function
 

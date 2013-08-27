@@ -170,9 +170,6 @@ def Wav2Media(sB,sTMP1,sIMG1,sOUT1,sAUDIBLE,sVISIBLE):
     else:
       if os.path.isfile("/usr/bin/avconv"):
         sFFcommand='avconv'
-      elif os.path.isfile("/Applications/Miro Video Converter.app/Contents/Helpers/ffmpeg"):
-        # OSX does not have ffmpeg by default, so we use the Miro video converter app (http://www.mirovideoconverter.com)
-        sFFcommand='/Applications/Miro Video Converter.app/Contents/Helpers/ffmpeg'
       else:
         sFFcommand='ffmpeg'
     if sOUT1EXT==".ogg":
