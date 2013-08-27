@@ -1373,10 +1373,12 @@ sub synthesizeOSXSpeech (sA, sLangLocale)
 		sLang=left(sLangLocale,instr(sLangLocale,&quot;_&quot;) )
 		CR = chr$(13)
 		sQ = chr$(34)
-		sB=&quot;#/usr/osascript&quot; &amp; CR
+		sB=&quot;#/usr/bin/osascript&quot; &amp; CR
 		sB=sB &amp; &quot;-- &quot; &amp; getBranding(bI_SPOKEN_BRANDING) &amp; &quot; created this osascript&quot; &amp; CR
 		sB=sB &amp; &quot;-- using &quot; &amp; fsGetSetting(&quot;ooname&quot;)&amp; &quot; &quot; &amp; fsNow &amp; CR
 		sB=sB &amp; &quot;set myLang to &quot;&quot;&quot; &amp; sLangLocale &amp; sQ &amp; CR
+		sB=sB &amp; &quot;set myVoice to &quot;&quot;Alex&quot; &amp; sQ &amp; CR
+		sB=sB &amp; &quot;set str0 to &quot;&quot;Alex  &quot; &amp; sQ &amp; CR
 		sB=sB &amp; &quot;try&quot;  &amp; CR
 		sB=sB &amp; &quot;set str0 to (do shell script &quot;&quot;say --voice ? | grep &quot;&quot; &amp; myLang)&quot;  &amp; CR
 		sB=sB &amp; &quot;on error&quot;  &amp; CR
