@@ -78,17 +78,22 @@ Function fsRetrieveCalcActiveCellProperty(strA) As String
 	&apos;get the active cell!
 	oActiveCell=ThisComponent.CurrentSelection
 	Select Case strA
-	Case &quot;country&quot;
-		sCellContent=oActiveCell.CharLocale.Country  
-	Case &quot;language&quot;
-		sCellContent=oActiveCell.CharLocale.Language
-	Case &quot;asian-language&quot;
-		sCellContent=oActiveCell.CharLocaleAsian.Language
-	Case &quot;complex-language&quot;
-		sCellContent=oActiveCell.CharLocaleComplex.Language
-	Case Else
-		 sCellContent=oActiveCell.getString()
+		Case &quot;country&quot;
+			s1r=oSelection.CharLocale.Country  
+		Case &quot;language&quot;
+			s1r=oSelection.CharLocale.Language
+		Case &quot;asian-language&quot;
+			s1r=oSelection.CharLocaleAsian.Language
+		Case &quot;complex-language&quot;
+			s1r=oSelection.CharLocaleComplex.Language
+		Case &quot;asian-country&quot;
+			s1r=oSelection.CharLocaleAsian.Country
+		Case &quot;complex-country&quot;
+			s1r=oSelection.CharLocaleComplex.Country
+		Case Else
+			s1r=oSelection.getString()
 	End Select
+	EndIf
 	&apos;restore the old selection (but loosing the previous active cell)
 	ThisComponent.CurrentController.Select(oOldSelection)
 		fsRetrieveCalcActiveCellProperty=sCellContent
@@ -141,16 +146,22 @@ Function fsDrawProperty(strA) As String
 	oSelection=oController.getSelection() 
 	If oSelection.supportsService(&quot;com.sun.star.text.TextCursor&quot;) Then
 	Select Case strA
-	Case &quot;country&quot;
-		s1r=oSelection.CharLocale.Country  
-	Case &quot;language&quot;
-		s1r=oSelection.CharLocale.Language
-	Case &quot;asian-language&quot;
-		s1r=oSelection.CharLocaleAsian.Language
-	Case &quot;complex-language&quot;
-		s1r=oSelection.CharLocaleComplex.Language
-	Case Else
-	s1r=oSelection.getString()
+		Case &quot;country&quot;
+			s1r=oSelection.CharLocale.Country  
+		Case &quot;language&quot;
+			s1r=oSelection.CharLocale.Language
+		Case &quot;asian-language&quot;
+			s1r=oSelection.CharLocaleAsian.Language
+		Case &quot;complex-language&quot;
+			s1r=oSelection.CharLocaleComplex.Language
+		Case &quot;asian-country&quot;
+			s1r=oSelection.CharLocaleAsian.Country
+		Case &quot;complex-country&quot;
+			s1r=oSelection.CharLocaleComplex.Country
+		Case Else
+			s1r=oSelection.getString()
+	End Select
+	EndIf
 		End Select
 	End If
 	fsDrawProperty=s1r
