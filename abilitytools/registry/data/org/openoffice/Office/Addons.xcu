@@ -2,6 +2,7 @@
 <oor:component-data xmlns:oor="http://openoffice.org/2001/registry" xmlns:xs="http://www.w3.org/2001/XMLSchema" oor:name="Addons" oor:package="org.openoffice.Office">
 <node oor:name="AddonUI">
 <node oor:name="OfficeToolBar">
+<!-- Items for Tool bars using LibreOffice/OpenOffice 3.0 format -->
 <node oor:name="schooltools.OfficeToolBar" oor:op="replace">
 <node oor:name="schooltools.AddonMenu.m00" oor:op="replace">
 <prop oor:name="Context" oor:type="xs:string">
