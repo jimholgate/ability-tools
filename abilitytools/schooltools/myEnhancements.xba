@@ -1911,8 +1911,7 @@ function fsXhtmlPreviewHeaderCode (byval sFile, optional byVal slang, optional b
 	sA = &quot;&quot;
 	sA = sA &amp; &quot;&lt;?xml version=&apos;1.0&apos; encoding=&apos;utf-8&apos;?&gt;&quot; &amp; CR
 	sA = sA &amp; &quot;&lt;!DOCTYPE html PUBLIC &quot;&quot;-//W3C//DTD XHTML 1.0 Strict//EN&quot;&quot; &quot;&quot;http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd&quot;&quot;&gt;&quot; &amp; CR
-
-	sA = sA &amp; &quot;&lt;html xmlns=&quot;&quot;http://www.w3.org/1999/xhtml&quot;&quot; xml:lang=&quot;&quot;&quot; &amp; sLang &amp; &quot;&quot;&quot;&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;html xmlns=&quot;&quot;http://www.w3.org/1999/xhtml&quot;&quot; lang=&quot;&quot;&quot; &amp; sLang &amp; &quot;&quot;&quot; xml:lang=&quot;&quot;&quot; &amp; sLang &amp; &quot;&quot;&quot;&gt;&quot; &amp; CR
 	sA = sA &amp; &quot;&lt;head&gt;&quot; &amp; CR
 	sA = sA &amp; &quot;&lt;title&gt;&quot; &amp; ConvertFromURL(GetFileNameWithoutExtension(sFile, &quot;/&quot;)) &amp; &quot;&lt;/title&gt;&quot; &amp; CR
 	sA = sA &amp; &quot;&lt;meta http-equiv=&quot;&quot;content-type&quot;&quot; content=&quot;&quot;text/html; charset=utf-8&quot;&quot; /&gt;&quot; &amp; CR
