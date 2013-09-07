@@ -1656,12 +1656,23 @@ sub SchoolToolsLanguage
 	dim fontStyled
 	fontStyled = createUnoStruct(&quot;com.sun.star.awt.FontDescriptor&quot;) 
 	fontStyled = f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).Model.FontDescriptor
-	if f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Enabled then 
+	if f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Enabled then
+		&apos; Disable multilingual reading globally
+		if fileExists (fsSpeechSettingURL) then
+			kill fsSpeechSettingURL
+		endif
 		f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Enabled = false
 		f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Text = fsGuessNoteLanguage
 		fontStyled.Slant = 0 
 		f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).Model.FontDescriptor = fontStyled
 	else
+		&apos;Enable multilingual reading globally
+		if fileExists (fsSpeechSettingURL) then
+			&apos; Preserve setting from Presentation Tools dialog
+		else
+			&apos; Use offline reading setting &apos;xxxxxx
+			CreateFile(fsSpeechSettingURL,&quot;(PLAY_PRESENTATION_ALOUD_OFFLINE)&quot;,&quot;UTF-8&quot;)
+		endif 
 		f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Enabled = true
 		if ThisComponent.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) then
 			&apos; Use the language of the slide note

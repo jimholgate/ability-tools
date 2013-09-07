@@ -922,7 +922,8 @@ function fsGetCommands(i as integer, optional sLanguage, optional iBrand, option
 				sA(26) = &quot;Ajouter 2D code pour URL 2 au projet&quot;
 				sA(27) = &quot;Ajouter 2D code pour URL 1 au projet&quot;
 				sA(28) = &quot;Ajouter 2D code pour Twitter au projet&quot;
-				sA(29) = &quot;Ajouter 2D code pour Identi.ca au projet&quot;
+				&apos; Ne fonction plus
+				&apos;sA(29) = &quot;Ajouter 2D code pour Identi.ca au projet&quot;
 				&apos; Nous avons ces fonctions dans l&apos;outil bloc-notes.
 				&apos;sA(30) = &quot;Ajouter l&apos;XHTML pour les paragraphes à la note&quot;
 				&apos;sA(31) = &quot;Ajouter l&apos;XHTML pour les puces à la note&quot;
@@ -962,7 +963,8 @@ function fsGetCommands(i as integer, optional sLanguage, optional iBrand, option
 				sA(26) = &quot;Add 2D scan code for URL 2 to project&quot;
 				sA(27) = &quot;Add 2D scan code for URL 1 to project&quot;
 				sA(28) = &quot;Add 2D scan code for Twitter to project&quot;
-				sA(29) = &quot;Add 2D scan code for Identi.ca to project&quot;
+				&apos; Doesn&apos;t work now
+				&apos; sA(29) = &quot;Add 2D scan code for Identi.ca to project&quot;
 				&apos; These are in notepad
 				&apos;sA(30) = &quot;Format note as paragraphs in XHTML&quot;
 				&apos;sA(31) = &quot;Format note as a bullet list in XHTML&quot;
