@@ -1663,6 +1663,13 @@ sub SchoolToolsLanguage
 		f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).Model.FontDescriptor = fontStyled
 	else
 		f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Enabled = true
+		if ThisComponent.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) then
+			&apos; Use the language of the slide note
+			f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Text = fsGuessNoteLanguage
+		else
+			&apos; Use the language of the selected text
+			f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Text = fsSelectionLanguage &amp; &quot;-&quot; &amp; fsSelectionCountry
+		endif
 	endif
 end sub
 
