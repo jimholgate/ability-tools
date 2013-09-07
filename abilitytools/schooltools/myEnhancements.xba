@@ -826,6 +826,16 @@ function fsSchoolToolsInputBox(optional sMsg as string, optional sTitle as strin
 	if fileExists (fsSpeechSettingURL) then
 		f_dlgImpressAsk.GetControl(&quot;CommandButton12&quot;).model.State = 1
 		f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Enabled = true
+		if ThisComponent.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) then
+			&apos; Use the language of the slide note
+			f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Text = fsGuessNoteLanguage
+		else
+			&apos; Use the language of the selected text
+			f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Text = fsSelectionLanguage &amp; &quot;-&quot; &amp; fsSelectionCountry
+		endif
+	else
+		&apos; Use language of the slide note or the default document language
+		f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Text = fsGuessNoteLanguage
 	endif
 	if sMsg=&quot;&quot; then
 		f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.PositionY = 2 + f_dlgImpressAsk.GetControl(&quot;CommandButton9&quot;).model.height
@@ -869,6 +879,84 @@ function fsSchoolToolsInputBox(optional sMsg as string, optional sTitle as strin
 			ThisComponent.Presentation.End
 		endif
 	endif
+end function
+
+Function fsSelectionLanguage as String
+   	Dim oDoc,oVC,sA,longI,sB,sC,sD
+    On Error Goto SELECTLANGUAGEERROR
+	oDoc=ThisComponent
+	If oDoc.SupportsService(&quot;com.sun.star.sheet.SpreadsheetDocument&quot;) Then
+		sA=fsRetrieveCalcActiveCellProperty(&quot;language&quot;)
+		sB=fsRetrieveCalcActiveCellProperty(&quot;string&quot;)
+		sC=fsRetrieveCalcActiveCellProperty(&quot;asian-language&quot;)
+		sD=fsRetrieveCalcActiveCellProperty(&quot;complex-language&quot;)
+	Elseif oDoc.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) or oDoc.supportsService(&quot;com.sun.star.drawing.DrawingDocument&quot;) Then
+		sA=fsDrawProperty(&quot;language&quot;)
+		sB=fsDrawProperty(&quot;string&quot;)
+		sC=fsDrawProperty(&quot;asian-language&quot;)
+		sD=fsDrawProperty(&quot;complex-language&quot;)
+	Else	
+		oVC=oDoc.getCurrentController.getViewCursor			
+		sA=oVC.CharLocale.Language
+		sB=oVC.GetString()
+		sC=oVC.CharLocaleAsian.Language
+		sD=oVC.CharLocaleComplex.Language
+	Endif
+	&apos;The application&apos;s built in CharLocale.Language property does not identify oriental or complex text locales
+	&apos;so we use the UTF encoding for the first character to evaluate the language. See http://www.utf8-chartable.de/
+	&apos;and http://unicode.org/Public/UNIDATA/Blocks.txt
+	fsSelectionLanguage=fsUseLanguageType(sA,sB,sC,sD)
+	Exit Function
+	SELECTLANGUAGEERROR:
+	fsSelectionLanguage=fsDocLanguage
+End Function
+
+function fsSelectionCountry as String
+   	Dim oDoc,oVC,sA,sB,sC,sD
+    On Error Goto SELECTCOUNTRYERROR
+	oDoc=ThisComponent
+	
+	If oDoc.SupportsService(&quot;com.sun.star.sheet.SpreadsheetDocument&quot;) Then
+		sA=fsRetrieveCalcActiveCellProperty(&quot;country&quot;)
+		sB=fsRetrieveCalcActiveCellProperty(&quot;string&quot;)
+		sC=fsRetrieveCalcActiveCellProperty(&quot;asian-country&quot;)
+		sD=fsRetrieveCalcActiveCellProperty(&quot;complex-country&quot;)
+	Elseif oDoc.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) or oDoc.supportsService(&quot;com.sun.star.drawing.DrawingDocument&quot;) Then
+		sA=fsDrawProperty(&quot;country&quot;)
+		sB=fsDrawProperty(&quot;string&quot;)
+		sC=fsDrawProperty(&quot;asian-country&quot;)
+		sD=fsDrawProperty(&quot;complex-country&quot;)
+	Else	
+		oVC=oDoc.getCurrentController.getViewCursor			
+		sA=oVC.CharLocale.Country
+		sB=oVC.GetString()
+		sC=oVC.CharLocaleAsian.Country
+		sD=oVC.CharLocaleComplex.Country
+	Endif
+	
+	&apos;The application&apos;s built in CharLocale.Country property does not identify oriental or complex text locales
+	&apos;so we use the UTF encoding for the first character to evaluate the country. See http://www.utf8-chartable.de/
+	&apos;and http://unicode.org/Public/UNIDATA/Blocks.txt
+	fsSelectionCountry=fsUseLanguageType(sA,sB,sC,sD)
+	&apos;xxxxx
+	Exit Function
+	SELECTCOUNTRYERROR:
+	fsSelectionCountry=fsDocCountry
+End Function
+
+function fsUseLanguageType( sA,sB,sC,sD)
+	dim sE as string
+	sE = fsComplexAsiaOrWest(sB)
+	
+	select case sE
+	case &quot;ASIA&quot;
+		fsUseLanguageType=sC
+	case &quot;COMPLEX&quot;
+		fsUseLanguageType=sD
+	case else &apos; &quot;WEST&quot; or &quot;UNDEFINED&quot;
+		fsUseLanguageType=sA
+	end select
+	
 end function
 
 sub startEditingFirstNote
