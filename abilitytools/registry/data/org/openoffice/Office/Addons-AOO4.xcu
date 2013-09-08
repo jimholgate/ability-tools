@@ -14,7 +14,7 @@
 			    </prop>
                 <node oor:name="ToolBarItems">
 
-                    <node oor:name="m1" oor:op="replace">
+                    <node oor:name="m0" oor:op="replace">
                         <prop oor:name="Context" oor:type="xs:string">
                             <value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument,com.sun.star.text.WebDocument,com.sun.star.drawing.DrawingDocument</value>
                         </prop>
@@ -25,6 +25,23 @@
                             <value>Export Selection</value>
                             <value xml:lang="en">Export Selection</value>
                             <value xml:lang="fr">Exporter la Sélection</value>
+                        </prop>
+                        <prop oor:name="Target" oor:type="xs:string">
+                            <value>_self</value>
+                        </prop>
+                    </node>
+
+                    <node oor:name="m1" oor:op="replace">
+                        <prop oor:name="Context" oor:type="xs:string">
+                            <value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument,com.sun.star.text.WebDocument,com.sun.star.drawing.DrawingDocument</value>
+                        </prop>
+                        <prop oor:name="URL" oor:type="xs:string">
+                            <value>vnd.sun.star.script:schooltools.quicktalkUtilities.textReaderButton?language=Basic&amp;location=application</value>
+                        </prop>
+                        <prop oor:name="Title" oor:type="xs:string" oor:localized="true">
+                            <value>Read Selection</value>
+                            <value xml:lang="en">Read Selection</value>
+                            <value xml:lang="fr">Lire la Sélection</value>
                         </prop>
                         <prop oor:name="Target" oor:type="xs:string">
                             <value>_self</value>
@@ -213,6 +230,22 @@
                     <value>_self</value>
                 </prop>
             </node>
+            <node oor:name="schooltools.AddonMenu.m07" oor:op="replace">
+                <prop oor:name="Context" oor:type="xs:string">
+                    <value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument,com.sun.star.text.WebDocument,com.sun.star.text.GlobalDocument,com.sun.star.drawing.DrawingDocument</value>
+                </prop>
+                <prop oor:name="URL" oor:type="xs:string">
+                    <value>vnd.sun.star.script:schooltools.quicktalkUtilities.textReaderButton?language=Basic&amp;location=application</value>
+                </prop>
+                <prop oor:name="Title" oor:type="xs:string">
+                    <value>Read Selection</value>
+                    <value xml:lang="en">Read Selection</value>
+                    <value xml:lang="fr">Lire la Sélection</value>
+                </prop>
+                <prop oor:name="Target" oor:type="xs:string">
+                    <value>_self</value>
+                </prop>
+            </node>
         </node>
 
 		<!-- specify image urls for icons -->
@@ -312,8 +345,26 @@
                     </prop>
 				</node>
             </node>
-            
             <node oor:name="schooltools.OfficeToolBar.images6" oor:op="replace">
+                <prop oor:name="URL" oor:type="xs:string">
+                    <value>vnd.sun.star.script:schooltools.quicktalkUtilities.textReaderButton?language=Basic&amp;location=application</value>
+                </prop>
+				<node oor:name="UserDefinedImages">
+                    <prop oor:name="ImageSmallURL">
+                        <value>%origin%/../../../../../images/textToSpeech_16.png</value>
+                    </prop>
+                    <prop oor:name="ImageSmallHCURL">
+                        <value>%origin%/../../../../../images/textToSpeech_16h.png</value>
+                    </prop>
+                    <prop oor:name="ImageBigURL">
+                        <value>%origin%/../../../../../images/textToSpeech_26.png</value>
+                    </prop>
+                    <prop oor:name="ImageBigHCURL">
+                        <value>%origin%/../../../../../images/textToSpeech_26h.png</value>
+                    </prop>
+				</node>
+            </node>            
+            <node oor:name="schooltools.OfficeToolBar.images7" oor:op="replace">
                 <prop oor:name="URL" oor:type="xs:string">
                     <value>vnd.sun.star.script:schooltools.schooltools.ToolBar3Pressed?language=Basic&amp;location=application</value>
                 </prop>
@@ -332,6 +383,7 @@
                     </prop>
 				</node>
             </node>
+
         </node>
 	</node>
 </oor:component-data>
