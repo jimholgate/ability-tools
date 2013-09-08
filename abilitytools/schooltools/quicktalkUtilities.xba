@@ -24,6 +24,17 @@ sub textMagnifierButton
 	endif
 end sub
 
+sub textReaderButton
+	dim sA, sB as string
+	sA = fsGetTextSelection()
+	sB = fsSelectionLanguage &amp; &quot;-&quot; &amp; fsSelectionCountry
+	if fileExists (fsSpeechSettingURL) then 
+		synthesizeSpeech (sA, sB, ENABLE_SYSTEM_LANGUAGES)
+	else
+		simpleSpeech (sA)
+	endif
+end sub
+
 Function fsGetTextSelection() As String
 	Dim oDoc   As Object
 	Dim oSelection As Object
