@@ -28,20 +28,11 @@ function fbWindowsHasVoiceInThisLanguage (Optional byval sLang)
 			exit for
 		endif
 	next
-		&apos; Check for a couple of Windows XP or third
-		&apos; party voices. This is just a hack for my
-		&apos; own convenience.
-		&apos; We don&apos;t detect Windows XP or third party
-		&apos; voices when the voice descriptions don&apos;t
-		&apos; include the iso code (fr-FR, de-AT etc.)
-		&apos; or the name of the language (Spanish, German).
-		&apos; You could try editing the voice description keyword
-		&apos; in the XPandThirdParty function. You&apos;re on your own.
 	if fbWindowsHasVoiceInThisLanguage = false then 
 		s1 = lcase(XPandThirdParty(sLang))
 		for n = 0 to Sapi.GetVoices.Count - 1
 			s2=lcase(Sapi.GetVoices.Item(n).GetDescription)
-			if instr(s2,s1) &lt;&gt; 0 then
+			if instr(s2,s1) = 1 then
 				fbWindowsHasVoiceInThisLanguage = true
 				exit for
 			endif
@@ -52,6 +43,42 @@ function fbWindowsHasVoiceInThisLanguage (Optional byval sLang)
 	VoiceTestError:
 	fbWindowsHasVoiceInThisLanguage = false
 	on Error resume next
+end function
+
+function XPandThirdParty (s1)
+	&apos; Returns search term for a voice when the voice descriptions omit the language or language code
+	&apos; in iso format (en-GB, fr-BE etc.) This list is not complete, nor are any voices listed here
+	&apos; recommended over competitor&apos;s products. The languages are listed purely as a convenience.	
+	&apos; AS-IS. No warranty...		
+	dim s2 as string
+	select case lcase(s1)
+			case &quot;en-gb&quot;
+				s2=&quot;Scansoft Emily&quot;
+			case &quot;en-us&quot;, &quot;en&quot;
+				s2=&quot;Microsoft Sam&quot;
+			&apos;case &quot;fr-ca&quot;
+			&apos;	s2=&quot;Scansoft Julie&quot;
+			case &quot;fr-fr&quot;, &quot;fr&quot;
+				s2=&quot;ScanSoft Virginie&quot;
+			case &quot;de-de&quot;, &quot;de&quot;
+				s2=&quot;Scansoft Steffi&quot;
+			case &quot;es-es&quot;, &quot;es&quot;
+				s2=&quot;Scansoft Isabel&quot;
+			case &quot;it-it&quot;, &quot;it&quot;
+				s2=&quot;Scansoft Paolo&quot;
+			case &quot;hi-in&quot;, &quot;hi&quot;
+				s2=&quot;Scansoft Lehka&quot;
+			case &quot;zh-cn&quot;, &quot;zh-tw&quot;, &quot;zh&quot;
+				s2=&quot;Scansoft Mei-Ling&quot;
+			case &quot;zh-hk&quot;, &quot;zh-mo&quot;, &quot;zh-yu&quot;,&quot;zh-yue&quot;
+				s2=&quot;Scansoft Sin-Ji&quot;
+			&apos; Add your own ...
+			&apos;case &quot;xx-xx&quot;, &quot;xx&quot;
+				&apos;s2=&quot;voice&quot;
+			case else  
+				s2=s1 &apos; not found, so we return iso language code.
+			end select
+	XPandThirdParty = s2	
 end function
 
 function canUseSpeechXML
@@ -1354,6 +1381,8 @@ sub synthesizeOSXSpeech (sA, sLangLocale)
 	if fileExists (fsTemporaryOSXVoiceScript) then
 		kill fsTemporaryOSXVoiceScript
 	endif
+	sA = fsReplaceText(sA, chr$(13), &quot;[[slnc 200]] &quot;)
+	sA = fsReplaceText(sA, chr$(10), &quot;[[slnc 200]] &quot;)
 	if sLangLocale = fsGetSetting(&quot;language&quot;) &amp; &quot;-&quot; &amp; fsGetSetting(&quot;country&quot;) then
 		&apos; if the selected language and locale is the same as the UI language 
 		&apos; and locale, then we don&apos;t specify the language. We assume that the 
@@ -1367,14 +1396,13 @@ sub synthesizeOSXSpeech (sA, sLangLocale)
 	else
 		sA = fsReplaceText(sA,&quot;&apos;&quot;,&quot;’&quot;)
 		sA = fsReplaceText(sA,chr$(34),&quot;’’&quot;)
-		sA = fsReplaceText(sA, chr$(13), &quot; &quot;)
 		bWait=false
 		sLangLocale=fsReplaceText(sLangLocale,&quot;-&quot;,&quot;_&quot;)
 		sLang=left(sLangLocale,instr(sLangLocale,&quot;_&quot;) )
 		CR = chr$(13)
 		sQ = chr$(34)
 		sB=&quot;#/usr/bin/osascript&quot; &amp; CR
-		sB=sB &amp; &quot;-- &quot; &amp; getBranding(bI_SPOKEN_BRANDING) &amp; &quot; created this osascript&quot; &amp; CR
+		sB=sB &amp; &quot;-- &quot; &amp; getBranding(bI_SPOKEN_BRANDING) &amp; &quot; created this script&quot; &amp; CR
 		sB=sB &amp; &quot;-- using &quot; &amp; fsGetSetting(&quot;ooname&quot;)&amp; &quot; &quot; &amp; fsNow &amp; CR
 		sB=sB &amp; &quot;set myLang to &quot;&quot;&quot; &amp; sLangLocale &amp; sQ &amp; CR
 		sB=sB &amp; &quot;set myVoice to &quot;&quot;Alex&quot; &amp; sQ &amp; CR
@@ -1409,6 +1437,9 @@ function synthesizeWindowsSpeech(sB, Optional sLang )
 	&apos; if you are using a language that is not compatible with iso-8859-15
 	&apos; be sure to wait until speech is finished completely before initiating
 	&apos; the next speech command, or else  the extension will skip some speech.
+	if ismissing(sLang) then 
+		sLang=fsGetSetting(&quot;language&quot;)
+	endif
 	select case left(sLang, 2)
 	case &quot;en&quot;,&quot;af&quot;,&quot;sq&quot;,&quot;br&quot;,&quot;ca&quot;,&quot;da&quot;,&quot;et&quot;,&quot;fo&quot;,&quot;fi&quot;,&quot;fr&quot;,&quot;gl&quot;,&quot;de&quot;,&quot;is&quot;,&quot;ga&quot;,&quot;it&quot;,&quot;ku&quot;,&quot;la&quot;,&quot;lb&quot;,&quot;ms&quot;,&quot;nb&quot;,&quot;nl&quot;,&quot;no&quot;,&quot;nn&quot;,&quot;oc&quot;,&quot;pt&quot;,&quot;gd&quot;,&quot;es&quot;,&quot;sw&quot;,&quot;sv&quot;,&quot;tl&quot;,&quot;wa&quot;
 		dim CR, sA , sQ, LF, WF as string
@@ -1951,41 +1982,6 @@ function isoToEnglish (s1)
 	Isotoenglish = S2	
 end function
 
-function XPandThirdParty (s1)
-	&apos; Returns search term for a voice when the voice descriptions omit the language or language code
-	&apos; in iso format (en-GB, fr-BE etc.) This list is not complete, nor are any voices listed here
-	&apos; recommended over competitor&apos;s products. The languages are listed purely as a convenience.	
-	&apos; AS-IS. No warranty...		
-	dim s2 as string
-	select case lcase(s1)
-			case &quot;en-gb&quot;
-				s2=&quot;Emily&quot;
-			case &quot;en-us&quot;, &quot;en&quot;
-				s2=&quot;Microsoft Sam&quot;
-			&apos;case &quot;fr-ca&quot;
-			&apos;	s2=&quot;julie&quot;
-			case &quot;fr-fr&quot;, &quot;fr&quot;
-				s2=&quot;Virginie&quot;
-			case &quot;de-de&quot;, &quot;de&quot;
-				s2=&quot;Steffi&quot;
-			case &quot;es-es&quot;, &quot;es&quot;
-				s2=&quot;Isabel&quot;
-			case &quot;it-it&quot;, &quot;it&quot;
-				s2=&quot;Paolo&quot;
-			case &quot;hi-in&quot;, &quot;hi&quot;
-				s2=&quot;Lehka&quot;
-			case &quot;zh-cn&quot;, &quot;zh-tw&quot;, &quot;zh&quot;
-				s2=&quot;Li-Li&quot;
-			case &quot;zh-hk&quot;, &quot;zh-mo&quot;, &quot;zh-yu&quot;,&quot;zh-yue&quot;
-				s2=&quot;Sin-Ji&quot;
-			&apos; Add your own ...
-			&apos;case &quot;xx-xx&quot;, &quot;xx&quot;
-				&apos;s2=&quot;voice&quot;
-			case else  
-				s2=s1 &apos; not found, so we return iso language code.
-			end select
-	XPandThirdParty = s2	
-end function
 
 function fsDocLanguage
 	on error goto fsDocLanguageErr

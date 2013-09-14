@@ -1,373 +1,363 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <oor:component-data xmlns:oor="http://openoffice.org/2001/registry" xmlns:xs="http://www.w3.org/2001/XMLSchema" oor:name="Addons" oor:package="org.openoffice.Office">
-<node oor:name="AddonUI">
-<node oor:name="OfficeToolBar">
-<!-- Items for Tool bars using LibreOffice/OpenOffice 3.0 format -->
-<node oor:name="schooltools.OfficeToolBar" oor:op="replace">
-<node oor:name="schooltools.AddonMenu.m00" oor:op="replace">
-<prop oor:name="Context" oor:type="xs:string">
-<value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument,com.sun.star.text.WebDocument,com.sun.star.text.GlobalDocument,com.sun.star.drawing.DrawingDocument</value>
-</prop>
-<prop oor:name="URL" oor:type="xs:string">
-<value>vnd.sun.star.script:schooltools.quicktalkUtilities.textMagnifierButton?language=Basic&amp;location=application</value>
-</prop>
-<prop oor:name="Title" oor:type="xs:string">
-<value>Export Selection</value>
-<value xml:lang="en">Export Selection</value>
-<value xml:lang="fr">Exporter la Sélection</value>
-</prop>
-<prop oor:name="Target" oor:type="xs:string">
-<value>_self</value>
-</prop>
-</node>
-<node oor:name="schooltools.AddonMenu.m06" oor:op="replace">
-<prop oor:name="Context" oor:type="xs:string">
-<value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument,com.sun.star.text.WebDocument,com.sun.star.text.GlobalDocument,com.sun.star.drawing.DrawingDocument</value>
-</prop>
-<prop oor:name="URL" oor:type="xs:string">
-<value>vnd.sun.star.script:schooltools.quicktalkUtilities.textReaderButton?language=Basic&amp;location=application</value>
-</prop>
-<prop oor:name="Title" oor:type="xs:string">
-<value>Read Selection</value>
-<value xml:lang="en">Read Selection</value>
-<value xml:lang="fr">Lire la Sélection</value>
-</prop>
-<prop oor:name="Target" oor:type="xs:string">
-<value>_self</value>
-</prop>
-</node>
-<node oor:name="schooltools.AddonMenu.m01" oor:op="replace">
-<prop oor:name="Context" oor:type="xs:string">
-<value>com.sun.star.presentation.PresentationDocument</value>
-</prop>
-<prop oor:name="URL" oor:type="xs:string">
-<value>vnd.sun.star.script:schooltools.schooltools.ToolBar1Pressed?language=Basic&amp;location=application</value>
-</prop>
-<prop oor:name="Title" oor:type="xs:string">
-<value>Start New Project</value>
-<value xml:lang="en">Start New Project</value>
-<value xml:lang="fr">Nouveau Projet</value>
-</prop>
-<prop oor:name="Target" oor:type="xs:string">
-<value>_self</value>
-</prop>
-</node>
-<node oor:name="schooltools.AddonMenu.m02" oor:op="replace">
-<prop oor:name="Context" oor:type="xs:string">
-<value>com.sun.star.presentation.PresentationDocument</value>
-</prop>
-<prop oor:name="URL" oor:type="xs:string">
-<value>vnd.sun.star.script:schooltools.schooltools.ToolBar2Pressed?language=Basic&amp;location=application</value>
-</prop>
-<prop oor:name="Title" oor:type="xs:string">
-<value>Project Tools</value>
-<value xml:lang="en">Project Tools</value>
-<value xml:lang="fr">Outils du Projet</value>
-</prop>
-<prop oor:name="Target" oor:type="xs:string">
-<value>_self</value>
-</prop>
-</node>
-<node oor:name="schooltools.AddonMenu.m03" oor:op="replace">
-<prop oor:name="Context" oor:type="xs:string">
-<value>com.sun.star.presentation.PresentationDocument</value>
-</prop>
-<prop oor:name="URL" oor:type="xs:string">
-<value>vnd.sun.star.script:schooltools.schooltools.ToolBar11Pressed?language=Basic&amp;location=application</value>
-</prop>
-<prop oor:name="Title" oor:type="xs:string">
-<value>Notepad</value>
-<value xml:lang="en">Notepad</value>
-<value xml:lang="fr">Bloc Notes</value>
-</prop>
-<prop oor:name="Target" oor:type="xs:string">
-<value>_self</value>
-</prop>
-</node>
-<node oor:name="schooltools.AddonMenu.m04" oor:op="replace">
-<prop oor:name="Context" oor:type="xs:string">
-<value>com.sun.star.presentation.PresentationDocument</value>
-</prop>
-<prop oor:name="URL" oor:type="xs:string">
-<value>vnd.sun.star.script:schooltools.schooltools.ToolBar12Pressed?language=Basic&amp;location=application</value>
-</prop>
-<prop oor:name="Title" oor:type="xs:string">
-<value>Read Project</value>
-<value xml:lang="en">Read Project</value>
-<value xml:lang="fr">Lire le Projet</value>
-</prop>
-<prop oor:name="Target" oor:type="xs:string">
-<value>_self</value>
-</prop>
-</node>
-<node oor:name="schooltools.AddonMenu.m05" oor:op="replace">
-<prop oor:name="Context" oor:type="xs:string">
-<value>com.sun.star.presentation.PresentationDocument</value>
-</prop>
-<prop oor:name="URL" oor:type="xs:string">
-<value>vnd.sun.star.script:schooltools.schooltools.ToolBar3Pressed?language=Basic&amp;location=application</value>
-</prop>
-<prop oor:name="Title" oor:type="xs:string">
-<value>Share Project</value>
-<value xml:lang="en">Share Project</value>
-<value xml:lang="fr">Partager le projet</value>
-</prop>
-<prop oor:name="Target" oor:type="xs:string">
-<value>_self</value>
-</prop>
-</node>
-</node>
-</node>
-<!--  Items for Tools - Add-ons menu  -->
-<node oor:name="AddonMenu">
-<node oor:name="schooltools.AddonMenu.m01" oor:op="replace">
-<prop oor:name="Context" oor:type="xs:string">
-<value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument,com.sun.star.text.WebDocument,com.sun.star.text.GlobalDocument,com.sun.star.presentation.PresentationDocument,com.sun.star.drawing.DrawingDocument</value>
-</prop>
-<prop oor:name="URL" oor:type="xs:string">
-<value>vnd.sun.star.script:schooltools.schooltools.ToolBar1Pressed?language=Basic&amp;location=application</value>
-</prop>
-<prop oor:name="Title" oor:type="xs:string">
-<value>Start New Project...</value>
-<value xml:lang="en">Start New Project...</value>
-<value xml:lang="fr">Nouveau Projet...</value>
-</prop>
-<prop oor:name="Target" oor:type="xs:string">
-<value>_self</value>
-</prop>
-</node>
-<node oor:name="schooltools.AddonMenu.m02" oor:op="replace">
-<prop oor:name="Context" oor:type="xs:string">
-<value>com.sun.star.presentation.PresentationDocument</value>
-</prop>
-<prop oor:name="URL" oor:type="xs:string">
-<value>vnd.sun.star.script:schooltools.schooltools.ToolBar2Pressed?language=Basic&amp;location=application</value>
-</prop>
-<prop oor:name="Title" oor:type="xs:string">
-<value>Project Tools...</value>
-<value xml:lang="en">Project Tools...</value>
-<value xml:lang="fr">Outils du Projet...</value>
-</prop>
-<prop oor:name="Target" oor:type="xs:string">
-<value>_self</value>
-</prop>
-</node>
-<node oor:name="schooltools.AddonMenu.m021" oor:op="replace">
-<prop oor:name="Context" oor:type="xs:string">
-<value>com.sun.star.presentation.PresentationDocument</value>
-</prop>
-<prop oor:name="URL" oor:type="xs:string">
-<value>vnd.sun.star.script:schooltools.schooltools.ToolBar11Pressed?language=Basic&amp;location=application</value>
-</prop>
-<prop oor:name="Title" oor:type="xs:string">
-<value>Notepad...</value>
-<value xml:lang="en">Notepad...</value>
-<value xml:lang="fr">Bloc Notes...</value>
-</prop>
-<prop oor:name="Target" oor:type="xs:string">
-<value>_self</value>
-</prop>
-</node>
-<node oor:name="schooltools.AddonMenu.m022" oor:op="replace">
-<prop oor:name="Context" oor:type="xs:string">
-<value>com.sun.star.presentation.PresentationDocument</value>
-</prop>
-<prop oor:name="URL" oor:type="xs:string">
-<value>vnd.sun.star.script:schooltools.schooltools.ToolBar12Pressed?language=Basic&amp;location=application</value>
-</prop>
-<prop oor:name="Title" oor:type="xs:string">
-<value>Read Project</value>
-<value xml:lang="en">Read Project</value>
-<value xml:lang="fr">Lire le Projet</value>
-</prop>
-<prop oor:name="Target" oor:type="xs:string">
-<value>_self</value>
-</prop>
-</node>
-<node oor:name="schooltools.AddonMenu.m05" oor:op="replace">
-<prop oor:name="Context" oor:type="xs:string">
-<value>com.sun.star.presentation.PresentationDocument</value>
-</prop>
-<prop oor:name="URL" oor:type="xs:string">
-<value>vnd.sun.star.script:schooltools.schooltools.ToolBar3Pressed?language=Basic&amp;location=application</value>
-</prop>
-<prop oor:name="Title" oor:type="xs:string">
-<value>Share Project...</value>
-<value xml:lang="en">Share Project...</value>
-<value xml:lang="fr">Partager le projet...</value>
-</prop>
-<prop oor:name="Target" oor:type="xs:string">
-<value>_self</value>
-</prop>
-</node>
-<node oor:name="schooltools.AddonMenu.m06" oor:op="replace">
-<prop oor:name="Context" oor:type="xs:string">
-<value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument,com.sun.star.text.WebDocument,com.sun.star.text.GlobalDocument,com.sun.star.drawing.DrawingDocument</value>
-</prop>
-<prop oor:name="URL" oor:type="xs:string">
-<value>vnd.sun.star.script:schooltools.quicktalkUtilities.textMagnifierButton?language=Basic&amp;location=application</value>
-</prop>
-<prop oor:name="Title" oor:type="xs:string">
-<value>Export Selection...</value>
-<value xml:lang="en">Export Selection...</value>
-<value xml:lang="fr">Exporter la Sélection...</value>
-</prop>
-<prop oor:name="Target" oor:type="xs:string">
-<value>_self</value>
-</prop>
-</node>
-<node oor:name="schooltools.AddonMenu.m07" oor:op="replace">
-<prop oor:name="Context" oor:type="xs:string">
-<value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument,com.sun.star.text.WebDocument,com.sun.star.text.GlobalDocument,com.sun.star.drawing.DrawingDocument</value>
-</prop>
-<prop oor:name="URL" oor:type="xs:string">
-<value>vnd.sun.star.script:schooltools.quicktalkUtilities.textReaderButton?language=Basic&amp;location=application</value>
-</prop>
-<prop oor:name="Title" oor:type="xs:string">
-<value>Export Selection...</value>
-<value xml:lang="en">Read Selection</value>
-<value xml:lang="fr">Lire la Sélection</value>
-</prop>
-<prop oor:name="Target" oor:type="xs:string">
-<value>_self</value>
-</prop>
-</node>
-</node>
-<!--  specify image urls for icons  -->
-<node oor:name="Images">
-<node oor:name="schooltools.OfficeToolBar.images1" oor:op="replace">
-<prop oor:name="URL" oor:type="xs:string">
-<value>vnd.sun.star.script:schooltools.quicktalkUtilities.textMagnifierButton?language=Basic&amp;location=application</value>
-</prop>
-<node oor:name="UserDefinedImages">
-<prop oor:name="ImageSmallURL">
-<value>%origin%/../../../../../images/selectiontoimpress_16.png</value>
-</prop>
-<prop oor:name="ImageSmallHCURL">
-<value>%origin%/../../../../../images/selectiontoimpress_16h.png</value>
-</prop>
-<prop oor:name="ImageBigURL">
-<value>%origin%/../../../../../images/selectiontoimpress_26.png</value>
-</prop>
-<prop oor:name="ImageBigHCURL">
-<value>%origin%/../../../../../images/selectiontoimpress_26h.png</value>
-</prop>
-</node>
-</node>
-<node oor:name="schooltools.OfficeToolBar.images2" oor:op="replace">
-<prop oor:name="URL" oor:type="xs:string">
-<value>vnd.sun.star.script:schooltools.schooltools.ToolBar1Pressed?language=Basic&amp;location=application</value>
-</prop>
-<node oor:name="UserDefinedImages">
-<prop oor:name="ImageSmallURL">
-<value>%origin%/../../../../../images/phototool_16.png</value>
-</prop>
-<prop oor:name="ImageSmallHCURL">
-<value>%origin%/../../../../../images/phototool_16h.png</value>
-</prop>
-<prop oor:name="ImageBigURL">
-<value>%origin%/../../../../../images/phototool_26.png</value>
-</prop>
-<prop oor:name="ImageBigHCURL">
-<value>%origin%/../../../../../images/phototool_26h.png</value>
-</prop>
-</node>
-</node>
-<node oor:name="schooltools.OfficeToolBar.images3" oor:op="replace">
-<prop oor:name="URL" oor:type="xs:string">
-<value>vnd.sun.star.script:schooltools.schooltools.ToolBar2Pressed?language=Basic&amp;location=application</value>
-</prop>
-<node oor:name="UserDefinedImages">
-<prop oor:name="ImageSmallURL">
-<value>%origin%/../../../../../images/schooltools_16.png</value>
-</prop>
-<prop oor:name="ImageSmallHCURL">
-<value>%origin%/../../../../../images/schooltools_16h.png</value>
-</prop>
-<prop oor:name="ImageBigURL">
-<value>%origin%/../../../../../images/schooltools_26.png</value>
-</prop>
-<prop oor:name="ImageBigHCURL">
-<value>%origin%/../../../../../images/schooltools_26h.png</value>
-</prop>
-</node>
-</node>
-<node oor:name="schooltools.OfficeToolBar.images4" oor:op="replace">
-<prop oor:name="URL" oor:type="xs:string">
-<value>vnd.sun.star.script:schooltools.schooltools.ToolBar11Pressed?language=Basic&amp;location=application</value>
-</prop>
-<node oor:name="UserDefinedImages">
-<prop oor:name="ImageSmallURL">
-<value>%origin%/../../../../../images/edit-slideshow_16.png</value>
-</prop>
-<prop oor:name="ImageSmallHCURL">
-<value>%origin%/../../../../../images/edit-slideshow_16h.png</value>
-</prop>
-<prop oor:name="ImageBigURL">
-<value>%origin%/../../../../../images/edit-slideshow_26.png</value>
-</prop>
-<prop oor:name="ImageBigHCURL">
-<value>%origin%/../../../../../images/edit-slideshow_26h.png</value>
-</prop>
-</node>
-</node>
-<node oor:name="schooltools.OfficeToolBar.images5" oor:op="replace">
-<prop oor:name="URL" oor:type="xs:string">
-<value>vnd.sun.star.script:schooltools.schooltools.ToolBar12Pressed?language=Basic&amp;location=application</value>
-</prop>
-<node oor:name="UserDefinedImages">
-<prop oor:name="ImageSmallURL">
-<value>%origin%/../../../../../images/read-slideshow_16.png</value>
-</prop>
-<prop oor:name="ImageSmallHCURL">
-<value>%origin%/../../../../../images/read-slideshow_16h.png</value>
-</prop>
-<prop oor:name="ImageBigURL">
-<value>%origin%/../../../../../images/read-slideshow_26.png</value>
-</prop>
-<prop oor:name="ImageBigHCURL">
-<value>%origin%/../../../../../images/read-slideshow_26h.png</value>
-</prop>
-</node>
-</node>
-<node oor:name="schooltools.OfficeToolBar.images6" oor:op="replace">
-<prop oor:name="URL" oor:type="xs:string">
-<value>vnd.sun.star.script:schooltools.quicktalkUtilities.textReaderButton?language=Basic&amp;location=application</value>
-</prop>
-<node oor:name="UserDefinedImages">
-<prop oor:name="ImageSmallURL">
-<value>%origin%/../../../../../images/textToSpeech_16.png</value>
-</prop>
-<prop oor:name="ImageSmallHCURL">
-<value>%origin%/../../../../../images/textToSpeech_16h.png</value>
-</prop>
-<prop oor:name="ImageBigURL">
-<value>%origin%/../../../../../images/textToSpeech_26.png</value>
-</prop>
-<prop oor:name="ImageBigHCURL">
-<value>%origin%/../../../../../images/textToSpeech_26h.png</value>
-</prop>
-</node>
-</node>
-<node oor:name="schooltools.OfficeToolBar.images7" oor:op="replace">
-<prop oor:name="URL" oor:type="xs:string">
-<value>vnd.sun.star.script:schooltools.schooltools.ToolBar3Pressed?language=Basic&amp;location=application</value>
-</prop>
-<node oor:name="UserDefinedImages">
-<prop oor:name="ImageSmallURL">
-<value>%origin%/../../../../../images/ebook_16.png</value>
-</prop>
-<prop oor:name="ImageSmallHCURL">
-<value>%origin%/../../../../../images/ebook_16h.png</value>
-</prop>
-<prop oor:name="ImageBigURL">
-<value>%origin%/../../../../../images/ebook_26.png</value>
-</prop>
-<prop oor:name="ImageBigHCURL">
-<value>%origin%/../../../../../images/ebook_26h.png</value>
-</prop>
-</node>
-</node>
-</node>
-</node>
-</oor:component-data>
+  <node oor:name="AddonUI">
+    <node oor:name="OfficeToolBar">
+      <!-- Items for Tool bars using LibreOffice/OpenOffice 3.0 format -->
+      <node oor:name="schooltools.OfficeToolBar" oor:op="replace">
+        <node oor:name="schooltools.AddonMenu.m06" oor:op="replace">
+          <prop oor:name="Context" oor:type="xs:string">
+            <value>com.sun.star.presentation.PresentationDocument,com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument,com.sun.star.text.WebDocument,com.sun.star.text.GlobalDocument,com.sun.star.drawing.DrawingDocument</value>
+          </prop>
+          <prop oor:name="URL" oor:type="xs:string">
+            <value>vnd.sun.star.script:schooltools.quicktalkUtilities.textReaderButton?language=Basic&amp;location=application</value>
+          </prop>
+          <prop oor:name="Title" oor:type="xs:string">
+            <value>Read Selection</value>
+            <value xml:lang="en">Read Selection</value>
+            <value xml:lang="fr">Lire la Sélection</value>
+          </prop>
+          <prop oor:name="Target" oor:type="xs:string">
+            <value>_self</value>
+          </prop>
+        </node>
+        <node oor:name="schooltools.AddonMenu.m00" oor:op="replace">
+          <prop oor:name="Context" oor:type="xs:string">
+            <value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument,com.sun.star.text.WebDocument,com.sun.star.text.GlobalDocument,com.sun.star.drawing.DrawingDocument</value>
+          </prop>
+          <prop oor:name="URL" oor:type="xs:string">
+            <value>vnd.sun.star.script:schooltools.quicktalkUtilities.textMagnifierButton?language=Basic&amp;location=application</value>
+          </prop>
+          <prop oor:name="Title" oor:type="xs:string">
+            <value>Export Selection</value>
+            <value xml:lang="en">Export Selection</value>
+            <value xml:lang="fr">Exporter la Sélection</value>
+          </prop>
+          <prop oor:name="Target" oor:type="xs:string">
+            <value>_self</value>
+          </prop>
+        </node>
+
+        <node oor:name="schooltools.AddonMenu.m01" oor:op="replace">
+          <prop oor:name="Context" oor:type="xs:string">
+            <value>com.sun.star.presentation.PresentationDocument</value>
+          </prop>
+          <prop oor:name="URL" oor:type="xs:string">
+            <value>vnd.sun.star.script:schooltools.schooltools.ToolBar1Pressed?language=Basic&amp;location=application</value>
+          </prop>
+          <prop oor:name="Title" oor:type="xs:string">
+            <value>Start New Project</value>
+            <value xml:lang="en">Start New Project</value>
+            <value xml:lang="fr">Nouveau Projet</value>
+          </prop>
+          <prop oor:name="Target" oor:type="xs:string">
+            <value>_self</value>
+          </prop>
+        </node>
+        <node oor:name="schooltools.AddonMenu.m02" oor:op="replace">
+          <prop oor:name="Context" oor:type="xs:string">
+            <value>com.sun.star.presentation.PresentationDocument</value>
+          </prop>
+          <prop oor:name="URL" oor:type="xs:string">
+            <value>vnd.sun.star.script:schooltools.schooltools.ToolBar2Pressed?language=Basic&amp;location=application</value>
+          </prop>
+          <prop oor:name="Title" oor:type="xs:string">
+            <value>Project Tools</value>
+            <value xml:lang="en">Project Tools</value>
+            <value xml:lang="fr">Outils du Projet</value>
+          </prop>
+          <prop oor:name="Target" oor:type="xs:string">
+            <value>_self</value>
+          </prop>
+        </node>
+        <node oor:name="schooltools.AddonMenu.m03" oor:op="replace">
+          <prop oor:name="Context" oor:type="xs:string">
+            <value>com.sun.star.presentation.PresentationDocument</value>
+          </prop>
+          <prop oor:name="URL" oor:type="xs:string">
+            <value>vnd.sun.star.script:schooltools.schooltools.ToolBar11Pressed?language=Basic&amp;location=application</value>
+          </prop>
+          <prop oor:name="Title" oor:type="xs:string">
+            <value>Notepad</value>
+            <value xml:lang="en">Notepad</value>
+            <value xml:lang="fr">Bloc Notes</value>
+          </prop>
+          <prop oor:name="Target" oor:type="xs:string">
+            <value>_self</value>
+          </prop>
+        </node>
+        <node oor:name="schooltools.AddonMenu.m04" oor:op="replace">
+          <prop oor:name="Context" oor:type="xs:string">
+            <value>com.sun.star.presentation.PresentationDocument</value>
+          </prop>
+          <prop oor:name="URL" oor:type="xs:string">
+            <value>vnd.sun.star.script:schooltools.schooltools.ToolBar12Pressed?language=Basic&amp;location=application</value>
+          </prop>
+          <prop oor:name="Title" oor:type="xs:string">
+            <value>Read Project</value>
+            <value xml:lang="en">Read Project</value>
+            <value xml:lang="fr">Lire le Projet</value>
+          </prop>
+          <prop oor:name="Target" oor:type="xs:string">
+            <value>_self</value>
+          </prop>
+        </node>
+        <node oor:name="schooltools.AddonMenu.m05" oor:op="replace">
+          <prop oor:name="Context" oor:type="xs:string">
+            <value>com.sun.star.presentation.PresentationDocument</value>
+          </prop>
+          <prop oor:name="URL" oor:type="xs:string">
+            <value>vnd.sun.star.script:schooltools.schooltools.ToolBar3Pressed?language=Basic&amp;location=application</value>
+          </prop>
+          <prop oor:name="Title" oor:type="xs:string">
+            <value>Share Project</value>
+            <value xml:lang="en">Share Project</value>
+            <value xml:lang="fr">Partager le projet</value>
+          </prop>
+          <prop oor:name="Target" oor:type="xs:string">
+            <value>_self</value>
+          </prop>
+        </node></node></node>
+        <!--  Items for Tools - Add-ons menu  -->
+        <node oor:name="AddonMenu">
+          <node oor:name="schooltools.AddonMenu.m07" oor:op="replace">
+            <prop oor:name="Context" oor:type="xs:string">
+              <value>com.sun.star.presentation.PresentationDocument,com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument,com.sun.star.text.WebDocument,com.sun.star.text.GlobalDocument,com.sun.star.drawing.DrawingDocument</value>
+            </prop>
+            <prop oor:name="URL" oor:type="xs:string">
+              <value>vnd.sun.star.script:schooltools.quicktalkUtilities.textReaderButton?language=Basic&amp;location=application</value>
+            </prop>
+            <prop oor:name="Title" oor:type="xs:string">
+              <value>Export Selection...</value>
+              <value xml:lang="en">Read Selection</value>
+              <value xml:lang="fr">Lire la Sélection</value>
+            </prop>
+            <prop oor:name="Target" oor:type="xs:string">
+              <value>_self</value>
+            </prop>
+          </node>
+          <node oor:name="schooltools.AddonMenu.m01" oor:op="replace">
+            <prop oor:name="Context" oor:type="xs:string">
+              <value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument,com.sun.star.text.WebDocument,com.sun.star.text.GlobalDocument,com.sun.star.presentation.PresentationDocument,com.sun.star.drawing.DrawingDocument</value>
+            </prop>
+            <prop oor:name="URL" oor:type="xs:string">
+              <value>vnd.sun.star.script:schooltools.schooltools.ToolBar1Pressed?language=Basic&amp;location=application</value>
+            </prop>
+            <prop oor:name="Title" oor:type="xs:string">
+              <value>Start New Project...</value>
+              <value xml:lang="en">Start New Project...</value>
+              <value xml:lang="fr">Nouveau Projet...</value>
+            </prop>
+            <prop oor:name="Target" oor:type="xs:string">
+              <value>_self</value>
+            </prop>
+          </node>
+          <node oor:name="schooltools.AddonMenu.m02" oor:op="replace">
+            <prop oor:name="Context" oor:type="xs:string">
+              <value>com.sun.star.presentation.PresentationDocument</value>
+            </prop>
+            <prop oor:name="URL" oor:type="xs:string">
+              <value>vnd.sun.star.script:schooltools.schooltools.ToolBar2Pressed?language=Basic&amp;location=application</value>
+            </prop>
+            <prop oor:name="Title" oor:type="xs:string">
+              <value>Project Tools...</value>
+              <value xml:lang="en">Project Tools...</value>
+              <value xml:lang="fr">Outils du Projet...</value>
+            </prop>
+            <prop oor:name="Target" oor:type="xs:string">
+              <value>_self</value>
+            </prop>
+          </node>
+          <node oor:name="schooltools.AddonMenu.m021" oor:op="replace">
+            <prop oor:name="Context" oor:type="xs:string">
+              <value>com.sun.star.presentation.PresentationDocument</value>
+            </prop>
+            <prop oor:name="URL" oor:type="xs:string">
+              <value>vnd.sun.star.script:schooltools.schooltools.ToolBar11Pressed?language=Basic&amp;location=application</value>
+            </prop>
+            <prop oor:name="Title" oor:type="xs:string">
+              <value>Notepad...</value>
+              <value xml:lang="en">Notepad...</value>
+              <value xml:lang="fr">Bloc Notes...</value>
+            </prop>
+            <prop oor:name="Target" oor:type="xs:string">
+              <value>_self</value>
+            </prop>
+          </node>
+          <node oor:name="schooltools.AddonMenu.m022" oor:op="replace">
+            <prop oor:name="Context" oor:type="xs:string">
+              <value>com.sun.star.presentation.PresentationDocument</value>
+            </prop>
+            <prop oor:name="URL" oor:type="xs:string">
+              <value>vnd.sun.star.script:schooltools.schooltools.ToolBar12Pressed?language=Basic&amp;location=application</value>
+            </prop>
+            <prop oor:name="Title" oor:type="xs:string">
+              <value>Read Project</value>
+              <value xml:lang="en">Read Project</value>
+              <value xml:lang="fr">Lire le Projet</value>
+            </prop>
+            <prop oor:name="Target" oor:type="xs:string">
+              <value>_self</value>
+            </prop>
+          </node>
+          <node oor:name="schooltools.AddonMenu.m05" oor:op="replace">
+            <prop oor:name="Context" oor:type="xs:string">
+              <value>com.sun.star.presentation.PresentationDocument</value>
+            </prop>
+            <prop oor:name="URL" oor:type="xs:string">
+              <value>vnd.sun.star.script:schooltools.schooltools.ToolBar3Pressed?language=Basic&amp;location=application</value>
+            </prop>
+            <prop oor:name="Title" oor:type="xs:string">
+              <value>Share Project...</value>
+              <value xml:lang="en">Share Project...</value>
+              <value xml:lang="fr">Partager le projet...</value>
+            </prop>
+            <prop oor:name="Target" oor:type="xs:string">
+              <value>_self</value>
+            </prop>
+          </node>
+          <node oor:name="schooltools.AddonMenu.m06" oor:op="replace">
+            <prop oor:name="Context" oor:type="xs:string">
+              <value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument,com.sun.star.text.WebDocument,com.sun.star.text.GlobalDocument,com.sun.star.drawing.DrawingDocument</value>
+            </prop>
+            <prop oor:name="URL" oor:type="xs:string">
+              <value>vnd.sun.star.script:schooltools.quicktalkUtilities.textMagnifierButton?language=Basic&amp;location=application</value>
+            </prop>
+            <prop oor:name="Title" oor:type="xs:string">
+              <value>Export Selection...</value>
+              <value xml:lang="en">Export Selection...</value>
+              <value xml:lang="fr">Exporter la Sélection...</value>
+            </prop>
+            <prop oor:name="Target" oor:type="xs:string">
+              <value>_self</value>
+            </prop>
+          </node></node>
+          <!--  specify image urls for icons  -->
+          <node oor:name="Images">
+            <node oor:name="schooltools.OfficeToolBar.images1" oor:op="replace">
+              <prop oor:name="URL" oor:type="xs:string">
+                <value>vnd.sun.star.script:schooltools.quicktalkUtilities.textMagnifierButton?language=Basic&amp;location=application</value>
+              </prop>
+              <node oor:name="UserDefinedImages">
+                <prop oor:name="ImageSmallURL">
+                  <value>%origin%/../../../../../images/selectiontoimpress_16.png</value>
+                </prop>
+                <prop oor:name="ImageSmallHCURL">
+                  <value>%origin%/../../../../../images/selectiontoimpress_16h.png</value>
+                </prop>
+                <prop oor:name="ImageBigURL">
+                  <value>%origin%/../../../../../images/selectiontoimpress_26.png</value>
+                </prop>
+                <prop oor:name="ImageBigHCURL">
+                  <value>%origin%/../../../../../images/selectiontoimpress_26h.png</value>
+                </prop>
+              </node></node>
+              <node oor:name="schooltools.OfficeToolBar.images2" oor:op="replace">
+                <prop oor:name="URL" oor:type="xs:string">
+                  <value>vnd.sun.star.script:schooltools.schooltools.ToolBar1Pressed?language=Basic&amp;location=application</value>
+                </prop>
+                <node oor:name="UserDefinedImages">
+                  <prop oor:name="ImageSmallURL">
+                    <value>%origin%/../../../../../images/phototool_16.png</value>
+                  </prop>
+                  <prop oor:name="ImageSmallHCURL">
+                    <value>%origin%/../../../../../images/phototool_16h.png</value>
+                  </prop>
+                  <prop oor:name="ImageBigURL">
+                    <value>%origin%/../../../../../images/phototool_26.png</value>
+                  </prop>
+                  <prop oor:name="ImageBigHCURL">
+                    <value>%origin%/../../../../../images/phototool_26h.png</value>
+                  </prop>
+                </node></node>
+                <node oor:name="schooltools.OfficeToolBar.images3" oor:op="replace">
+                  <prop oor:name="URL" oor:type="xs:string">
+                    <value>vnd.sun.star.script:schooltools.schooltools.ToolBar2Pressed?language=Basic&amp;location=application</value>
+                  </prop>
+                  <node oor:name="UserDefinedImages">
+                    <prop oor:name="ImageSmallURL">
+                      <value>%origin%/../../../../../images/schooltools_16.png</value>
+                    </prop>
+                    <prop oor:name="ImageSmallHCURL">
+                      <value>%origin%/../../../../../images/schooltools_16h.png</value>
+                    </prop>
+                    <prop oor:name="ImageBigURL">
+                      <value>%origin%/../../../../../images/schooltools_26.png</value>
+                    </prop>
+                    <prop oor:name="ImageBigHCURL">
+                      <value>%origin%/../../../../../images/schooltools_26h.png</value>
+                    </prop>
+                  </node></node>
+                  <node oor:name="schooltools.OfficeToolBar.images4" oor:op="replace">
+                    <prop oor:name="URL" oor:type="xs:string">
+                      <value>vnd.sun.star.script:schooltools.schooltools.ToolBar11Pressed?language=Basic&amp;location=application</value>
+                    </prop>
+                    <node oor:name="UserDefinedImages">
+                      <prop oor:name="ImageSmallURL">
+                        <value>%origin%/../../../../../images/edit-slideshow_16.png</value>
+                      </prop>
+                      <prop oor:name="ImageSmallHCURL">
+                        <value>%origin%/../../../../../images/edit-slideshow_16h.png</value>
+                      </prop>
+                      <prop oor:name="ImageBigURL">
+                        <value>%origin%/../../../../../images/edit-slideshow_26.png</value>
+                      </prop>
+                      <prop oor:name="ImageBigHCURL">
+                        <value>%origin%/../../../../../images/edit-slideshow_26h.png</value>
+                      </prop>
+                    </node></node>
+                    <node oor:name="schooltools.OfficeToolBar.images5" oor:op="replace">
+                      <prop oor:name="URL" oor:type="xs:string">
+                        <value>vnd.sun.star.script:schooltools.schooltools.ToolBar12Pressed?language=Basic&amp;location=application</value>
+                      </prop>
+                      <node oor:name="UserDefinedImages">
+                        <prop oor:name="ImageSmallURL">
+                          <value>%origin%/../../../../../images/read-slideshow_16.png</value>
+                        </prop>
+                        <prop oor:name="ImageSmallHCURL">
+                          <value>%origin%/../../../../../images/read-slideshow_16h.png</value>
+                        </prop>
+                        <prop oor:name="ImageBigURL">
+                          <value>%origin%/../../../../../images/read-slideshow_26.png</value>
+                        </prop>
+                        <prop oor:name="ImageBigHCURL">
+                          <value>%origin%/../../../../../images/read-slideshow_26h.png</value>
+                        </prop>
+                      </node></node>
+                      <node oor:name="schooltools.OfficeToolBar.images6" oor:op="replace">
+                        <prop oor:name="URL" oor:type="xs:string">
+                          <value>vnd.sun.star.script:schooltools.quicktalkUtilities.textReaderButton?language=Basic&amp;location=application</value>
+                        </prop>
+                        <node oor:name="UserDefinedImages">
+                          <prop oor:name="ImageSmallURL">
+                            <value>%origin%/../../../../../images/textToSpeech_16.png</value>
+                          </prop>
+                          <prop oor:name="ImageSmallHCURL">
+                            <value>%origin%/../../../../../images/textToSpeech_16h.png</value>
+                          </prop>
+                          <prop oor:name="ImageBigURL">
+                            <value>%origin%/../../../../../images/textToSpeech_26.png</value>
+                          </prop>
+                          <prop oor:name="ImageBigHCURL">
+                            <value>%origin%/../../../../../images/textToSpeech_26h.png</value>
+                          </prop>
+                        </node></node>
+                        <node oor:name="schooltools.OfficeToolBar.images7" oor:op="replace">
+                          <prop oor:name="URL" oor:type="xs:string">
+                            <value>vnd.sun.star.script:schooltools.schooltools.ToolBar3Pressed?language=Basic&amp;location=application</value>
+                          </prop>
+                          <node oor:name="UserDefinedImages">
+                            <prop oor:name="ImageSmallURL">
+                              <value>%origin%/../../../../../images/ebook_16.png</value>
+                            </prop>
+                            <prop oor:name="ImageSmallHCURL">
+                              <value>%origin%/../../../../../images/ebook_16h.png</value>
+                            </prop>
+                            <prop oor:name="ImageBigURL">
+                              <value>%origin%/../../../../../images/ebook_26.png</value>
+                            </prop>
+                            <prop oor:name="ImageBigHCURL">
+                              <value>%origin%/../../../../../images/ebook_26h.png</value>
+                            </prop>
+                          </node></node></node></node>
+                        </oor:component-data>
+

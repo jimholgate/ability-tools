@@ -16,15 +16,15 @@
 
                     <node oor:name="m0" oor:op="replace">
                         <prop oor:name="Context" oor:type="xs:string">
-                            <value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument,com.sun.star.text.WebDocument,com.sun.star.drawing.DrawingDocument</value>
+                            <value>com.sun.star.presentation.PresentationDocument,com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument,com.sun.star.text.WebDocument,com.sun.star.drawing.DrawingDocument</value>
                         </prop>
                         <prop oor:name="URL" oor:type="xs:string">
-                            <value>vnd.sun.star.script:schooltools.quicktalkUtilities.textMagnifierButton?language=Basic&amp;location=application</value>
+                            <value>vnd.sun.star.script:schooltools.quicktalkUtilities.textReaderButton?language=Basic&amp;location=application</value>
                         </prop>
                         <prop oor:name="Title" oor:type="xs:string" oor:localized="true">
-                            <value>Export Selection</value>
-                            <value xml:lang="en">Export Selection</value>
-                            <value xml:lang="fr">Exporter la Sélection</value>
+                            <value>Read Selection</value>
+                            <value xml:lang="en">Read Selection</value>
+                            <value xml:lang="fr">Lire la Sélection</value>
                         </prop>
                         <prop oor:name="Target" oor:type="xs:string">
                             <value>_self</value>
@@ -36,12 +36,12 @@
                             <value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument,com.sun.star.text.WebDocument,com.sun.star.drawing.DrawingDocument</value>
                         </prop>
                         <prop oor:name="URL" oor:type="xs:string">
-                            <value>vnd.sun.star.script:schooltools.quicktalkUtilities.textReaderButton?language=Basic&amp;location=application</value>
+                            <value>vnd.sun.star.script:schooltools.quicktalkUtilities.textMagnifierButton?language=Basic&amp;location=application</value>
                         </prop>
                         <prop oor:name="Title" oor:type="xs:string" oor:localized="true">
-                            <value>Read Selection</value>
-                            <value xml:lang="en">Read Selection</value>
-                            <value xml:lang="fr">Lire la Sélection</value>
+                            <value>Export Selection</value>
+                            <value xml:lang="en">Export Selection</value>
+                            <value xml:lang="fr">Exporter la Sélection</value>
                         </prop>
                         <prop oor:name="Target" oor:type="xs:string">
                             <value>_self</value>
@@ -134,6 +134,22 @@
 	    </node>
 		<!-- Items for Tools - Add-ons menu -->
         <node oor:name="AddonMenu">
+            <node oor:name="schooltools.AddonMenu.m00" oor:op="replace">
+                <prop oor:name="Context" oor:type="xs:string">
+                    <value>com.sun.star.presentation.PresentationDocument,com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument,com.sun.star.text.WebDocument,com.sun.star.text.GlobalDocument,com.sun.star.drawing.DrawingDocument</value>
+                </prop>
+                <prop oor:name="URL" oor:type="xs:string">
+                    <value>vnd.sun.star.script:schooltools.quicktalkUtilities.textReaderButton?language=Basic&amp;location=application</value>
+                </prop>
+                <prop oor:name="Title" oor:type="xs:string">
+                    <value>Read Selection</value>
+                    <value xml:lang="en">Read Selection</value>
+                    <value xml:lang="fr">Lire la Sélection</value>
+                </prop>
+                <prop oor:name="Target" oor:type="xs:string">
+                    <value>_self</value>
+                </prop>
+            </node>
             <node oor:name="schooltools.AddonMenu.m01" oor:op="replace">
                 <prop oor:name="Context" oor:type="xs:string">
                     <value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument,com.sun.star.text.WebDocument,com.sun.star.text.GlobalDocument,com.sun.star.presentation.PresentationDocument,com.sun.star.drawing.DrawingDocument</value>
@@ -166,7 +182,7 @@
                     <value>_self</value>
                 </prop>
             </node>
-            <node oor:name="schooltools.AddonMenu.m021" oor:op="replace">
+            <node oor:name="schooltools.AddonMenu.m03" oor:op="replace">
                 <prop oor:name="Context" oor:type="xs:string">
                     <value>com.sun.star.presentation.PresentationDocument</value>
                 </prop>
@@ -182,7 +198,7 @@
                     <value>_self</value>
                 </prop>
             </node>
-            <node oor:name="schooltools.AddonMenu.m022" oor:op="replace">
+            <node oor:name="schooltools.AddonMenu.m04" oor:op="replace">
                 <prop oor:name="Context" oor:type="xs:string">
                     <value>com.sun.star.presentation.PresentationDocument</value>
                 </prop>
@@ -225,22 +241,6 @@
                     <value>Export Selection...</value>
                     <value xml:lang="en">Export Selection...</value>
                     <value xml:lang="fr">Exporter la Sélection...</value>
-                </prop>
-                <prop oor:name="Target" oor:type="xs:string">
-                    <value>_self</value>
-                </prop>
-            </node>
-            <node oor:name="schooltools.AddonMenu.m07" oor:op="replace">
-                <prop oor:name="Context" oor:type="xs:string">
-                    <value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument,com.sun.star.text.WebDocument,com.sun.star.text.GlobalDocument,com.sun.star.drawing.DrawingDocument</value>
-                </prop>
-                <prop oor:name="URL" oor:type="xs:string">
-                    <value>vnd.sun.star.script:schooltools.quicktalkUtilities.textReaderButton?language=Basic&amp;location=application</value>
-                </prop>
-                <prop oor:name="Title" oor:type="xs:string">
-                    <value>Read Selection</value>
-                    <value xml:lang="en">Read Selection</value>
-                    <value xml:lang="fr">Lire la Sélection</value>
                 </prop>
                 <prop oor:name="Target" oor:type="xs:string">
                     <value>_self</value>

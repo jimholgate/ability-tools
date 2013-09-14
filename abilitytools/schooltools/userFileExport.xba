@@ -145,7 +145,7 @@ function createJsonMobile (Optional MyKey as string)
 	&apos; SlideSpeech.com currently uses data.json and image
 	&apos; files in a zip archive to store, display and audition 
 	&apos; talking presentations for Android, iOS and Windows 
-	&apos; Mobile. The mobile apps allow you to store SlideSpeech 
+	&apos; Mobile. The mobile apps allow you to store converted 
 	&apos; presentations so that they are available offline. 
 	&apos; I modelled this implementation on the file structure as it
 	&apos; appeared in the iOS file system on August 21, 2012.
