@@ -4,7 +4,7 @@
     <node oor:name="OfficeToolBar">
       <!-- Items for Tool bars using LibreOffice/OpenOffice 3.0 format -->
       <node oor:name="schooltools.OfficeToolBar" oor:op="replace">
-        <node oor:name="schooltools.AddonMenu.m06" oor:op="replace">
+        <node oor:name="schooltools.AddonMenu.m00" oor:op="replace">
           <prop oor:name="Context" oor:type="xs:string">
             <value>com.sun.star.presentation.PresentationDocument,com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument,com.sun.star.text.WebDocument,com.sun.star.text.GlobalDocument,com.sun.star.drawing.DrawingDocument</value>
           </prop>
@@ -20,7 +20,7 @@
             <value>_self</value>
           </prop>
         </node>
-        <node oor:name="schooltools.AddonMenu.m00" oor:op="replace">
+        <node oor:name="schooltools.AddonMenu.m01" oor:op="replace">
           <prop oor:name="Context" oor:type="xs:string">
             <value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument,com.sun.star.text.WebDocument,com.sun.star.text.GlobalDocument,com.sun.star.drawing.DrawingDocument</value>
           </prop>
@@ -37,7 +37,7 @@
           </prop>
         </node>
 
-        <node oor:name="schooltools.AddonMenu.m01" oor:op="replace">
+        <node oor:name="schooltools.AddonMenu.m02" oor:op="replace">
           <prop oor:name="Context" oor:type="xs:string">
             <value>com.sun.star.presentation.PresentationDocument</value>
           </prop>
@@ -53,7 +53,7 @@
             <value>_self</value>
           </prop>
         </node>
-        <node oor:name="schooltools.AddonMenu.m02" oor:op="replace">
+        <node oor:name="schooltools.AddonMenu.m03" oor:op="replace">
           <prop oor:name="Context" oor:type="xs:string">
             <value>com.sun.star.presentation.PresentationDocument</value>
           </prop>
@@ -69,7 +69,7 @@
             <value>_self</value>
           </prop>
         </node>
-        <node oor:name="schooltools.AddonMenu.m03" oor:op="replace">
+        <node oor:name="schooltools.AddonMenu.m04" oor:op="replace">
           <prop oor:name="Context" oor:type="xs:string">
             <value>com.sun.star.presentation.PresentationDocument</value>
           </prop>
@@ -85,7 +85,7 @@
             <value>_self</value>
           </prop>
         </node>
-        <node oor:name="schooltools.AddonMenu.m04" oor:op="replace">
+        <node oor:name="schooltools.AddonMenu.m05" oor:op="replace">
           <prop oor:name="Context" oor:type="xs:string">
             <value>com.sun.star.presentation.PresentationDocument</value>
           </prop>
@@ -101,7 +101,7 @@
             <value>_self</value>
           </prop>
         </node>
-        <node oor:name="schooltools.AddonMenu.m05" oor:op="replace">
+        <node oor:name="schooltools.AddonMenu.m06" oor:op="replace">
           <prop oor:name="Context" oor:type="xs:string">
             <value>com.sun.star.presentation.PresentationDocument</value>
           </prop>
@@ -116,10 +116,26 @@
           <prop oor:name="Target" oor:type="xs:string">
             <value>_self</value>
           </prop>
+        </node>
+        <node oor:name="schooltools.AddonMenu.m07" oor:op="replace">
+          <prop oor:name="Context" oor:type="xs:string">
+            <value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument,com.sun.star.text.WebDocument,com.sun.star.text.GlobalDocument,com.sun.star.drawing.DrawingDocument</value>
+          </prop>
+          <prop oor:name="URL" oor:type="xs:string">
+            <value>.uno:InsertGraphic</value>
+          </prop>
+          <prop oor:name="Title" oor:type="xs:string">
+            <value>Insert Graphic</value>
+            <value xml:lang="en">Insert Graphic</value>
+            <value xml:lang="fr">Inserer Graphique</value>
+          </prop>
+          <prop oor:name="Target" oor:type="xs:string">
+            <value>_self</value>
+          </prop>
         </node></node></node>
         <!--  Items for Tools - Add-ons menu  -->
         <node oor:name="AddonMenu">
-          <node oor:name="schooltools.AddonMenu.m07" oor:op="replace">
+          <node oor:name="schooltools.AddonMenu.m00" oor:op="replace">
             <prop oor:name="Context" oor:type="xs:string">
               <value>com.sun.star.presentation.PresentationDocument,com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument,com.sun.star.text.WebDocument,com.sun.star.text.GlobalDocument,com.sun.star.drawing.DrawingDocument</value>
             </prop>
@@ -167,7 +183,7 @@
               <value>_self</value>
             </prop>
           </node>
-          <node oor:name="schooltools.AddonMenu.m021" oor:op="replace">
+          <node oor:name="schooltools.AddonMenu.m03" oor:op="replace">
             <prop oor:name="Context" oor:type="xs:string">
               <value>com.sun.star.presentation.PresentationDocument</value>
             </prop>
@@ -183,7 +199,7 @@
               <value>_self</value>
             </prop>
           </node>
-          <node oor:name="schooltools.AddonMenu.m022" oor:op="replace">
+          <node oor:name="schooltools.AddonMenu.m04" oor:op="replace">
             <prop oor:name="Context" oor:type="xs:string">
               <value>com.sun.star.presentation.PresentationDocument</value>
             </prop>
@@ -357,6 +373,24 @@
                             </prop>
                             <prop oor:name="ImageBigHCURL">
                               <value>%origin%/../../../../../images/ebook_26h.png</value>
+                            </prop>
+                          </node></node>
+                        <node oor:name="schooltools.OfficeToolBar.images8" oor:op="replace">
+                          <prop oor:name="URL" oor:type="xs:string">
+                            <value>.uno:InsertGraphic</value>
+                          </prop>
+                          <node oor:name="UserDefinedImages">
+                            <prop oor:name="ImageSmallURL">
+                              <value>%origin%/../../../../../images/import_image_16.png</value>
+                            </prop>
+                            <prop oor:name="ImageSmallHCURL">
+                              <value>%origin%/../../../../../images/import_image_16h.png</value>
+                            </prop>
+                            <prop oor:name="ImageBigURL">
+                              <value>%origin%/../../../../../images/import_image_26.png</value>
+                            </prop>
+                            <prop oor:name="ImageBigHCURL">
+                              <value>%origin%/../../../../../images/import_image_26h.png</value>
                             </prop>
                           </node></node></node></node>
                         </oor:component-data>
