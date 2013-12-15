@@ -371,9 +371,9 @@ function fs_DIALOG3_OK_HELP (cL)
 	case &quot;MAC&quot;,&quot;OSX&quot;
 		select case cL
 		case &quot;fr&quot;
-			fs_DIALOG3_OK_HELP = &quot;Cliquez sur OK pour continuer. Faites une commande clic pour enregistrer le texte dans une note.&quot;
+			fs_DIALOG3_OK_HELP = &quot;Cliquez sur OK pour continuer. Faites une contrôle clic pour enregistrer le texte dans une note.&quot;
 		case else
-			fs_DIALOG3_OK_HELP = &quot;Click OK to continue. Command click to save the text as a note.&quot;
+			fs_DIALOG3_OK_HELP = &quot;Click OK to continue. Control click to save the text as a note.&quot;
 		end select
 	case else
 		select case cL
