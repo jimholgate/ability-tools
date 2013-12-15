@@ -155,7 +155,7 @@ function fs_EMAIL (cL)
 		fs_EMAIL = &quot;Email&quot;
 	end select
 end function
-&apos; Voulez-vous ajouter un horodatage?
+
 
 function fs_ADD_TIMESTAMP (cL)
 	select case cL
@@ -363,6 +363,25 @@ function fs_DIALOG_OK (cL)
 		fs_DIALOG_OK = &quot;OK&quot;
 	case else
 		fs_DIALOG_OK = &quot;OK&quot;
+	end select
+end function
+
+function fs_DIALOG3_OK_HELP (cL)
+	select case fsGetOS()
+	case &quot;MAC&quot;,&quot;OSX&quot;
+		select case cL
+		case &quot;fr&quot;
+			fs_DIALOG3_OK_HELP = &quot;Cliquez sur OK pour continuer. Faites une commande clic pour enregistrer le texte dans une note.&quot;
+		case else
+			fs_DIALOG3_OK_HELP = &quot;Click OK to continue. Command click to save the text as a note.&quot;
+		end select
+	case else
+		select case cL
+		case &quot;fr&quot;
+			fs_DIALOG3_OK_HELP = &quot;Cliquez sur OK pour continuer. Faites un clic droit pour enregistrer le texte dans une note.&quot;
+		case else
+			fs_DIALOG3_OK_HELP = &quot;Click OK to continue. Right click to save the text as a note.&quot;
+		end select
 	end select
 end function
 

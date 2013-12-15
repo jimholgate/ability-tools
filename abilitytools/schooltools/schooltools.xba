@@ -66,6 +66,20 @@ sub Dialog1PictureClicked
 	synthesizeSpeech(oDlg.GetControl(&quot;TextField1&quot;).Text, fs_USEINTERFACELANGUAGE (fs_cL))
 end sub
 
+Sub Dialog3_OK_MouseUp(Event As Object)
+	&apos; This Sub selects a different command when
+	&apos; you right click or centre click the OK button.
+	Dim msgs() As Variant
+	Dim errorCode As Integer 
+	If Event.Buttons AND com.sun.star.awt.MouseButton.RIGHT Then
+		&apos; Do second activity instead. For example, offer advanced option(s)
+		SchoolToolsDialogSaveAs
+	Elseif Event.Buttons AND com.sun.star.awt.MouseButton.MIDDLE Then
+		&apos; Do third activity - help related
+		ShowDialog (fs_DIALOG3_OK_HELP (fs_cL))
+	Endif
+End Sub
+
 function fb_Online_Resource_CarteBlanche
 	dim sA as string
 	fb_Online_Resource_CarteBlanche = false
