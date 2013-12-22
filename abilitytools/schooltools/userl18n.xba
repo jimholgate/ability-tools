@@ -421,6 +421,15 @@ function fs_BAD_MAC_FILENAME (cL)
 	end select
 end function
 
+function fs_FILE_IS_IN_USE (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_FILE_IS_IN_USE = &quot;Fichier en cours d&apos;utilisation. Essayer de nouveau.&quot;
+	case else
+		fs_FILE_IS_IN_USE = &quot;The action is unavailable because the file name is already used. Try again.&quot;
+	end select
+end function
+
 function fs_APPLICATION (cL)
 	select case cL
 	case &quot;fr&quot;
@@ -725,7 +734,7 @@ function fs_EXPORT_SELECTION (cL)
 	case &quot;fr&quot;
 		fs_EXPORT_SELECTION = &quot;Exporter le texte à une note dans une nouvelle présentation &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp; &quot;.&quot;
 	case else
-		fs_EXPORT_SELECTION = &quot;Export the text to a note in a new &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp; &quot; presentation&quot;
+		fs_EXPORT_SELECTION = &quot;Export the text to a note in a new &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp; &quot; presentation.&quot;
 	end select
 end function
 

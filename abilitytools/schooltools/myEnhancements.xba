@@ -1670,7 +1670,7 @@ sub SchoolToolsLanguage
 		if fileExists (fsSpeechSettingURL) then
 			&apos; Preserve setting from Presentation Tools dialog
 		else
-			&apos; Use offline reading setting &apos;xxxxxx
+			&apos; Use offline reading setting
 			CreateFile(fsSpeechSettingURL,&quot;(PLAY_PRESENTATION_ALOUD_OFFLINE)&quot;,&quot;UTF-8&quot;)
 		endif 
 		f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Enabled = true

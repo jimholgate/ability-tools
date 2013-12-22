@@ -1,27 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
 <script:module xmlns:script="http://openoffice.org/2000/script" script:name="quicktalkUtilities" script:language="StarBasic">REM  *****  BASIC  *****
-sub textMagnifierButton
-	dim sA, sB as string
+sub exportSelectionAsODP
+	dim sA, sB, sC as string
 	dim oAlbum
-	sB = fsMyURL &amp; &quot;/templates/narrow.otp&quot;
+	sB = &quot;&quot;
 	sA = fsGetTextSelection()
 	sA = fsSchoolToolsInputBox(fs_EXPORT_SELECTION (fs_cL), getBranding (bI_SPOKEN_BRANDING), sA)
 	if len (sA) &lt;&gt; 0 then
-		oAlbum = StarDesktop.loadComponentFromUrl (sB,&quot;_blank&quot;,0,dimarray())
-		UpdateSlideNote (sA)
-		if f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Enabled then
-			setNoteLanguage (f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Text)
-		endif
-		sB = left (sA, iGetBreakPoint(sA, 30))
+		sB = trim (left (sA, iGetBreakPoint(sA, 30)))
 		if len(sB) = 0 then 
 			sB = getBranding( bI_SPOKEN_BRANDING )
 		endif
-		sB = fsSaveSchoolToolFile(sB , &quot;ODF Presentation (.odp)&quot;,&quot;*.odp&quot;)
-		if len (sB) &lt;&gt; 0 then
-			fsSaveAsPresentation(sB)
+		sC = fsSaveSchoolToolFile(sB , &quot;ODF Presentation (.odp)&quot;,&quot;*.odp&quot;)
+		if len (sC) &lt;&gt; 0 then
+			if fileExists(sC) then
+				showDialog (fs_FILE_IS_IN_USE (fs_cL) , false)
+			else
+				oAlbum = StarDesktop.loadComponentFromUrl (fsMyURL &amp; &quot;/templates/narrow.otp&quot;,&quot;_blank&quot;,0,dimarray())
+				UpdateSlideNote (sA)
+				UpdateSlideTitle (ConvertFromURL(GetFileNameWithoutExtension( sC,&quot;/&quot;)))
+				if f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Enabled then
+					setNoteLanguage (f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Text)
+				endif
+				fsSaveAsPresentation(sC)
+			endif
 		endif
 	endif
+end sub
+
+sub textMagnifierButton
+	exportSelectionAsODP
 end sub
 
 sub textReaderButton
