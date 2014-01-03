@@ -20,6 +20,7 @@ sub exportSelectionAsODP
 				oAlbum = StarDesktop.loadComponentFromUrl (fsMyURL &amp; &quot;/templates/narrow.otp&quot;,&quot;_blank&quot;,0,dimarray())
 				UpdateSlideNote (sA)
 				UpdateSlideTitle (ConvertFromURL(GetFileNameWithoutExtension( sC,&quot;/&quot;)))
+				UpdateSlideName (ConvertFromURL(GetFileNameWithoutExtension( sC,&quot;/&quot;)))
 				if f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Enabled then
 					setNoteLanguage (f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Text)
 				endif

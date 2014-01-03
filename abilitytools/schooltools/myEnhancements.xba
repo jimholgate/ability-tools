@@ -982,6 +982,31 @@ sub startEditingFirstNote
 	endif
 end sub
 
+function UpdateSlideName (byval optional sA, optional nPage)
+	if B_DEBUG=false then
+		on error goto UpdateSlideNameErr
+	endif
+	UpdateSlideName = false
+	if ismissing (nPage) then 
+		nPage = fnCurrentCard
+	endif
+	if ismissing (sA) then
+		sA = fsNow()
+	endif
+	dim oDoc as object
+	dim i as integer
+	oDoc = ThisComponent
+	if oDoc.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) then
+		&apos; The function will update the slide name (
+		oDoc.getDrawPages().getByIndex( nPage ).name= sA
+		thisComponent.setModified(true)
+	endif
+	UpdateSlideName = true
+	exit function
+	UpdateSlideNameErr:
+	UpdateSlideName = false
+end function
+
 sub UpdateSlideNote (byval sA, optional nPage)
 	if ismissing (nPage) then 
 		nPage = fnCurrentCard
