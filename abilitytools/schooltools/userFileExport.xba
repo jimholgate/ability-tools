@@ -1254,58 +1254,50 @@ function fbtestKindle ()
 	endif
 end function
 
+function fbHaveEpubProgram
+	dim sA, sB as string
+	dim sProgramPath (15) as string
+	dim n as integer
+	sA = fsProgramDirectory()
+	sB = fsProgramDirectoryx86()
+	&apos; You saw the dialogue but declined installing calibre or another known ePub reader.
+	sProgramPath(0) = createUnoService(&quot;com.sun.star.util.PathSettings&quot;).userConfig &amp; &quot;/impresstools/calibre.txt&quot;
+	&apos; OSX
+	sProgramPath(1) = &quot;/Applications/calibre.app&quot;
+	sProgramPath(2) = &quot;/Applications/iBooks.app&quot;
+	sProgramPath(3) = &quot;/Applications/Adobe Digital Editions.app&quot;
+	&apos; Linux
+	sProgramPath(4) = &quot;/usr/bin/calibre&quot;
+	sProgramPath(5) = &quot;/usr/bin/fbreader&quot;
+	sProgramPath(6) = &quot;/usr/bin/sigil&quot;
+	&apos; Windows
+	sProgramPath(7) = sA &amp; &quot;Adobe\Adobe Digital Editions&quot;
+	sProgramPath(8) = sB &amp; &quot;Adobe\Adobe Digital Editions&quot;
+	sProgramPath(9) = sA &amp; &quot;Overdrive Media Console&quot;
+	sProgramPath(10) = sB &amp; &quot;Overdrive Media Console&quot;
+	sProgramPath(11) = sA &amp; &quot;Calibre2&quot;
+	sProgramPath(12) = sB &amp; &quot;Calibre2&quot;
+	sProgramPath(13) = sA &amp; &quot;fbreader&quot;
+	sProgramPath(14) = sB &amp; &quot;fbreader&quot;
+	fbHaveEpubProgram = false
+	for n = 0 to 14
+		if fileExists(sProgramPath(n)) then
+			fbHaveEpubProgram = true
+			exit for
+		endif
+	next
+end function
+
 function makeCalibreEpub (optional ntype)
 	if ismissing (bType) then
 		nType = 0
 	endif
 	dim i, iNO_SYSTEM_ERROR_MESSAGE as integer
 	dim sA, CR, cURL as string
-	dim bCalibreOK as boolean
 	dim oSvc
 	CR = chr$(13)
 	iNO_SYSTEM_ERROR_MESSAGE = 1
-	if fileExists (&quot;/Applications/calibre.app&quot;) then
-		bCalibreOK = true
-	elseif fileExists (&quot;/Applications/Adobe Digital Editions.app&quot;) then
-		bCalibreOK = true
-	&apos;elseif fileExists (&quot;/Applications/Kobo.app&quot;) then
-	&apos;	bCalibreOK = true
-	elseif fileExists (&quot;/usr/bin/calibre&quot;) then
-		bCalibreOK = true
-	elseif fileExists (&quot;/usr/bin/fbreader&quot;) then
-		bCalibreOK = true
-	&apos;-----------
-	&apos; Adobe Digital Editions hasn&apos;t been updated in over two years. 
-	&apos; It doesn&apos;t respect font alignment in SVGs created with Inkscape.
-	&apos; Other images randomly fail to display. 
-	&apos; No Hindi fonts, even if Hindi fonts are installed on the system.
-	&apos; Menus are not standard for system. You might need Adobe Digital
-	&apos; Editions to read DRM protected books. Otherwise, use calibre.
-	elseif fileExists (fsProgramDirectory() &amp; &quot;Adobe\Adobe Digital Editions&quot;) then
-		bCalibreOK = true
-	elseif fileExists (fsProgramDirectoryx86() &amp; &quot;Adobe\Adobe Digital Editions&quot;) then
-		bCalibreOK = true
-	elseif fileExists (fsProgramDirectory() &amp; &quot;Calibre2&quot;) then
-		bCalibreOK = true
-	elseif fileExists (fsProgramDirectoryx86() &amp; &quot;Calibre2&quot;) then
-		bCalibreOK = true
-	elseif fileExists (fsProgramDirectory() &amp; &quot;fbreader&quot;) then
-		bCalibreOK = true
-	elseif fileExists (fsProgramDirectoryx86() &amp; &quot;fbreader&quot;) then
-		bCalibreOK = true
-	elseif fileExists(createUnoService(&quot;com.sun.star.util.PathSettings&quot;).userConfig &amp; &quot;/impresstools/calibre.txt&quot;) then
-		bCalibreOK = true &apos; You saw the dialogue but declined installing calibre or another known ePub reader.
-	&apos; Kobo on PC does not display fonts properly. Problem verified with
-	&apos;  .epub documents created with dotEpub.com and with this extension.
-	&apos;elseif fileExists (fsProgramDirectory() &amp; &quot;Kobo&quot;) then
-	&apos;	bCalibreOK = true
-	&apos;elseif fileExists (fsProgramDirectoryx86() &amp; &quot;Kobo&quot;) then
-	&apos;	bCalibreOK = true
-	else 
-		bCalibreOK = false
-	endif
-	
-	if bCalibreOK = false then
+	if fbHaveEpubProgram = false then
 		cURL = &quot;http://calibre-ebook.com/&quot;
 		sA = fs_EPUB_CALIBRE(fs_cL)
 		i = msgBox (sA, 163)

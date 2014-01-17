@@ -218,7 +218,10 @@ sub readSlideShowNote (Optional nSpeechResources)
 			readTheNotesScript(sA, nSpeechResources, nPage)
 		endif
 	else 
-		ShowDialog(fs_SAVE_BEFORE_PROCEEDING(fs_cL))
+		if showdialog (fs_SAVE_BEFORE_PROCEEDING(fs_cL), true) then
+			&apos;Save the file
+			saveDocument
+		endif
 	endif
 end sub 
 

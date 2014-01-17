@@ -38,7 +38,10 @@ sub ToolBar11Pressed
 	if fBextensionOK (&quot;odp&quot;, cAttachmentURL) then 
 		SchoolToolsEditNotesDialog
 	else 
-		ShowDialog(fs_SAVE_BEFORE_PROCEEDING(fs_cL))
+		if showdialog (fs_SAVE_BEFORE_PROCEEDING(fs_cL), true) then
+			&apos;Save the file
+			saveDocument
+		endif
 	endif
 end sub
 
@@ -48,7 +51,10 @@ sub ToolBar12Pressed
 	if fBextensionOK (&quot;odp&quot;, cAttachmentURL) then 
 		doToolBar12ReadNotes
 	else 
-		ShowDialog(fs_SAVE_BEFORE_PROCEEDING(fs_cL))
+		if showdialog (fs_SAVE_BEFORE_PROCEEDING(fs_cL), true) then
+			&apos;Save the file
+			saveDocument
+		endif
 	endif
 end sub
 
@@ -168,7 +174,10 @@ sub SetupImpressTools (optional iToolType)
 			ShowDialog(fs_NO_ACTION(fs_cL))
 		end select 
 	else 
-		ShowDialog(fs_SAVE_BEFORE_PROCEEDING(fs_cL))
+		if showdialog (fs_SAVE_BEFORE_PROCEEDING(fs_cL), true) then
+			&apos;Save the file
+			saveDocument
+		endif
 	endif
 end sub 
 
@@ -312,7 +321,7 @@ sub saveDocument
 	dim s1 
 	oDoc   = ThisComponent.CurrentController.Frame
 	oDispatcher = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
-	oDispatcher.executeDispatch(oDoc, &quot;.uno:Save&quot;, &quot;&quot;, 0, array())
+	oDispatcher.executeDispatch(oDoc, &quot;.uno:SaveAs&quot;, &quot;&quot;, 0, array())
 end sub
 
 sub OSXMail (byval sGetURL,byval sKey,byval sRecipient)
