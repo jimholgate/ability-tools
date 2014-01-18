@@ -2564,9 +2564,6 @@ function fbIsAQuestion(byval optional sA as string, optional sLanguage as string
 end function
 
 &apos;------------------------------------------------------------
-sub testLatin
-	synthesizeSpeech(&quot;Lorem. Ego sum a magister.&quot;, &quot;la-VA&quot;)
-end sub
 
 sub testDefault
 	simpleSpeech(&quot;This is the default voice on your system.&quot;)
@@ -2580,18 +2577,6 @@ sub testFrCA
 	synthesizeSpeech (&quot;Salut! Je m&apos;appelle Alexandre.&quot;, &quot;fr-CA&quot;)
 end sub
 
-sub testEsMx
-	synthesizeSpeech (&quot;Hola. Soy Javier.&quot;, &quot;es-MX&quot;)
-end sub
-
-sub testEnGB
-	synthesizeSpeech (&quot;Good evening. My name is Sarah.&quot;, &quot;en-GB&quot;)
-end sub
-
-sub testRuRU
-	synthesizeSpeech (&quot;Привет. Меня зовут Дмитрий.&quot;, &quot;ru-RU&quot;)
-end sub
-
 sub testZhCN
 	synthesizeSpeech (&quot;你好。我是老师。&quot;, &quot;zh-CN&quot;)
 end sub
@@ -2601,32 +2586,8 @@ sub testZxx
 	synthesizeSpeech (&quot;Hello. This language is undefined.&quot;, &quot;zxx-&quot;)
 end sub
 
-sub testEnAU2
-	getOnlineSpeech (&quot;Good day! I teach English.&quot;, &quot;en-AU&quot;, false)
-end sub
-
-sub testEsMx2
-	getOnlineSpeech (&quot;¡Hola! Doy clases de español.&quot;, &quot;es-ES&quot;, false)
-end sub
-
-sub testZhCn2
-	getOnlineSpeech (&quot;你好。我教普通话。&quot;,&quot;zh-CN&quot;,false)
-end sub
-
-sub testRuRU2
-	getOnlineSpeech (&quot;Привет. Меня зовут Дмитрий.&quot;, &quot;ru-RU&quot;, false)
-end sub
-
-sub testHiIn2
-	getOnlineSpeech (&quot;नमस्कार.मैं हिंदी सिखाने के लिए.&quot;,&quot;hi-IN&quot;,false)
-end sub
-
 sub testFrCa2
 	getOnlineSpeech (&quot;Salut! J&apos;enseigne le français.&quot;,&quot;fr-CA&quot;,false)
-end sub
-
-sub testLtLt2
-	getOnlineSpeech (&quot;Sveiki. Esu mokytojas.&quot;,&quot;lt-LT&quot;,false)
 end sub
 
 sub testLongPhraseOnline()

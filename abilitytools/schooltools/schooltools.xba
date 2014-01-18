@@ -39,8 +39,7 @@ sub ToolBar11Pressed
 		SchoolToolsEditNotesDialog
 	else 
 		if showdialog (fs_SAVE_BEFORE_PROCEEDING(fs_cL), true) then
-			&apos;Save the file
-			saveDocument
+			saveDocumentAs
 		endif
 	endif
 end sub
@@ -52,8 +51,7 @@ sub ToolBar12Pressed
 		doToolBar12ReadNotes
 	else 
 		if showdialog (fs_SAVE_BEFORE_PROCEEDING(fs_cL), true) then
-			&apos;Save the file
-			saveDocument
+			saveDocumentAs
 		endif
 	endif
 end sub
@@ -175,8 +173,7 @@ sub SetupImpressTools (optional iToolType)
 		end select 
 	else 
 		if showdialog (fs_SAVE_BEFORE_PROCEEDING(fs_cL), true) then
-			&apos;Save the file
-			saveDocument
+			saveDocumentAs
 		endif
 	endif
 end sub 
@@ -316,6 +313,15 @@ sub saveDocument
 &apos;programs like LibreOffice use the traditional warning
 &apos;to save unsaved changes when you attempt to close the 
 &apos;window.
+	dim oDoc as object
+	dim oDispatcher as object
+	dim s1 
+	oDoc   = ThisComponent.CurrentController.Frame
+	oDispatcher = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
+	oDispatcher.executeDispatch(oDoc, &quot;.uno:Save&quot;, &quot;&quot;, 0, array())
+end sub
+
+sub saveDocumentAs
 	dim oDoc as object
 	dim oDispatcher as object
 	dim s1 
