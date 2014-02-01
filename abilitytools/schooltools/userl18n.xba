@@ -502,15 +502,6 @@ function fs_END_OF_SLIDESHOW (cL)
 	end select
 end function
 
-function fs_WRITE_DRAW_SAVE (cL)
-	select case cL
-	case &quot;fr&quot;
-		fs_WRITE_DRAW_SAVE = &quot;Utiliser le bloc-notes pour ecrire des textes. Faire des diapositives. Enregistrez la présentation. Publiez le projet.&quot;
-	case else
-		fs_WRITE_DRAW_SAVE = &quot;Use the notepad to write text. Add images and text to slides. Save the presentation. Publish it.&quot;
-	end select
-end function
-
 function fs_NO_ACTION  (cL)
 	select case cL
 	case &quot;fr&quot;

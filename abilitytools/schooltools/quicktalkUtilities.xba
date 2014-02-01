@@ -213,6 +213,17 @@ Sub selecttoEnd
 	dispatcher.executeDispatch(document, &quot;.uno:EndOfDocumentSel&quot;, &quot;&quot;, 0, Array())
 End Sub
 
+Sub InsertPageQuick	
+	&apos; Inserts new slide in presentation after the current slide
+	dim document   as object
+	dim dispatcher as object
+	viewNormal()
+	wait 500
+	document   = ThisComponent.CurrentController.Frame
+	dispatcher = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
+	dispatcher.executeDispatch(document, &quot;.uno:InsertPageQuick&quot;, &quot;&quot;, 0, Array())
+End Sub
+
 Sub selectAWord
 	dim document   as object
 	dim dispatcher as object
