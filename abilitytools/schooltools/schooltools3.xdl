@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE dlg:window PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "dialog.dtd">
-<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:style-id="5" dlg:id="schooltools3" dlg:left="0" dlg:top="0" dlg:width="203" dlg:height="196" dlg:closeable="true" dlg:moveable="true">
+<dlg:window xmlns:dlg="http://openoffice.org/2000/dialog" xmlns:script="http://openoffice.org/2000/script" dlg:style-id="5" dlg:id="schooltools3" dlg:left="0" dlg:top="0" dlg:width="253" dlg:height="181" dlg:closeable="true" dlg:moveable="true">
  <dlg:styles>
   <dlg:style dlg:style-id="0" dlg:font-name="Sans" dlg:font-stylename="Regular" dlg:font-family="swiss"/>
   <dlg:style dlg:style-id="1" dlg:text-color="0x4c4c4c" dlg:font-height="14"/>
@@ -10,13 +10,13 @@
   <dlg:style dlg:style-id="5" dlg:font-name=" " dlg:font-stylename="Regular"/>
  </dlg:styles>
  <dlg:bulletinboard>
-  <dlg:textfield dlg:style-id="0" dlg:id="TextField1" dlg:tab-index="0" dlg:left="2" dlg:top="52" dlg:width="196" dlg:height="115" dlg:tabstop="true" dlg:hide-inactive-selection="false" dlg:vscroll="true" dlg:multiline="true">
+  <dlg:textfield dlg:style-id="0" dlg:id="TextField1" dlg:tab-index="0" dlg:left="2" dlg:top="52" dlg:width="246" dlg:height="100" dlg:tabstop="true" dlg:hide-inactive-selection="false" dlg:vscroll="true" dlg:multiline="true">
    <script:event script:event-name="on-mouseover" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.upDateSchoolToolsNewStatus?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:textfield>
-  <dlg:button dlg:id="CommandButton1" dlg:tab-index="1" dlg:left="149" dlg:top="173" dlg:width="43" dlg:height="18" dlg:default="true" dlg:value="OK" dlg:button-type="ok">
+  <dlg:button dlg:id="CommandButton1" dlg:tab-index="1" dlg:left="199" dlg:top="158" dlg:width="43" dlg:height="18" dlg:default="true" dlg:value="OK" dlg:button-type="ok">
    <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:schooltools.schooltools.Dialog3_OK_MouseUp?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:button>
-  <dlg:button dlg:id="CommandButton2" dlg:tab-index="2" dlg:left="101" dlg:top="173" dlg:width="43" dlg:height="18" dlg:value="Cancel" dlg:button-type="cancel"/>
+  <dlg:button dlg:id="CommandButton2" dlg:tab-index="2" dlg:left="151" dlg:top="158" dlg:width="43" dlg:height="18" dlg:value="Cancel" dlg:button-type="cancel"/>
   <dlg:button dlg:id="CommandButton4" dlg:tab-index="4" dlg:left="0" dlg:top="0" dlg:width="18" dlg:height="22" dlg:tabstop="false" dlg:grab-focus="false">
    <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsDialogFileOpen?language=Basic&amp;location=application" script:language="Script"/>
    <script:event script:event-name="on-mouseover" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.upDateSchoolToolsNewStatus?language=Basic&amp;location=application" script:language="Script"/>
@@ -49,7 +49,7 @@
    <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsLanguage?language=Basic&amp;location=application" script:language="Script"/>
    <script:event script:event-name="on-mouseover" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.upDateSchoolToolsNewStatus?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:button>
-  <dlg:combobox dlg:id="ComboBox1" dlg:tab-index="15" dlg:disabled="true" dlg:left="3" dlg:top="173" dlg:width="55" dlg:height="18" dlg:value="..." dlg:spin="true">
+  <dlg:combobox dlg:id="ComboBox1" dlg:tab-index="15" dlg:disabled="true" dlg:left="3" dlg:top="158" dlg:width="55" dlg:height="18" dlg:value="..." dlg:spin="true">
    <dlg:menupopup>
     <dlg:menuitem dlg:value="af-ZA"/>
     <dlg:menuitem dlg:value="ar-AE"/>
@@ -192,14 +192,14 @@
    <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsSpeak?language=Basic&amp;location=application" script:language="Script"/>
    <script:event script:event-name="on-mouseover" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.upDateSchoolToolsNewStatus?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:button>
-  <dlg:textfield dlg:style-id="2" dlg:id="Serif" dlg:tab-index="16" dlg:visible="false" dlg:left="173" dlg:top="44" dlg:width="29" dlg:height="16" dlg:value="Serif"/>
-  <dlg:textfield dlg:style-id="3" dlg:id="DefaultFont" dlg:tab-index="17" dlg:visible="false" dlg:left="173" dlg:top="27" dlg:width="29" dlg:height="16" dlg:printable="false" dlg:value="DefaultFont"/>
-  <dlg:textfield dlg:style-id="4" dlg:id="Monospace" dlg:tab-index="18" dlg:visible="false" dlg:left="173" dlg:top="60" dlg:width="29" dlg:height="16" dlg:value="Monospace"/>
-  <dlg:text dlg:id="Label1" dlg:tab-index="3" dlg:left="2" dlg:top="24" dlg:width="195" dlg:height="25" dlg:value="Label1" dlg:multiline="true">
+  <dlg:textfield dlg:style-id="2" dlg:id="Serif" dlg:tab-index="16" dlg:visible="false" dlg:left="223" dlg:top="44" dlg:width="29" dlg:height="16" dlg:value="Serif"/>
+  <dlg:textfield dlg:style-id="3" dlg:id="DefaultFont" dlg:tab-index="17" dlg:visible="false" dlg:left="223" dlg:top="27" dlg:width="29" dlg:height="16" dlg:printable="false" dlg:value="DefaultFont"/>
+  <dlg:textfield dlg:style-id="4" dlg:id="Monospace" dlg:tab-index="18" dlg:visible="false" dlg:left="223" dlg:top="60" dlg:width="29" dlg:height="16" dlg:value="Monospace"/>
+  <dlg:text dlg:id="Label1" dlg:tab-index="3" dlg:left="2" dlg:top="24" dlg:width="245" dlg:height="25" dlg:value="Label1" dlg:multiline="true">
    <script:event script:event-name="on-mouseover" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.upDateSchoolToolsNewStatus?language=Basic&amp;location=application" script:language="Script"/>
    <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsReadQuestion?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:text>
-  <dlg:filecontrol dlg:id="Destination1" dlg:tab-index="6" dlg:visible="false" dlg:left="3" dlg:top="173" dlg:width="43" dlg:height="18" dlg:printable="false" dlg:tabstop="false"/>
-  <dlg:textfield dlg:style-id="4" dlg:id="styleNo" dlg:tab-index="19" dlg:visible="false" dlg:left="173" dlg:top="76" dlg:width="29" dlg:height="16" dlg:value="0"/>
+  <dlg:filecontrol dlg:id="Destination1" dlg:tab-index="6" dlg:visible="false" dlg:left="3" dlg:top="158" dlg:width="43" dlg:height="18" dlg:printable="false" dlg:tabstop="false"/>
+  <dlg:textfield dlg:style-id="4" dlg:id="styleNo" dlg:tab-index="19" dlg:visible="false" dlg:left="223" dlg:top="76" dlg:width="29" dlg:height="16" dlg:value="0"/>
  </dlg:bulletinboard>
 </dlg:window>

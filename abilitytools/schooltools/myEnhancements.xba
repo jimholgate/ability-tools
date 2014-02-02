@@ -1288,6 +1288,8 @@ sub SchoolToolsTextEditorStyleSetup
 	dim fontDes, fontStyled, fontDefault, fontModern
 	dim iA, iB as integer
 	dim iDefaultFontSize as integer
+	dim flDialogWidthMultiplier
+	dim flDialogHeightMultiplier
 	dim sA, sB as string
 	fontDes = createUnoStruct(&quot;com.sun.star.awt.FontDescriptor&quot;) 
 	fontDes = f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.FontDescriptor
@@ -1300,10 +1302,16 @@ sub SchoolToolsTextEditorStyleSetup
 	select case fsGetOS()
 	case &quot;WINDOWS&quot;
   		iDefaultFontSize = 9
+  		flDialogWidthMultiplier = 2
+		flDialogHeightMultiplier = 1 
   	case &quot;MAC&quot;,&quot;OSX&quot;
   		iDefaultFontSize = 8
+  		flDialogWidthMultiplier = 1.5
+		flDialogHeightMultiplier = 1.5 
   	case else
   		iDefaultFontSize = 10
+  		flDialogWidthMultiplier = 1.5
+		flDialogHeightMultiplier = 1.5
   	end select
   	if fileExists (fsNotesMenuSettingURL) then
 		sA = fsSuperTrim (getTextFromFile(fsNotesMenuSettingURL, &quot;UTF-8&quot;))
@@ -1312,8 +1320,8 @@ sub SchoolToolsTextEditorStyleSetup
 	endif
 	select case sA
 	case &quot;1&quot;, &quot;2&quot;, &quot;3&quot;, &quot;4&quot;, &quot;5&quot;, &quot;6&quot;, &quot;7&quot;, &quot;8&quot;, &quot;9&quot;
-		f_dlgImpressAsk.Model.Width = int( f_dlgImpressAsk.Model.Width * 1.5 )
-		f_dlgImpressAsk.Model.Height = int (f_dlgImpressAsk.Model.Height * 1.5 )
+		f_dlgImpressAsk.Model.Width = int( f_dlgImpressAsk.Model.Width * flDialogWidthMultiplier )
+		f_dlgImpressAsk.Model.Height = int(f_dlgImpressAsk.Model.Height * flDialogHeightMultiplier )
 		hideEditControls
 	case else
 		if len (f_dlgImpressAsk.GetControl(&quot;Label1&quot;).Model.Label) = 0 then
@@ -1400,6 +1408,8 @@ end sub
 sub SchoolToolsTextEditorStyle
 	dim fontDes, fontStyled, fontDefault, fontModern
 	dim iA, iB as integer
+	dim flDialogWidthMultiplier
+	dim flDialogHeightMultiplier
 	dim iDefaultFontSize as integer
 	dim sA, sB as string
 	fontDes = createUnoStruct(&quot;com.sun.star.awt.FontDescriptor&quot;) 
@@ -1413,10 +1423,16 @@ sub SchoolToolsTextEditorStyle
 	select case fsGetOS()
 	case &quot;WINDOWS&quot;
   		iDefaultFontSize = 9
+  		flDialogWidthMultiplier = 2
+		flDialogHeightMultiplier = 1 
   	case &quot;MAC&quot;,&quot;OSX&quot;
   		iDefaultFontSize = 8
+  		flDialogWidthMultiplier = 1.5
+		flDialogHeightMultiplier = 1.5 
   	case else
   		iDefaultFontSize = 10
+  		flDialogWidthMultiplier = 1.5
+		flDialogHeightMultiplier = 1.5
   	end select
   	if fileExists (fsNotesMenuSettingURL) then
 		sA = fsSuperTrim (getTextFromFile(fsNotesMenuSettingURL, &quot;UTF-8&quot;))
@@ -1427,8 +1443,8 @@ sub SchoolToolsTextEditorStyle
   	case &quot;0&quot;
   		sB = &quot;1&quot;
   		fontDes.Height = int( iDefaultFontSize * 1.41421356237 )
-  		f_dlgImpressAsk.Model.Width = int( f_dlgImpressAsk.Model.Width * 1.5 )
-		f_dlgImpressAsk.Model.Height = int (f_dlgImpressAsk.Model.Height * 1.5 )
+  		f_dlgImpressAsk.Model.Width = int( f_dlgImpressAsk.Model.Width * flDialogWidthMultiplier )
+		f_dlgImpressAsk.Model.Height = int (f_dlgImpressAsk.Model.Height * flDialogHeightMultiplier )
 		hideEditControls
 	case &quot;1&quot;
   		sB = &quot;2&quot;
@@ -1465,8 +1481,8 @@ sub SchoolToolsTextEditorStyle
   	case else
   		sB = &quot;0&quot;
   		fontDes.Height = iDefaultFontSize
-  		f_dlgImpressAsk.Model.Width = int( f_dlgImpressAsk.Model.Width / 1.5 )
-		f_dlgImpressAsk.Model.Height = int( f_dlgImpressAsk.Model.Height / 1.5 )
+  		f_dlgImpressAsk.Model.Width = int( f_dlgImpressAsk.Model.Width / flDialogWidthMultiplier )
+		f_dlgImpressAsk.Model.Height = int (f_dlgImpressAsk.Model.Height / flDialogHeightMultiplier )
 		if len (f_dlgImpressAsk.GetControl(&quot;Label1&quot;).Model.Label) = 0 then
 	  		showEditControls
 	  	else
