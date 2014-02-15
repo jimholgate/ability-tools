@@ -52,12 +52,18 @@ Function fsGetTextSelection() As String
 	Dim n As Integer
 	On Error Goto TEXTSELECTERROR
 	oDoc=thisComponent
+	sSelectedText = &quot;&quot;
 	If oDoc.SupportsService(&quot;com.sun.star.sheet.SpreadsheetDocument&quot;) Then	
 		fsGetSelectionAndCopy()
 		sSelectedText=fsRetrieveCalcActiveCellProperty(&quot;text&quot;)
 	Elseif oDoc.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) or oDoc.supportsService(&quot;com.sun.star.drawing.DrawingDocument&quot;) Then
 		fsGetSelectionAndCopy()
+		on error resume next
 		sSelectedText=fsDrawProperty(&quot;text&quot;)
+		on error goto TEXTSELECTERROR
+		if sSelectedText = &quot;&quot; then
+			sSelectedText = fsgetSlideAltContentText (ThisComponent.getCurrentController.getCurrentPage().Number-1, false) 	
+		endif
 	Elseif oDoc.supportsService(&quot;com.sun.star.text.TextDocument&quot;) or oDoc.supportsService(&quot;com.sun.star.text.WebDocument&quot;) or oDoc.supportsService(&quot;com.sun.star.text.GlobalDocument&quot;) Then
 		oSelection=oDoc.getCurrentSelection()
 		sSelectedText=&quot;&quot; 	 

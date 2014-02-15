@@ -482,6 +482,16 @@ sub synthesizeSpeech( byval sA, Optional sLang as string, Optional byval nSpeech
 	if ismissing(sLang) then 
 		sLang = &quot;en-US&quot;
 	endif
+	if sLang = &quot;-&quot; then 
+		sLang = fsDocLanguage &amp; &quot;-&quot; &amp; fsDocCountry
+		if len (sLang) &gt; 1 then
+			if right(sLang,1) = &quot;-&quot; then
+				sLang = left(sLang, len(sLang) -1)
+			endif
+		else
+			sLang = &quot;en-US&quot;
+		endif
+	endif
 	if ismissing(nSpeechResources) then
 		if fBHasGLicense = true then
 			nSpeechResources = ENABLE_ONLINE_RESOURCES
