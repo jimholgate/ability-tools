@@ -600,6 +600,7 @@ function fs_NO_ONLINE_LANGUAGE (cL)
 		fs_NO_ONLINE_LANGUAGE = getBranding ( bI_SPOKEN_BRANDING ) &amp; &quot; is not able to read this. Check the language.&quot;
 	end select
 end function
+
 function fs_SLIDE(cL)
 	select case cL
 	case &quot;af&quot; &apos;afrikaans

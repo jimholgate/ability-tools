@@ -2389,7 +2389,7 @@ function ImpressAssembleHTML (Optional nStyle)
 		oElem=oDoc.getDrawPages().getElementNames() 
 		nThisPage=oDoc.getCurrentController.getCurrentPage().Number-1
 		for nPage=nThisPage To nNumPages - 1 
-			cTitle = fs_SLIDE(fs_cL)
+			cTitle = fs_SLIDE(fsDocLanguage)
 			if nStyle = 4 or nStyle = 5 then 
 				cTitle=  &quot;&lt;h1&gt;&quot; &amp; fsToGradeOneBraille ( cTitle &amp; &quot; &quot; &amp; nPage + 1 , nStyle)  &amp; &quot;&lt;/h1&gt;&quot; &amp; CR
 				sA = sA &amp; cTitle

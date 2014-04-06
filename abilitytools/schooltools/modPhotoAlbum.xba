@@ -85,7 +85,7 @@ sub rppPhotoAlbum (optional iLimit)
 		oSlides.Remove (oSlides (0))
 	wend
 	&apos;Now have one blank slide, to be used as title slide
-	oSlides(0).Name = fs_SLIDE(fs_cL) &amp; &quot; 1&quot;
+	oSlides(0).Name = fs_SLIDE(fsDocLanguage) &amp; &quot; 1&quot;
 
 	&apos;Get first file in directory
 	sFile = dir(sDir)
