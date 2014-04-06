@@ -1192,12 +1192,86 @@ function fs_BOOK_COVER (cL)
 		fs_BOOK_COVER = &quot;Cover&quot;
 	end select
 end function
-
 function fs_NOTE (cL)
+	&apos; Translations by Google. If you have a better translation, please contact me.
 	select case cL
-	case &quot;fr&quot;
+	case &quot;af&quot; &apos;afrikaans
+		fs_NOTE = &quot;Noot&quot;
+	case &quot;bg&quot; &apos;bulgarian
+		fs_NOTE = &quot;бележка&quot;
+	case &quot;ca&quot; &apos;catalan
+		fs_NOTE = &quot;Nota&quot;
+	case &quot;cs&quot; &apos;czech
+		fs_NOTE = &quot;Nota&quot;
+	case &quot;da&quot; &apos;danish
+		fs_NOTE = &quot;Note&quot;		
+	case &quot;de&quot; &apos;german
+		fs_NOTE = &quot;Anmerkung&quot;
+	case &quot;el&quot; &apos;greek
+		fs_NOTE = &quot;νότα&quot;
+	case &quot;en&quot; &apos;english
 		fs_NOTE = &quot;Note&quot;
-	case else
+	case &quot;es&quot; &apos;spanish
+		fs_NOTE = &quot;Nota&quot;
+	case &quot;et&quot; &apos;estonian
+		fs_NOTE = &quot;Märkus&quot;
+	case &quot;fi&quot; &apos;finnish
+		fs_NOTE = &quot;Huomata&quot;
+	case &quot;fr&quot; &apos;french
+		fs_NOTE = &quot;Note&quot;
+	case &quot;ga&quot; &apos;irish
+		fs_NOTE = &quot;Nóta&quot;
+	case &quot;hi&quot; &apos;hindi
+		fs_NOTE = &quot;टिप्पणी&quot;
+	case &quot;hu&quot; &apos;hungarian
+		fs_NOTE = &quot;Jegyzet&quot;
+	case &quot;id&quot; &apos;indonesian
+		fs_NOTE = &quot;Nota&quot;
+	case &quot;is&quot; &apos;icelandic
+		fs_NOTE = &quot;Nótur&quot;
+	case &quot;it&quot; &apos;italian
+		fs_NOTE = &quot;Commento&quot;
+	case &quot;ja&quot;, &quot;jp&quot; &apos;japanese
+		fs_NOTE = &quot;控え&quot;
+	case &quot;ko&quot; &apos;korean
+		fs_NOTE = &quot;각서&quot;
+	case &quot;lv&quot; &apos;latvian
+		fs_NOTE = &quot;Piezīme&quot;
+	case &quot;lt&quot; &apos;lithuanian
+		fs_NOTE = &quot;Pastaba&quot;
+	case &quot;mt&quot; &apos;maltese
+		fs_NOTE = &quot;Nota&quot;
+	case &quot;nl&quot; &apos;dutch
+		fs_NOTE = &quot;Noot&quot;
+	case &quot;no&quot;, &quot;nb&quot;, &quot;nn&quot; &apos;norwegian	
+		fs_NOTE = &quot;Note&quot;
+	case &quot;pl&quot; &apos;polish
+		fs_NOTE = &quot;Notatka&quot;
+	case &quot;pt&quot; &apos;portuguese
+		fs_NOTE = &quot;Note&quot;
+	case &quot;ro&quot; &apos;romanian
+		fs_NOTE = &quot;Notă&quot;
+	case &quot;ru&quot; &apos;russian
+		fs_NOTE = &quot;нота&quot;
+	case &quot;sk&quot; &apos;slovak
+		fs_NOTE = &quot;Správa&quot;
+	case &quot;sl&quot; &apos;slovenian
+		fs_NOTE = &quot;Nota&quot;
+	case &quot;sv&quot; &apos;swedish
+		fs_NOTE = &quot;Annotation&quot;
+	case &quot;tl&quot; &apos;tagalog
+		fs_NOTE = &quot;Nota&quot;
+	case &quot;tr&quot; &apos;turkish
+		fs_NOTE = &quot;Not&quot;
+	case &quot;uk&quot; &apos;ukrainian
+		fs_NOTE = &quot;нота&quot;
+	case &quot;zh&quot; &apos;chinese
+		if fsGetSetting(&quot;country&quot;) &lt;&gt; &quot;tw&quot; then
+			fs_NOTE = &quot;音符&quot;
+		else
+			fs_NOTE = &quot;注解&quot;
+		endif
+	case else &apos;Simple English
 		fs_NOTE = &quot;Note&quot;
 	end select
 end function
