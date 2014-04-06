@@ -709,6 +709,13 @@ sub ssActuate(config() As Variant,msgs() As Variant,errorCode as integer, option
 		exit sub
 	else &apos; We didn&apos;t find an action we could do...
 		ShowDialog(fs_NO_ACTION(fs_cL) &amp; &quot; &quot; &amp; sA
+		&apos; reset the settings to previous on next iteration
+		if fileExists (fsConfigurationFileURI) then
+			kill fsConfigurationFileURI
+			if fileExists (fsConfigurationFileURI &amp; &quot;.bak&quot;) then
+				fileCopy fsConfigurationFileURI &amp; &quot;.bak&quot;, fsConfigurationFileURI
+			endif
+		endif
 		exit sub
 	endif
 	On Error Resume next

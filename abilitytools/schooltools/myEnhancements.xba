@@ -2421,14 +2421,15 @@ function ImpressAssembleHTML (Optional nStyle)
 					endif
 				endif 
 			next
-			if nStyle = 4 or nStyle = 5 then 
-				sA = sA &amp; &quot;&lt;h2&gt;&quot; &amp; fsToGradeOneBraille (fs_NOTE(fs_cL) &amp; &quot; &quot; &amp; nPage + 1 , nStyle) &amp; &quot;&lt;/h2&gt;&quot; &amp; CR
-			else
-				sA = sA &amp; &quot;&lt;h2&gt;&quot; &amp; fs_NOTE(fs_cL) &amp; &quot; &quot; &amp; nPage + 1 &amp; &quot;&lt;/h2&gt;&quot; &amp; CR
-			endif
+
 			&apos; &quot;Getting Note&quot;
 			cTitle=oDrawPage.getNotesPage.getByIndex(fiGetSlideNoteIndex).getText().getString()
 			if len(cTitle) &lt;&gt; 0 then
+				if nStyle = 4 or nStyle = 5 then 
+					sA = sA &amp; &quot;&lt;h2&gt;&quot; &amp; fsToGradeOneBraille (fs_NOTE(fs_cL) &amp; &quot; &quot; &amp; nPage + 1 , nStyle) &amp; &quot;&lt;/h2&gt;&quot; &amp; CR
+				else
+					sA = sA &amp; &quot;&lt;h2&gt;&quot; &amp; fs_NOTE(fs_cL) &amp; &quot; &quot; &amp; nPage + 1 &amp; &quot;&lt;/h2&gt;&quot; &amp; CR
+				endif
 				oDoc.getcurrentcontroller().setCurrentPage(odoc.drawpages(nPage))
 				cTitle = fsAskForNote(cTitle)
 				if instr (cTitle,&quot;http&quot;) = 1 and instr(cTitle,&quot; &quot;) = 0 then
