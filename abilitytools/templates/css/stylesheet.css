@@ -87,3 +87,7 @@ white-space: pre;
 span.ccache1 {
 display:none;
 }
+img.pagewidth {
+height: auto;
+width:100%;
+}

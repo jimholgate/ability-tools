@@ -1810,7 +1810,7 @@ sub writeEpubChapter (sUUID)
 				sA = sA &amp; &quot;&lt;body&gt;&quot; &amp; CR
 				sA = sA &amp; &quot;&lt;div&gt;&quot; &amp; CR
 				sA = sA &amp; &quot;&lt;p class=&quot;&quot;s&quot;&quot;&gt;&quot; &amp; CR
-				sA = sA &amp; &quot;&lt;img src=&quot;&quot;../images/image-&quot; &amp; trim(i+1) &amp; &quot;.jpg&quot;&quot; alt=&quot;&quot;&quot; &amp; cChapterSlideText &amp; &quot;&quot;&quot; title=&quot;&quot;&quot; &amp; cChapterSlideText &amp; &quot;&quot;&quot; class=&quot;&quot;calibre1&quot;&quot;/&gt;&quot;
+				sA = sA &amp; &quot;&lt;img src=&quot;&quot;../images/image-&quot; &amp; trim(i+1) &amp; &quot;.jpg&quot;&quot; alt=&quot;&quot;&quot; &amp; cChapterSlideText &amp; &quot;&quot;&quot; title=&quot;&quot;&quot; &amp; cChapterSlideText &amp; &quot;&quot;&quot; class=&quot;&quot;pagewidth&quot;&quot; /&gt;&quot;
 				sA = sA &amp; &quot;&lt;/p&gt;&quot; &amp; CR
 				if instr (clcStr,&quot;&lt;p&quot;) = 1 and right(clcStr, 4 ) = &quot;&lt;/p&gt;&quot; then
 					&apos; Uer did  a little simple formatting of the text - like adding a link or bold text
