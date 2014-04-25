@@ -1852,7 +1852,7 @@ sub writeEpubChapter (sUUID)
 				if len(fsGetSlideURLContent(i)) = 0 then
 					sA = sA &amp; &quot;&lt;img src=&quot;&quot;../images/image-&quot; &amp; trim(i+1) &amp; &quot;.jpg&quot;&quot; alt=&quot;&quot;&quot; &amp; cChapterSlideText &amp; &quot;&quot;&quot; title=&quot;&quot;&quot; &amp; cChapterSlideText &amp; &quot;&quot;&quot; class=&quot;&quot;pagewidth&quot;&quot; /&gt;&quot;
 				else
-					sA = sA &amp; &quot;&lt;a href=&quot;&quot;&quot; &amp; fsGetSlideURLContent(i) &amp; &quot;&quot;&quot;&gt;&lt;img src=&quot;&quot;../images/image-&quot; &amp; trim(i+1) &amp; &quot;.jpg&quot;&quot; alt=&quot;&quot;&quot; &amp; cChapterSlideText &amp; &quot;&quot;&quot; title=&quot;&quot;&quot; &amp; cChapterSlideText &amp; &quot;&quot;&quot; class=&quot;&quot;calibre1&quot;&quot;/&gt;&lt;/a&gt;&quot;
+					sA = sA &amp; &quot;&lt;a href=&quot;&quot;&quot; &amp; fsGetSlideURLContent(i) &amp; &quot;&quot;&quot;&gt;&lt;img src=&quot;&quot;../images/image-&quot; &amp; trim(i+1) &amp; &quot;.jpg&quot;&quot; alt=&quot;&quot;&quot; &amp; cChapterSlideText &amp; &quot;&quot;&quot; title=&quot;&quot;&quot; &amp; cChapterSlideText &amp; &quot;&quot;&quot; class=&quot;&quot;pagewidth&quot;&quot;/&gt;&lt;/a&gt;&quot;
 				endif
 				sA = sA &amp; &quot;&lt;/p&gt;&quot; &amp; CR
 				if instr (clcStr,&quot;&lt;p&quot;) = 1 and right(clcStr, 4 ) = &quot;&lt;/p&gt;&quot; then
