@@ -14,7 +14,7 @@ function B_DEBUG
 	&apos;Set B_DEBUG to true when testing the extension.
 	&apos;Set it to false when releasing the extension.
 	&apos;B_DEBUG=true 
-    B_DEBUG=false &apos;release
+	B_DEBUG=false &apos;release
 end function 
 
 sub ToolBar1Pressed

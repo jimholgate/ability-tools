@@ -2166,8 +2166,8 @@ end sub
 
 function getSlideTitle (optional byval i)
 	dim oDoc, oDrawPages, oDrawPage, oShape
-	dim sA, cChapterTitle, sB, cLocale
-	on error goto getSlideTitleError
+	dim sA, sB, cLocale
+	&apos;on error goto getSlideTitleError
 	if ismissing (i) then 
 		i = 0
 	endif
@@ -2177,26 +2177,28 @@ function getSlideTitle (optional byval i)
 	oDrawPages=oDoc.getDrawPages()
     oDrawPage=oDrawPages.getByIndex(i)
     sA = &quot;&quot;
+    &apos; Is the name of the slide a good choice? 
     if len(sA) = 0 then
-		if len(oDrawpage.Name) &gt; 8 or oDrawpage.Name = fs_IMPRINT (fsDocLanguage) then
+		if (len(oDrawpage.Name) &gt; 8) or oDrawpage.Name = fs_IMPRINT (fsDocLanguage) then
 			sA = trim (oDrawpage.Name)
 		endif 
 	endif
+	&apos; Is there a text shape that is a good choice? On a normal note form presentation, the
+	&apos; first text shape is the title at the top of the slide.
     if len(sA) = 0 then
 	    for j = 0 to oDrawPage.Count - 1
 		    oShape=oDrawPage.getByIndex( j )
 		    if HasUnoInterfaces( oShape, &quot;com.sun.star.lang.XServiceInfo&quot;) then
 				sA =  oShape.getText().getString()
-				if len(sA) &lt;&gt; 0 then
+				if len(sA) &lt;&gt; 0 and fbIsAnURL(sA) = false then
 					sA = fsReplaceText(sA,chr(10),&quot; - &quot;) 
-					cChapterTitle = sA
 					exit for
 				endif
 			endif
 		next
 	endif
 	if len(sA) = 0 then
-		&apos; There is no text field in the slide. Let&apos;s look at the note.		
+		&apos; There is no eligible text field in the slide. Let&apos;s look at the note.		
 		iNo = fiGetSlideNoteIndex
 		sA = oDrawPage.getNotesPage.getByIndex(iNo).getText().getString() &apos; oDrawPage note of slide 
 		sA = fsSuperTrim (sA)  
