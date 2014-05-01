@@ -2235,7 +2235,8 @@ function fbSlideNameIsUnique (sA)
     next
 end function
 
-sub writeAlternateEpubOpf (optional UUID)
+
+sub writeAlternateEpubOpf(optional UUID)
 	&apos; Tip o&apos; the hat to dotEpub.org - create ePub documents with your web browser
 	&apos; Create the Alternate Epub opf file if you prefer to use a single svg image as 
 	&apos; your book cover. Note that some ePub readers do not support the full SVG feature
