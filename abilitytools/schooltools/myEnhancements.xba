@@ -493,14 +493,14 @@ function fsOrgMicroformatsVeventXhtml (csummary, optional cNow, optional iVerbos
 		&quot;&lt;/div&gt;&quot; &amp; chr$(10) &amp; _
 		&quot;&lt;/div&gt;&quot;
 	case 1 &apos; minimum microformat vevent
-		sA = &quot;&lt;div id=&quot;&quot;x-small.org.microformats.vevent-&quot; &amp; cNow &amp; &quot;&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; _
+		sA = &quot;&lt;div id=&quot;&quot;x-small.org.microformats.vevent-&quot; &amp; cNow2 &amp; &quot;&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; _
 		&quot;&lt;div class=&quot;&quot;vevent&quot;&quot; title=&quot;&quot;&quot; &amp; fs_EVENT (fsDocLanguage) &amp; &quot;&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; _
 		&quot;&lt;h2 class=&quot;&quot;summary&quot;&quot;&gt;&quot; &amp; csummary &amp; &quot;&lt;/h2&gt; &quot; &amp; chr$(10) &amp; _
 	 	&quot;&lt;span class=&quot;&quot;dtstart&quot;&quot; title=&quot;&quot;&quot; &amp; cNow &amp; &quot;&quot;&quot;&gt;&quot; &amp; cNow2 &amp; &quot;&lt;/span&gt;&quot; &amp; chr$(10) &amp; _
 		&quot;&lt;/div&gt;&quot; &amp; chr$(10) &amp; _
 		&quot;&lt;/div&gt;&quot;
 	case 2 &apos; verbose microformat vevent - best practice for annotating a web resource
-		sA = &quot;&lt;div id=&quot;&quot;x-big.org.microformats.vevent-&quot; &amp; cNow &amp; &quot;&quot;&quot;&gt;&quot; &amp; _
+		sA = &quot;&lt;div id=&quot;&quot;x-big.org.microformats.vevent-&quot; &amp; left(fsNow(),instr(fsNow(),&quot;T&quot;) - 1) &amp; &quot;&quot;&quot;&gt;&quot; &amp; _
 		&quot;&lt;div class=&quot;&quot;vevent&quot;&quot; title=&quot;&quot;&quot; &amp; fs_EVENT (fsDocLanguage) &amp; &quot;&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; _
 		&quot;&lt;h2 class=&quot;&quot;summary&quot;&quot;&gt;&quot; &amp; csummary &amp; &quot;&lt;/h2&gt; &quot; &amp; chr$(10) &amp; _
 	 	&quot;&lt;span class=&quot;&quot;dtstart&quot;&quot; title=&quot;&quot;&quot; &amp; cNow &amp; &quot;&quot;&quot;&gt;&quot; &amp; cNow2 &amp; &quot;&lt;/span&gt;&quot; &amp; chr$(10) &amp; _
@@ -518,7 +518,7 @@ function fsOrgMicroformatsVeventXhtml (csummary, optional cNow, optional iVerbos
 		&quot;&lt;div class=&quot;&quot;vevent&quot;&quot; title=&quot;&quot;&quot; &amp; fs_EVENT (fsDocLanguage) &amp; &quot;&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; _
 		&quot;&lt;h2 class=&quot;&quot;summary&quot;&quot;&gt;&quot; &amp; csummary &amp; &quot;&lt;/h2&gt; &quot; &amp; chr$(10) &amp; _
 		&quot;&lt;span class=&quot;&quot;description&quot;&quot;&gt;© &quot; &amp; fsCleanForXtml(fsEditorInfo(&quot;fullname&quot;, false)) &amp; &quot;&lt;/span&gt; &quot; &amp; chr$(10) &amp; _
-	 	&quot;&lt;span class=&quot;&quot;dtstart&quot;&quot; title=&quot;&quot;&quot; &amp; cNow &amp; &quot;&quot;&quot;&gt;&quot; &amp; year(now) &amp; &quot;&lt;/span&gt;&quot;  &amp; chr$(10)
+	 	&quot;&lt;span class=&quot;&quot;dtstart&quot;&quot; title=&quot;&quot;&quot; &amp; cNow2 &amp; &quot;&quot;&quot;&gt;&quot; &amp; year(now) &amp; &quot;&lt;/span&gt;&quot;  &amp; chr$(10)
 		if len(cURL) &lt;&gt; 0 then 
 			sA = sA &amp; &quot;&lt;span class=&quot;&quot;url ccache1&quot;&quot;&gt;&quot; &amp; cURL &amp; &quot;&lt;/span&gt;&quot;
 		endif
@@ -528,7 +528,7 @@ function fsOrgMicroformatsVeventXhtml (csummary, optional cNow, optional iVerbos
 		sA = &quot;&lt;div id=&quot;&quot;x-big.org.microformats.vevent-&quot; &amp; cNow &amp; &quot;&quot;&quot;&gt;&quot; &amp; _
 		&quot;&lt;div class=&quot;&quot;vevent&quot;&quot; title=&quot;&quot;&quot; &amp; fs_EVENT (fsDocLanguage) &amp; &quot;&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; _
 		&quot;&lt;h2 class=&quot;&quot;summary&quot;&quot;&gt;&quot; &amp; csummary &amp; &quot;&lt;/h2&gt; &quot; &amp; chr$(10) &amp; _
-	 	&quot;&lt;span class=&quot;&quot;dtstart&quot;&quot; title=&quot;&quot;&quot; &amp; cNow &amp; &quot;&quot;&quot;&gt;&quot; &amp; cNow2 &amp; &quot;&lt;/span&gt;&quot; &amp; chr$(10) &amp; _
+	 	&quot;&lt;span class=&quot;&quot;dtstart&quot;&quot; title=&quot;&quot;&quot; &amp; cNow2 &amp; &quot;&quot;&quot;&gt;&quot; &amp; cNow2 &amp; &quot;&lt;/span&gt;&quot; &amp; chr$(10) &amp; _
 	 	&quot;&lt;span class=&quot;&quot;description ccache1&quot;&quot;&gt;&quot; &amp; &quot;AUTHOR=&quot; &amp; fsCleanForXtml(fsEditorInfo(&quot;fullname&quot;, false)) &amp; _
 		&quot;;TITLE=&quot; &amp; fsCleanForXtml(fsShortFileName) &amp; _
 		&quot;;ORG=&quot; &amp; fsCleanForXtml(fsEditorInfo(&quot;o&quot;, false)) &amp; _
@@ -601,7 +601,7 @@ function fsOrgMicroformatsVcardXhtml (sFullName, _
 	&apos;	www.upu.int
 	&apos;
 	if fb_UseEuropeanAddress (ccountryregion) = false then
-		sA	= &quot;&lt;div id=&quot;&quot;x-ca+us.org.microformats.vcard-&quot; &amp; sB &amp; &quot;&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; _
+		sA	= &quot;&lt;div id=&quot;&quot;x-us.org.microformats.vcard-&quot; &amp; sB &amp; &quot;&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; _
 		&quot;&lt;div class=&quot;&quot;vcard&quot;&quot; title=&quot;&quot;&quot; &amp; fs_CONTACT (fsDocLanguage) &amp; &quot;&quot;&quot;&gt;&quot; &amp; chr$(10)
 		sA = sA &amp; fsNameAndOrgCode (sFullName, corg)
 		sA = sA &amp; &quot;&lt;div class=&quot;&quot;adr&quot;&quot;&gt;&quot; &amp; chr$(10)
@@ -938,7 +938,6 @@ function fsSelectionCountry as String
 	&apos;so we use the UTF encoding for the first character to evaluate the country. See http://www.utf8-chartable.de/
 	&apos;and http://unicode.org/Public/UNIDATA/Blocks.txt
 	fsSelectionCountry=fsUseLanguageType(sA,sB,sC,sD)
-	&apos;xxxxx
 	Exit Function
 	SELECTCOUNTRYERROR:
 	fsSelectionCountry=fsDocCountry
@@ -1773,33 +1772,33 @@ sub chooseNewEncoding
 			&apos; Convert to unordered list
 			f_dlgImpressAsk.GetControl(cA).model.helpText = fsOrderedList
 			sA = fsSuperTrim(fsstripXMLTags (sA), true)
-			sA = fsAlterStringMarkup (sA, &quot;&lt;div class=&quot;&quot;at-bullets&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;ul&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;li&gt;&quot;, &quot;&lt;/li&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;li&gt;&quot;, &quot;&lt;/li&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/ul&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/div&gt;&quot;, true)
+			sA = fsAlterStringMarkup (sA, &quot;&lt;div class=&quot;&quot;at-bullets&quot;&quot; id=&quot;&quot;textbody&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;ul&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;li&gt;&quot;, &quot;&lt;/li&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;li&gt;&quot;, &quot;&lt;/li&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/ul&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/div&gt;&quot;, true)
 		elseif sB = fsNovel then
 			&apos;convert to novel format - indented paragraphs
 			f_dlgImpressAsk.GetControl(cA).model.helpText = fsInformationDiv
 			sA = fsSuperTrim(fsstripXMLTags (sA), true)
-			sA = fsAlterStringMarkup (sA, &quot;&lt;div class=&quot;&quot;at-novel&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;p&gt;&quot;, &quot;&lt;/p&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;p&gt;&quot;, &quot;&lt;/p&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/div&gt;&quot;, true)			
+			sA = fsAlterStringMarkup (sA, &quot;&lt;div class=&quot;&quot;at-novel&quot;&quot; id=&quot;&quot;textbody&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;p&gt;&quot;, &quot;&lt;/p&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;p&gt;&quot;, &quot;&lt;/p&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/div&gt;&quot;, true)			
 		elseif sB = fsPoetryDiv then 
 			&apos;convert to poetry format - div list
 			f_dlgImpressAsk.GetControl(cA).model.helpText = fsNovel
 			sA = fsSuperTrim(fsstripXMLTags (sA), true)
-			sA = fsAlterStringMarkup (sA, &quot;&lt;div class=&quot;&quot;at-poetry&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;div&gt;&quot;, &quot;&lt;/div&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;div&gt;&quot;, &quot;&lt;/div&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/div&gt;&quot;, true)
+			sA = fsAlterStringMarkup (sA, &quot;&lt;div class=&quot;&quot;at-poetry&quot;&quot; id=&quot;&quot;textbody&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;div&gt;&quot;, &quot;&lt;/div&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;div&gt;&quot;, &quot;&lt;/div&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/div&gt;&quot;, true)
 			sA = fsReplaceText(sA, &quot;&lt;div&gt;&lt;/div&gt;&quot;, &quot;&lt;div&gt;&lt;p&gt;&lt;/p&gt;&lt;/div&gt;&quot;)
 		elseif sB = fsInformationDiv then
 			&apos;convert to directory format - div list
 			f_dlgImpressAsk.GetControl(cA).model.helpText = fsUnorderedList
 			sA = fsSuperTrim(fsstripXMLTags (sA), true)
-			sA = fsAlterStringMarkup (sA, &quot;&lt;div class=&quot;&quot;at-information&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;div&gt;&quot;, &quot;&lt;/div&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;div&gt;&quot;, &quot;&lt;/div&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/div&gt;&quot;, true)
+			sA = fsAlterStringMarkup (sA, &quot;&lt;div class=&quot;&quot;at-information&quot;&quot; id=&quot;&quot;textbody&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;div&gt;&quot;, &quot;&lt;/div&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;div&gt;&quot;, &quot;&lt;/div&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/div&gt;&quot;, true)
 			sA = fsReplaceText(sA, &quot;&lt;div&gt;&lt;/div&gt;&quot;, &quot;&lt;div&gt;&lt;p&gt;&lt;/p&gt;&lt;/div&gt;&quot;)
 		elseif sB = fsOrderedList then
 			&apos; Convert to ordered list
 			f_dlgImpressAsk.GetControl(cA).model.helpText = fsCodeList
 			sA = fsSuperTrim(fsstripXMLTags (sA), true)
-			sA = fsAlterStringMarkup (sA, &quot;&lt;div class=&quot;&quot;at-numbers&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;ol type=&quot;&quot;1&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;li&gt;&quot;, &quot;&lt;/li&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;li&gt;&quot;, &quot;&lt;/li&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/ol&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/div&gt;&quot;, true)
+			sA = fsAlterStringMarkup (sA, &quot;&lt;div class=&quot;&quot;at-numbers&quot;&quot; id=&quot;&quot;textbody&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;ol type=&quot;&quot;1&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;li&gt;&quot;, &quot;&lt;/li&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;li&gt;&quot;, &quot;&lt;/li&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/ol&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/div&gt;&quot;, true)
 		elseif sB = fsCodeList then
 			f_dlgImpressAsk.GetControl(cA).model.helpText = fsSmil
 			sA = fsSuperTrim(fsstripXMLTags (sA), true)
-			sA = fsAlterStringMarkup (sA,&quot;&lt;div&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;code&gt;&quot; &amp; chr$(10), &quot;&lt;br /&gt;&quot; &amp; chr$(10),  chr$(10) &amp; &quot;&lt;/code&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/div&gt;&quot;, true)
+			sA = fsAlterStringMarkup (sA,&quot;&lt;div id=&quot;&quot;textbody&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;code&gt;&quot; &amp; chr$(10), &quot;&lt;br /&gt;&quot; &amp; chr$(10),  chr$(10) &amp; &quot;&lt;/code&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/div&gt;&quot;, true)
 		elseif sB = fsSmil then
 			f_dlgImpressAsk.GetControl(cA).model.helpText = fsAskXML
 			sA = fsSuperTrim(fsstripXMLTags (sA), true)
@@ -2020,7 +2019,7 @@ sub finishSchoolToolsDialogSave (sFile, optional sB)
 			sA = sA &amp; sB &amp; CR
 		case &quot;&lt;body&quot;
 			&apos; We add a head section to view results with your default browser.
-			sA = fsXhtmlPreviewHeaderCode( sFile, f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Text, &quot;&quot;, &quot;image-&quot; &amp; trim (str (fnCurrentCard + 1)) &amp; &quot;.jpg&quot; )
+			sA = fsXhtmlPreviewHeaderCode( sfFile, f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Text, &quot;&quot;, &quot;image-&quot; &amp; trim (str (fnCurrentCard + 1)) &amp; &quot;.jpg&quot; )
 			sA = sA &amp; sB &amp; CR
 			sA = sA &amp; &quot;&lt;/html&gt;&quot;
 		case &quot;&lt;html&quot;
@@ -2041,7 +2040,7 @@ function fsAbilityMeta
 	fsAbilityMeta = &quot;&lt;meta name=&quot;&quot;generator&quot;&quot; content=&quot;&quot;&quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp; &quot; - &quot; &amp; getBranding (bI_BRANDING) &amp; &quot;&quot;&quot; /&gt;&quot; 
 end function
 
-function fsXhtmlPreviewHeaderCode (byval sFile, optional byVal slang, optional byval sStyleOptions, optional byval sImage)
+function fsXhtmlPreviewHeaderCode (byval sFile, optional byVal slang, optional byval sStyleOptions, optional byval sImage, optional sVersion)
 	dim CR, sA, sB as string
 	if ismissing (slang) then
 		slang = fsDocLanguage
@@ -2054,14 +2053,23 @@ function fsXhtmlPreviewHeaderCode (byval sFile, optional byVal slang, optional b
 		&apos; image normally associated with this page
 		sImage=&quot;image-&quot; &amp; trim (str (fnCurrentCard + 1)) &amp; &quot;.jpg&quot;
 	endif
+	if ismissing (sVersion) then
+		sVersion = &quot;3.0&quot;
+	endif
+	
 	CR = chr$(10)
 	sA = &quot;&quot;
 	sA = sA &amp; &quot;&lt;?xml version=&apos;1.0&apos; encoding=&apos;utf-8&apos;?&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;!DOCTYPE html PUBLIC &quot;&quot;-//W3C//DTD XHTML 1.1//EN&quot;&quot; &quot;&quot;http://www.w3.org/TR/xhtml11/DTD/xhtml11.dtd&quot;&quot;&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;html xmlns=&quot;&quot;http://www.w3.org/1999/xhtml&quot;&quot; lang=&quot;&quot;&quot; &amp; sLang &amp; &quot;&quot;&quot; xml:lang=&quot;&quot;&quot; &amp; sLang &amp; &quot;&quot;&quot;&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;!DOCTYPE html&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;html xmlns=&quot;&quot;http://www.w3.org/1999/xhtml&quot;&quot; lang=&quot;&quot;&quot; &amp; sLang &amp; &quot;&quot;&quot; xml:lang=&quot;&quot;&quot; &amp; sLang &amp; &quot;&quot;&quot;&quot;
+	if int (sVersion) &gt; 2 then
+		sA = sA &amp; CR
+		sA = sA &amp; &quot;xmlns:epub=&quot;&quot;http://www.idpf.org/2007/ops&quot;&quot; &quot; &amp; CR
+		sA = sA &amp; &quot;epub:prefix=&quot;&quot;z3998: http://www.daisy.org/z3998/2012/vocab/structure/#&quot;&quot;&quot;
+	endif
+	sA = sA &amp; &quot;&gt;&quot; &amp; CR
 	sA = sA &amp; &quot;&lt;head&gt;&quot; &amp; CR
 	sA = sA &amp; &quot;&lt;title&gt;&quot; &amp; ConvertFromURL(GetFileNameWithoutExtension(sFile, &quot;/&quot;)) &amp; &quot;&lt;/title&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;meta http-equiv=&quot;&quot;content-type&quot;&quot; content=&quot;&quot;text/html; charset=utf-8&quot;&quot; /&gt;&quot; &amp; CR
 	sA = sA &amp; &quot;&lt;meta name=&quot;&quot;created&quot;&quot; content=&quot;&quot;&quot; &amp; fsCreationDate &amp; &quot;&quot;&quot; /&gt;&quot; &amp; CR
 	sB = trim(fsDocAuthor)
 	if len (sB) &lt;&gt; 0 then
@@ -2365,7 +2373,7 @@ function ImpressAssembleHTML (Optional nStyle)
 		&apos;
 	end select
 	sA = sA &amp; CR
-	sA = fsXhtmlPreviewHeaderCode( cTitle, fsDocLanguage, sA, &quot;cover.jpg&quot; )
+	sA = fsXhtmlPreviewHeaderCode( cTitle, fsDocLanguage, sA, &quot;cover.jpg&quot;, &quot;2.0&quot; )
 	select case nStyle
 	case 1
 		&apos; sA = sA &amp; &quot;&lt;body contenteditable=&quot;&quot;true&quot;&quot;&gt;&quot; &amp; CR

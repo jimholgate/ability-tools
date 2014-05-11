@@ -1,7 +1,4 @@
-This extension for LibreOffice and OpenOffice.org includes the ability
-to read the notes aloud during a presentation. You can send slide
-shows to colleagues and teachers. You can publish them on-line with
-publishing and cloud storage services.
+This extension for LibreOffice and Apache OpenOffice can read presentation notes aloud while you show a slide show. It can create electronic books optimized for speech synthesis or HTML documents optimized for Braille conversion.
 
 Use 
 
@@ -9,7 +6,7 @@ After installing this extension, close the application then restart it.
 
 Copyright and License
 
-(c) 2013 James Holgate Vancouver, BC Canada
+(c) 2014 James Holgate Vancouver, BC Canada
 
 Programming license - GPL 2.0 license. 
 Documentation license - Creative Commons with Attribution License 2.5 for Canada 2012.

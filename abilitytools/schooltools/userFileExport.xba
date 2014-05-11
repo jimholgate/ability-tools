@@ -1314,11 +1314,10 @@ function makeCalibreEpub (optional ntype)
 	endif
 	select case nType
 	case 1
-		makeCalibreEpub = makeEPubAlt1 &apos; Get the file path string
+		makeCalibreEpub = MakeEpub30 &apos; Get the file path string
 	case else 
 		makeCalibreEpub = makeEpub &apos; Get the file path string
 	end select
-	
 end function
 
 function fsSaveSchoolToolFile(optional sDefault, optional sFileDesc, optional sFileExtension ) 
@@ -1330,10 +1329,10 @@ function fsSaveSchoolToolFile(optional sDefault, optional sFileDesc, optional sF
 	oDocCtrl = oDoc.getCurrentController() 
 	oDocFrame = oDocCtrl.getFrame() 
 	if ismissing (sDefault) then
-		sDefault = &quot;calibre-epub&quot;
+		sDefault = &quot;epub 3 (.epub)&quot;
 	endif
 	if ismissing (sFileDesc) then
-		sFileDesc = &quot;calibre epub (.epub)&quot;
+		sFileDesc = &quot;epub 3 (.epub)&quot;
 	endif
 	if ismissing (sFileExtension) then
 		sFileExtension = &quot;*.epub&quot;
@@ -1362,11 +1361,13 @@ function fsSaveSchoolToolFile(optional sDefault, optional sFileDesc, optional sF
 	endif 
 end function 
 
-function makeEPubAlt1
+function MakeEpub30
 	&apos; sUUID is a required unique id number for each ePub publication
 	dim sUUID as string
+	dim sVersion as string
 	dim odoc, octl, oBar, sFileOut
-	sFileOut = fsSaveSchoolToolFile(fsShortFileName(), &quot;calibre epub (.epub)&quot;, &quot;*.epub&quot;)
+	sVersion = &quot;3.0&quot; &apos; ePub version
+	sFileOut = fsSaveSchoolToolFile(fsShortFileName(), &quot;epub 3 (.epub)&quot;, &quot;*.epub&quot;)
 	viewNormal () &apos; required for jpeg export
 	CleanUpStagingDirectory(true)
 	if fileExists ( sFileOut ) then
@@ -1375,30 +1376,33 @@ function makeEPubAlt1
 	sUUID = UUIDv4()
 	writeEpubMimeType (sUUID) &apos; ok - write the mimetype
 	writeEpubContainer (sUUID) &apos; ok - write the metadata
-	writeEpubCoverJpg (sUUID) &apos; ok - write jpeg cover
+	writeEpubCoverJpg (sUUID, sVersion) &apos; ok - write jpeg cover
 	&apos; Styled image in svg format.
 	writeAltCoverSvg (fsShortFileName(),fsDocAuthor,fsCreationShortDate)
-	writeEpubCoverTextAlt1 (sUUID) &apos; ok write cover text
-	writeEpubTableOfContentsPage (sUUID) &apos; ok write toc page
+	writeEpubCoverTextAlt1 (sUUID, sVersion) &apos; ok write cover text
+	writeEpubBackCoverText (sUUID, sVersion)
+	writeEpubTableOfContentsPage (sUUID, sVersion) &apos; ok write toc page
 	writeEpubBookCss (sUUID) &apos; ok we might want to customize this. Currently optimal for iBooks
-	writeEpubChapter (sUUID) &apos; Adobe Digital Editions occasionally randomly fails to show an image - why?
+	writeEpubChapter (sUUID, sVersion) &apos; Adobe Digital Editions occasionally randomly fails to show an image - why?
 		&apos; Also Adobe Digital Editions fails to show Hindi fonts in Windows. Chinese is okay.
 	writeEpubEpbNcx (sUUID) &apos; ok write Daisy index. No issues.
-	writeEpubEpbOpf (sUUID, true) &apos; spine is verbose compared to calibre. We  include all pages. Checks okay with standards tester.
+	writeAlternateEpubOpf (sUUID, sVersion) &apos; ePub 3 for tablets. 
 	writeEpubImages (sUUID) &apos; ok we might want to customize this. Currently optimal for iBooks 
 		
 	&apos; store the file
 	writeEpubArchive ( fsStagingDirectoryURL, sFileOut )
 	CleanUpStagingDirectory(false)
-	makeEPubAlt1 = sFileOut
+	MakeEpub30 = sFileOut
 end function
 
 function makeEpub
 	&apos; sUUID is a required unique id number for each ePub publication
-	&apos; This is a plain ePub, styled for small mobile devices.
+	&apos; This is a plain ePub, styled for small and legacy mobile devices.
 	dim sUUID as string
+	dim sVersion as string
 	dim odoc, octl, oBar, sFileOut
 	sFileOut = fsSaveSchoolToolFile(fsShortFileName(), &quot;ePub 2 (.epub)&quot;, &quot;*.epub&quot;)
+	sVersion = &quot;2.0&quot; &apos; Compatible with calibre editor and pre 2007 eBook readers
 	viewNormal () &apos; required for jpeg export
 	CleanUpStagingDirectory(true)
 	if fileExists ( sFileOut ) then
@@ -1409,14 +1413,15 @@ function makeEpub
 	writeEpubContainer (sUUID) &apos; ok - write the metadata
 	writeTinyEpubCoverJpg (sUUID) &apos; ok - write small jpg cover image - fbReader and Adobe Digital Reader need tiny thumbnails.
 	&apos; Very simple svg image is required because it is included in the manifest.
-	writePlainCoverSvg (fsShortFileName(),fsDocAuthor,fsCreationShortDate)
-	writeEpubCoverText (sUUID) &apos; ok write simple cover text with small graphic
-	writeEpubTableOfContentsPage (sUUID) &apos; ok write a toc page
+	writeAltHCCoverSvg (fsShortFileName(),fsDocAuthor,fsCreationShortDate)
+	writeEpubCoverText (sUUID, sVersion) &apos; ok write simple cover text with small graphic
+	writeEpubBackCoverText (sUUID, sVersion)
+	writeEpubTableOfContentsPage (sUUID, sVersion) &apos; ok write a ePub 2 compatible toc page
 	writeEpubBookCss (sUUID) &apos; ok we might want to customize this. Currently optimal for iBooks
-	writeEpubChapter (sUUID) &apos; todo Adobe Digital Editions occasionally randomly fails to show a slide image - why?
+	writeEpubChapter (sUUID,sVersion) &apos; todo Adobe Digital Editions occasionally randomly fails to show a slide image - why?
 		&apos; Also Adobe Digital Editions fails to show Hindi fonts in Windows. Chinese is okay.
 	writeEpubEpbNcx (sUUID) &apos; ok write Daisy index. No issues.
-	writeEpubEpbOpf (sUUID, true) &apos; ok is verbose - we include all pages.
+	writeBasicEpubOpf (sUUID, sVersion) &apos; ok is verbose - we include all pages.
 	writeEpubImages (sUUID, 65.625 ) &apos; This is for native resolution of iPod.
 		
 	&apos; store the file
@@ -1446,8 +1451,8 @@ sub writeEpubArchive(sSourceDirUrl as string, sZipUrl as string)
 	bIncludeFolders = true
 	mFolderContents() = oFileAccess.getFolderContents(sSourceDirUrl, bIncludeFolders)
 	AddResourceToZip(sSourceDirUrl &amp; &quot;/mimetype&quot;, oZipRootFolder, oPackage,  false )
-	AddResourceToZip(sSourceDirUrl &amp; &quot;/META-INF&quot;, oZipRootFolder, oPackage, false )
-	AddResourceToZip(sSourceDirUrl &amp; &quot;/OEBPS&quot;, oZipRootFolder, oPackage,  false )
+	AddResourceToZip(sSourceDirUrl &amp; &quot;/META-INF&quot;, oZipRootFolder, oPackage, true )
+	AddResourceToZip(sSourceDirUrl &amp; &quot;/OEBPS&quot;, oZipRootFolder, oPackage,  true )
 	
 	
 	&apos;commit
@@ -1754,8 +1759,7 @@ function fsGetSlideURLContent(optional byval i)
 	fsGetSlideURLContent = sB 
 end function
 
-
-sub writeEpubChapter (sUUID)
+sub writeEpubChapter (sUUID, optional sVersion)
 	&apos; Writes XHTML files. Each document is a chapter. 
 	&apos; An image link points to the location of a 
 	&apos; corresponding image file.
@@ -1772,6 +1776,9 @@ sub writeEpubChapter (sUUID)
 	dim longI as Long
 	dim CR as string
 	dim bSeenWarning as boolean
+	if isMissing (sVersion) then
+		sVersion = &quot;3.0&quot;
+	endif
 	bSeenWarning = false
 	CR = chr$(10)
 	oDoc=ThisComponent 
@@ -1834,7 +1841,7 @@ sub writeEpubChapter (sUUID)
 			sA = &quot;&lt;meta name=&quot;&quot;EPB-UUID&quot;&quot; content=&quot;&quot;&quot; &amp; sUUID &amp; &quot;&quot;&quot; /&gt;&quot; &amp; CR
 			sA = sA &amp; &quot;&lt;link href=&quot;&quot;../styles/stylesheet.css&quot;&quot; type=&quot;&quot;text/css&quot;&quot; rel=&quot;&quot;stylesheet&quot;&quot; /&gt;&quot; &amp; CR
 			sA = sA &amp; &quot;&lt;link href=&quot;&quot;../styles/page_styles.css&quot;&quot; type=&quot;&quot;text/css&quot;&quot; rel=&quot;&quot;stylesheet&quot;&quot; /&gt;&quot; &amp; CR
-			sA = fsXhtmlPreviewHeaderCode( cChapterTitle, cLocale, sA, &quot;image-&quot; &amp; trim(i+1) &amp; &quot;.jpg&quot; )
+			sA = fsXhtmlPreviewHeaderCode( cChapterTitle, cLocale, sA, &quot;image-&quot; &amp; trim(i+1) &amp; &quot;.jpg&quot;, sVersion )
 			&apos;----------------
 			cStr = fsSuperTrim(cStr)
 			if instr (clcStr,&quot;&lt;body&gt;&quot;) = 1 and right(clcStr, 7 ) = &quot;&lt;/body&gt;&quot; then
@@ -1848,15 +1855,25 @@ sub writeEpubChapter (sUUID)
 			else
 				sA = sA &amp; &quot;&lt;body&gt;&quot; &amp; CR
 				sA = sA &amp; &quot;&lt;div&gt;&quot; &amp; CR
-				sA = sA &amp; &quot;&lt;p class=&quot;&quot;s&quot;&quot;&gt;&quot; &amp; CR
+				sA = sA &amp; &quot;&lt;p id=&quot;&quot;figure&quot;&quot; class=&quot;&quot;pagewidth&quot;&quot;&gt;&quot; &amp; CR
+				if int (sVersion) &gt; 5 then
+					&apos; Tell screen reader the extent of the figure so reader can skip it if desired
+					sA = sA &amp; &quot;&lt;figure class=&quot;&quot;pagewidth&quot;&quot;&gt;&quot; &amp; CR
+				endif
 				if len(fsGetSlideURLContent(i)) = 0 then
 					sA = sA &amp; &quot;&lt;img src=&quot;&quot;../images/image-&quot; &amp; trim(i+1) &amp; &quot;.jpg&quot;&quot; alt=&quot;&quot;&quot; &amp; cChapterSlideText &amp; &quot;&quot;&quot; title=&quot;&quot;&quot; &amp; cChapterSlideText &amp; &quot;&quot;&quot; class=&quot;&quot;pagewidth&quot;&quot; /&gt;&quot;
 				else
 					sA = sA &amp; &quot;&lt;a href=&quot;&quot;&quot; &amp; fsGetSlideURLContent(i) &amp; &quot;&quot;&quot;&gt;&lt;img src=&quot;&quot;../images/image-&quot; &amp; trim(i+1) &amp; &quot;.jpg&quot;&quot; alt=&quot;&quot;&quot; &amp; cChapterSlideText &amp; &quot;&quot;&quot; title=&quot;&quot;&quot; &amp; cChapterSlideText &amp; &quot;&quot;&quot; class=&quot;&quot;pagewidth&quot;&quot;/&gt;&lt;/a&gt;&quot;
 				endif
+				if int (sVersion) &gt; 5 then
+					&apos; Add a brief caption for screen reader
+					sA = sA &amp; CR &amp; &quot;&lt;figcaption&gt;&quot;&amp; CR &amp; &quot;&lt;span class=&quot;&quot;ccache1&quot;&quot;&gt;&quot;  &amp; trim(i+1) &amp; &quot;. &quot; &amp; cChapterTitle &amp;  &quot;.&quot;
+					sA = sA &amp; &quot;&lt;/span&gt;&quot;&amp; CR &amp; &quot;&lt;/figcaption&gt;&quot; &amp; CR			
+					sA = sA &amp; &quot;&lt;/figure&gt;&quot;  &amp; CR
+				endif				
 				sA = sA &amp; &quot;&lt;/p&gt;&quot; &amp; CR
 				if instr (clcStr,&quot;&lt;p&quot;) = 1 and right(clcStr, 4 ) = &quot;&lt;/p&gt;&quot; then
-					&apos; Uer did  a little simple formatting of the text - like adding a link or bold text
+					&apos; User did  a little simple formatting of the text - like adding a link or bold text
 					if bSeenWarning = false and instr(cStr,&quot;org.microformats&quot;) = 0 then
 						ShowDialog (fs_EPUB_XML_WARNING(fs_cL) &amp; cStr)
 						bSeenWarning = true
@@ -1887,17 +1904,17 @@ sub writeEpubChapter (sUUID)
 						endif
 						end
 					endif
-					sA = sA &amp; &quot;&lt;p&gt;&quot; &amp; fsCleanForXtml ( cStr ) &amp; &quot;&lt;/p&gt;&quot; &amp; CR
+					sA = sA &amp; &quot;&lt;p id=&quot;&quot;textbody&quot;&quot;&gt;&quot; &amp; fsCleanForXtml ( cStr ) &amp; &quot;&lt;/p&gt;&quot; &amp; CR
 				elseif instr (cStr,&quot;http&quot;) = 1 and instr(cStr, &quot;&amp;&quot;) = 0 then
 					&apos; the subroutine converts the URL text to a URL link.
 					&apos; xhtml doesn&apos;t let us use an ampersand anywhere in the body, so
 					&apos; complex URLs that include an ampersand like Google forms
 					&apos; cause a rendering error.
-					sA = sA &amp; &quot;&lt;p&gt;&lt;a href=&quot;&quot;&quot; &amp;  cStr &amp; &quot;&quot;&quot;&gt;&quot; &amp; _
+					sA = sA &amp; &quot;&lt;p id=&quot;&quot;textbody&quot;&quot;&gt;&lt;a href=&quot;&quot;&quot; &amp;  cStr &amp; &quot;&quot;&quot;&gt;&quot; &amp; _
 						fsCleanForXtml ( cStr ) &amp; &quot;&lt;/a&gt;&lt;/p&gt;&quot; &amp; CR
 				else
 					&apos; simply format into paragraphs.
-					sA = sA &amp; &quot;&lt;p class=&quot;&quot;s5&quot;&quot;&gt;&quot; &amp; fsCleanForXtml ( cStr ) &amp; &quot;&lt;/p&gt;&quot; &amp; CR
+					sA = sA &amp; &quot;&lt;p id=&quot;&quot;textbody&quot;&quot; class=&quot;&quot;s5&quot;&quot;&gt;&quot; &amp; fsCleanForXtml ( cStr ) &amp; &quot;&lt;/p&gt;&quot; &amp; CR
 				endif
 				sA = sA &amp; &quot;&lt;/div&gt;&quot; &amp; CR
 				sA = sA &amp; &quot;&lt;/body&gt;&quot; &amp; CR
@@ -1940,15 +1957,15 @@ sub writeEpubContainer (sUUID)
 	CreateFile(fsStagingDirectoryURL &amp; &quot;/META-INF/container.xml&quot;,sA,&quot;UTF-8&quot;)
 end sub
 
-sub writeEpubCoverText (optional sUUID)
+sub writeEpubCoverText (optional sUUID, optional sVersion)
 	&apos; points to cover.jpeg in the base directory.
-	&apos; This is a minimalist - based on the regular page
-	&apos; but with caption styled text instead of normal.
-	&apos; Some eReaders don&apos;t respect paragraph and page
-	&apos; formatting.
+	&apos; This is a minimalist design for small screens
 	dim sA, sB, sC, CR as string
 	if ismissing (sUUID) then
 		sUUID = &quot;-------------Unknown-------------&quot;
+	endif
+	if isMissing (sVersion) then
+		sVersion = &quot;3.0&quot;
 	endif
 	CR = chr$(10)
 	sA = &quot;&lt;meta name=&quot;&quot;EPB-UUID&quot;&quot; content=&quot;&quot;&quot; &amp; sUUID &amp; &quot;&quot;&quot;/&gt;&quot; &amp; CR
@@ -1956,63 +1973,96 @@ sub writeEpubCoverText (optional sUUID)
 	sA = sA &amp; &quot;&lt;link href=&quot;&quot;../styles/stylesheet.css&quot;&quot; type=&quot;&quot;text/css&quot;&quot; rel=&quot;&quot;stylesheet&quot;&quot;/&gt;&quot; &amp; CR
 	sA = sA &amp; &quot;&lt;link href=&quot;&quot;../styles/page_styles.css&quot;&quot; type=&quot;&quot;text/css&quot;&quot; rel=&quot;&quot;stylesheet&quot;&quot;/&gt;&quot; &amp; CR
 	sA = sA &amp; &quot;&lt;style type=&quot;&quot;text/css&quot;&quot;&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;body { background-color:&quot; &amp; fsBackgroundColour &amp; &quot;; color:&quot; &amp; fsTextColour &amp; &quot;; padding:0; margin:0 }&quot; &amp; CR
+	sA = sA &amp;&quot;/*&lt;![CDATA[*/&quot;&amp; CR
+	sA = sA &amp; &quot;hr { background-color:&quot; &amp; fsBackgroundColour &amp; &quot;; color:&quot; &amp; fsBackgroundColour &amp; &quot;; }&quot; &amp; CR
+	sA = sA &amp;&quot;/*]]&gt;*/&quot;&amp; CR
 	sA = sA &amp; &quot;&lt;/style&gt;&quot; &amp; CR
-	sA =  fsXhtmlPreviewHeaderCode(fs_BOOK_COVER(fs_cL), fsDocLanguage, sA, &quot;cover.jpeg&quot;)
+	sA =  fsXhtmlPreviewHeaderCode(fs_BOOK_COVER(fs_cL), fsDocLanguage, sA, &quot;cover.jpeg&quot;, sVersion)
 	sA = sA &amp; &quot;&lt;body&gt;&quot;
-	sA = sA &amp; &quot;&lt;p class=&quot;&quot;t&quot;&quot;&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;p&gt;&quot; &amp; CR
 	sA = sA &amp; &quot;&lt;img src=&quot;&quot;../images/cover.jpeg&quot;&quot; alt=&quot;&quot;&quot; &amp; fsShortFileName &amp; &quot;&quot;&quot; title=&quot;&quot;&quot; &amp; fsShortFileName &amp; &quot;&quot;&quot; /&gt;&quot; &amp; CR
 	sA = sA &amp; &quot;&lt;/p&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;div class=&quot;&quot;u33&quot;&quot;&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;p&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;h1&gt;&quot; &amp; CR
 	sA = sA &amp; fsShortFileName &amp; CR
-	sA = sA &amp; &quot;&lt;/p&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;/div&gt;&quot; &amp; CR 
-	sA = sA &amp; &quot;&lt;p class=&quot;&quot;s&quot;&quot;&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/h1&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;hr /&gt;&quot; &amp; CR
+
 	if B_DEBUG = false then
 		sB = fsDocAuthor
 	else
 		sB = &quot;AbilityToolsTestingDemo&quot;
 	endif
-	
+	sA = sA &amp; &quot;&lt;div id=&quot;&quot;creator&quot;&quot;&gt;&quot;
 	if len(sB) &lt;&gt; 0 and instr (sB, &quot; &quot;) &lt;&gt; 0 then 
 		sA = sA &amp; sB
 	else &apos; No first and last name. Use brand link instead.
 		sA = sA &amp; &quot;&lt;a href=&quot;&quot;&quot; &amp; getBranding( bI_HOMEPAGE, fsDocLanguage) &amp; &quot;&quot;&quot;&gt;&quot; &amp; lcase (getBranding( bI_BRANDING, fsDocLanguage)) &amp; &quot;&lt;/a&gt;&quot; &amp; CR
 	endif
-	sA = sA &amp; &quot;&lt;/p&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/div&gt;&quot; &amp; CR
+	if len(fsEditorInfo (&quot;organization&quot;)) &lt;&gt; 0 then
+		sA = sA &amp; &quot;&lt;div id=&quot;&quot;publisher&quot;&quot;&gt;&quot; &amp; fsEditorInfo (&quot;organization&quot;) &amp; &quot;&lt;/div&gt;&quot; &amp; CR
+	else
+		sA = sA &amp; &quot;&lt;div id=&quot;&quot;publisher&quot;&quot;&gt;&quot; &amp; getBranding( bI_HOMEPAGE, fsDocLanguage) &amp; &quot;&lt;/div&gt;&quot; &amp; CR
+	endif
+	sA = sA &amp; &quot;&lt;div id=&quot;&quot;date&quot;&quot;&gt;&quot; &amp;  fsCreationShortDate() &amp; &quot;&lt;/div&gt;&quot; &amp; CR  
 	sA = sA &amp; &quot;&lt;/body&gt;&quot; &amp; CR
 	sA = sA &amp; &quot;&lt;/html&gt;&quot; &amp; CR
 	CreateFile(fsStagingDirectoryURL &amp; &quot;/OEBPS/text/cover.xhtml&quot;,sA,&quot;UTF-8&quot;) 
 end sub
 
-sub writeEpubCoverTextAlt1 (optional sUUID)
+sub writeEpubBackCoverText (optional sUUID, optional sVersion)
 	&apos; points to cover.svg in the images directory.
-	dim sA, sB, CR as string
+	dim sA, sB, sC, CR as string
 	if ismissing (sUUID) then
 		sUUID = &quot;-------------Unknown-------------&quot;
 	endif
+	if isMissing (sVersion) then
+		sVersion = &quot;3.0&quot;
+	endif
 	CR = chr$(10)
 	sA = &quot;&lt;meta name=&quot;&quot;EPB-UUID&quot;&quot; content=&quot;&quot;&quot; &amp; sUUID &amp; &quot;&quot;&quot;/&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;meta name=&quot;&quot;calibre:cover&quot;&quot; content=&quot;&quot;true&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;link href=&quot;&quot;../styles/stylesheet.css&quot;&quot; type=&quot;&quot;text/css&quot;&quot; rel=&quot;&quot;stylesheet&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;link href=&quot;&quot;../styles/page_styles.css&quot;&quot; type=&quot;&quot;text/css&quot;&quot; rel=&quot;&quot;stylesheet&quot;&quot;/&gt;&quot; &amp; CR
 	sA = sA &amp; &quot;&lt;style type=&quot;&quot;text/css&quot;&quot;&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;.ub45 { max-width: 100%; padding: 0%; margin: 0%; }&quot; &amp; CR
-	sA = sA &amp; &quot;body { oeb-column-number: 1; }&quot; &amp; CR
+	sA = sA &amp;&quot;/*&lt;![CDATA[*/&quot;&amp; CR
+	sA = sA &amp; &quot;hr { background-color:&quot; &amp; fsBackgroundColour &amp; &quot;; color:&quot; &amp; fsBackgroundColour &amp; &quot;; }&quot; &amp; CR
+	sA = sA &amp;&quot;/*]]&gt;*/&quot;&amp; CR
 	sA = sA &amp; &quot;&lt;/style&gt;&quot; &amp; CR
-	sA =  fsXhtmlPreviewHeaderCode(fs_BOOK_COVER(fs_cL), fsDocLanguage, sA, &quot;cover.svg&quot;)
-	sA = sA &amp; &quot;&lt;body&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;div&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;img class=&quot;&quot;ub45&quot;&quot; src=&quot;&quot;../images/cover.svg&quot;&quot; alt=&quot;&quot;&quot; &amp; fsShortFileName &amp; &quot;&quot;&quot; title=&quot;&quot;&quot; &amp; fsShortFileName &amp; &quot;&quot;&quot; /&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;/div&gt;&quot; &amp; CR
+	sA =  fsXhtmlPreviewHeaderCode(fs_BOOK_COVER(fs_cL), fsDocLanguage, sA, &quot;cover.jpeg&quot;, sVersion)
+	sA = sA &amp; &quot;&lt;body&gt;&quot;
+	sA = sA &amp; &quot;&lt;p&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;img src=&quot;&quot;../images/cover.svg&quot;&quot; alt=&quot;&quot;&quot; &amp; fsShortFileName &amp; &quot;&quot;&quot; title=&quot;&quot;&quot; &amp; fsShortFileName &amp; &quot;&quot;&quot; /&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/p&gt;&quot; &amp; CR
+	if len(fsDescription) = 0 then
+		sA = sA &amp; &quot;&lt;h1&gt;&lt;a href=&quot;&quot;&quot; &amp; getBranding( bI_HOMEPAGE, fsDocLanguage) &amp; &quot;&quot;&quot;&gt;&quot; &amp; getBranding( bI_BRANDING, fsDocLanguage)  &amp; &quot;&lt;/a&gt;&lt;/h1&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;&lt;p&gt;&quot; &amp; CR
+		sA = sA &amp; getBranding(bI_SLOGAN, fsDocLanguage)  &amp; CR
+		sA = sA &amp; getBranding(bI_ABOUT_TEXT, fsDocLanguage) &amp; CR
+		sA = sA &amp; &quot;&lt;/p&gt;&quot; &amp; CR
+	else
+		sA = sA &amp; &quot;&lt;h1&gt;&quot; &amp; fsShortFileName &amp; &quot;&lt;/h1&gt;&quot; &amp; CR
+		sB = fsDescription
+		sA = sA &amp; fsAlterStringMarkup (sB, &quot;&lt;div&gt;&quot;, &quot;&lt;/div&gt;&quot; &amp; CR &amp; &quot;&lt;div&gt;&quot;, CR &amp; &quot;&lt;/div&gt;&quot; &amp; CR, true)
+	endif
 	sA = sA &amp; &quot;&lt;/body&gt;&quot; &amp; CR
 	sA = sA &amp; &quot;&lt;/html&gt;&quot; &amp; CR
-	CreateFile(fsStagingDirectoryURL &amp; &quot;/OEBPS/text/cover.xhtml&quot;,sA,&quot;UTF-8&quot;)
+	CreateFile(fsStagingDirectoryURL &amp; &quot;/OEBPS/text/backcover.xhtml&quot;,sA,&quot;UTF-8&quot;) 
 end sub
 
-sub writeEpubTableOfContentsPage (optional sUUID)
+sub writeEpubCoverTextAlt1 (optional sUUID)
+	&apos; The jpeg image is large for high definition tablets
+	if ismissing (sUUID) then
+		sUUID = &quot;-------------Unknown-------------&quot;
+	endif
+	writeEpubCoverText (sUUID)
+end sub
+
+sub writeEpubTableOfContentsPage (optional sUUID, optional sVersion)
 	dim sA, CR as string
 	dim sTo,sFrom as string
 	dim i as integer
+	dim cL as string
+	cL = fsDocLanguage
 	sTo = fsStagingDirectoryURL &amp; &quot;/OEBPS/images/icon.png&quot;
 	if B_DEBUG = true then
 		sFrom =fsMyURL &amp; &quot;/images/&quot; &amp; getBranding( bI_QR_PNG )
@@ -2023,21 +2073,53 @@ sub writeEpubTableOfContentsPage (optional sUUID)
 	if ismissing (sUUID) then
 		sUUID = &quot;-------------Unknown-------------&quot;
 	endif
+	if ismissing (sVersion) then
+		sVersion = &quot;3.0&quot;
+	endif
 	CR = chr$(10)
-	sA =  &quot;&lt;meta name=&quot;&quot;EPB-UUID&quot;&quot; content=&quot;&quot;&quot; &amp; sUUID &amp; &quot;&quot;&quot;/&gt;&quot; &amp; CR
+	sA = &quot;&lt;?xml version=&quot;&quot;1.0&quot;&quot; encoding=&quot;&quot;UTF-8&quot;&quot;?&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;html xmlns=&quot;&quot;http://www.w3.org/1999/xhtml&quot;&quot; xml:lang=&quot;&quot;&quot; &amp; cL &amp; &quot;&quot;&quot; lang=&quot;&quot;&quot; &amp; cL &amp; &quot;&quot;&quot;&quot; &amp; CR	
+	sA = sA &amp; &quot;xmlns:epub=&quot;&quot;http://www.idpf.org/2007/ops&quot;&quot;&gt;&quot; &amp; CR	
+	sA = sA &amp; &quot;&lt;head&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;title&gt;&quot; &amp; fs_TABLE_OF_CONTENTS (cL) &amp; &quot;&lt;/title&gt;&quot; &amp; CR
+	sA =  sA &amp; &quot;&lt;meta name=&quot;&quot;EPB-UUID&quot;&quot; content=&quot;&quot;&quot; &amp; sUUID &amp; &quot;&quot;&quot;/&gt;&quot; &amp; CR
 	sA = sA &amp; &quot;&lt;link href=&quot;&quot;../styles/stylesheet.css&quot;&quot; type=&quot;&quot;text/css&quot;&quot; rel=&quot;&quot;stylesheet&quot;&quot;/&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;link href=&quot;&quot;../styles/page_styles.css&quot;&quot; type=&quot;&quot;text/css&quot;&quot; rel=&quot;&quot;stylesheet&quot;&quot;/&gt;&quot; &amp; CR
-	sA =  fsXhtmlPreviewHeaderCode(fsShortFileName(), fsDocLanguage, sA , &quot;icon.png&quot;)
+	sA = sA &amp; &quot;&lt;link href=&quot;&quot;../styles/page_styles.css&quot;&quot; type=&quot;&quot;text/css&quot;&quot; rel=&quot;&quot;stylesheet&quot;&quot;/&gt;&quot; &amp; CR		
+	sA = sA &amp; &quot;&lt;style type=&quot;&quot;text/css&quot;&quot;&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;/*&lt;![CDATA[*/&quot; &amp; CR
+	sA = sA &amp; &quot;div.ccache1 {display:none}&quot; &amp; CR
+	sA = sA &amp; &quot;/*]]&gt;*/&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/style&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/head&gt;&quot; &amp; CR	
 	sA = sA &amp; &quot;&lt;body&gt;&quot; &amp; CR
 	sA = sA &amp; &quot;&lt;div&gt;&quot; &amp; CR
     sA = sA &amp; &quot;&lt;h1 class = &quot;&quot;t&quot;&quot;&gt;&quot; &amp; fsShortFileName() &amp; &quot;&lt;/h1&gt;&quot; &amp; CR
-    sA = sA &amp; &quot;&lt;ul&gt;&quot; &amp; CR
+    sA = sA &amp; &quot;&lt;h2 class = &quot;&quot;t&quot;&quot;&gt;&quot; &amp; fs_TABLE_OF_CONTENTS (cL) &amp; &quot;&lt;/h2&gt;&quot; &amp; CR 
+    if int (sVersion) &gt; 2 then  
+    	sA = sA &amp; &quot;&lt;nav epub:type=&quot;&quot;toc&quot;&quot; id=&quot;&quot;toc&quot;&quot;&gt;&quot; &amp; CR
+    endif
+    sA = sA &amp; &quot;&lt;ol&gt;&quot; &amp; CR
     for i=1 To ThisComponent.getDrawPages.getCount()
   		sA = sA &amp; &quot;&lt;li&gt;&quot; &amp; CR
 		sA = sA &amp; &quot;&lt;a href=&quot;&quot;chapter-&quot; &amp; trim (i) &amp; &quot;.xhtml&quot;&quot;&gt;&quot; &amp; fsReplaceText (getSlideTitle (i-1), &quot;&amp;&quot;, &quot;&amp;amp;&quot;) &amp; &quot;&lt;/a&gt;&quot; &amp; CR
 		sA = sA &amp; &quot;&lt;/li&gt;&quot; &amp; CR
 	next
-	sA = sA &amp; &quot;&lt;/ul&gt;&quot; &amp; CR
+	i = i + 1
+	sA = sA &amp; &quot;&lt;li&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;a href=&quot;&quot;backcover.xhtml&quot;&quot;&gt;&quot; &amp; fs_NOTE (cL) &amp; &quot;&lt;/a&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/li&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/ol&gt;&quot; &amp; CR
+	if int (sVersion) &gt; 2 then  
+		sA = sA &amp; &quot;&lt;/nav&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;&lt;nav epub:type=&quot;&quot;landmarks&quot;&quot;&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;    &lt;h2 class = &quot;&quot;t&quot;&quot;&gt;&quot; &amp; fs_GUIDE(cL) &amp; &quot;&lt;/h2&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;    &lt;ol&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;       &lt;li&gt;&lt;a epub:type=&quot;&quot;frontmatter&quot;&quot; href=&quot;&quot;cover.xhtml&quot;&quot;&gt;frontmatter&lt;/a&gt;&lt;/li&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;       &lt;li&gt;&lt;a epub:type=&quot;&quot;bodymatter&quot;&quot; href=&quot;&quot;chapter-1.xhtml&quot;&quot;&gt;bodymatter&lt;/a&gt;&lt;/li&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;       &lt;li&gt;&lt;a epub:type=&quot;&quot;backmatter&quot;&quot; href=&quot;&quot;backcover.xhtml&quot;&quot;&gt;backmatter&lt;/a&gt;&lt;/li&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;    &lt;/ol&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;&lt;/nav&gt;&quot; &amp; CR
+	endif
 	sA = sA &amp; &quot;&lt;hr/&gt;&quot; &amp; CR
     sA = sA &amp; fsEpubFooterText
 	sA = sA &amp; &quot;&lt;/div&gt;&quot; &amp; CR
@@ -2141,24 +2223,30 @@ sub writeEpubEpbNcx (sUUID)
 	sA = sA &amp; &quot;&lt;/navLabel&gt;&quot; &amp; CR
 	sA = sA &amp; &quot;&lt;content src=&quot;&quot;text/cover.xhtml&quot;&quot;/&gt;&quot; &amp; CR
 	sA = sA &amp; &quot;&lt;/navPoint&gt;&quot; &amp; CR
-	i = 1
-	sA = sA &amp; &quot;&lt;navPoint id=&quot;&quot;navPoint-&quot; &amp; trim(i+1) &amp; &quot;&quot;&quot; playOrder=&quot;&quot;&quot; &amp; trim(i+1) &amp; &quot;&quot;&quot;&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;navLabel&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;text&gt;&quot; &amp; fs_TABLE_OF_CONTENTS(cLocale)  &amp; &quot;&lt;/text&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;/navLabel&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;content src=&quot;&quot;text/toc.xhtml&quot;&quot;/&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;/navPoint&gt;&quot; &amp; CR
+&apos;	i = 1
+&apos;	sA = sA &amp; &quot;&lt;navPoint id=&quot;&quot;navPoint-&quot; &amp; trim(i+1) &amp; &quot;&quot;&quot; playOrder=&quot;&quot;&quot; &amp; trim(i+1) &amp; &quot;&quot;&quot;&gt;&quot; &amp; CR
+&apos;	sA = sA &amp; &quot;&lt;navLabel&gt;&quot; &amp; CR
+&apos;	sA = sA &amp; &quot;&lt;text&gt;&quot; &amp; fs_TABLE_OF_CONTENTS(cLocale)  &amp; &quot;&lt;/text&gt;&quot; &amp; CR
+&apos;	sA = sA &amp; &quot;&lt;/navLabel&gt;&quot; &amp; CR
+&apos;	sA = sA &amp; &quot;&lt;content src=&quot;&quot;text/toc.xhtml&quot;&quot;/&gt;&quot; &amp; CR
+&apos;	sA = sA &amp; &quot;&lt;/navPoint&gt;&quot; &amp; CR
 	&apos; --------------
 	for i=1 To ThisComponent.getDrawPages.getCount()
 		oDrawPage=oDrawPages.getByIndex(i-1) 
-		&apos; Add two to navPoint to account for Cover and TOC
-		sA = sA &amp; &quot;&lt;navPoint id=&quot;&quot;navPoint-&quot; &amp; trim(i+2) &amp; &quot;&quot;&quot; playOrder=&quot;&quot;&quot; &amp; trim(i+2) &amp; &quot;&quot;&quot;&gt;&quot; &amp; CR
+		&apos; Add one to navPoint to account for Cover 
+		sA = sA &amp; &quot;&lt;navPoint id=&quot;&quot;navPoint-&quot; &amp; trim(i+1) &amp; &quot;&quot;&quot; playOrder=&quot;&quot;&quot; &amp; trim(i+1) &amp; &quot;&quot;&quot;&gt;&quot; &amp; CR
 		sA = sA &amp; &quot;&lt;navLabel&gt;&quot; &amp; CR
 		sA = sA &amp; &quot;&lt;text&gt;&quot; &amp; fsReplaceText ( getSlideTitle (i-1), &quot;&amp;&quot;, &quot;&amp;amp;&quot;) &amp; &quot;&lt;/text&gt;&quot; &amp; CR
 		sA = sA &amp; &quot;&lt;/navLabel&gt;&quot; &amp; CR
 		sA = sA &amp; &quot;&lt;content src=&quot;&quot;text/chapter-&quot; &amp; trim(i) &amp; &quot;.xhtml&quot;&quot;/&gt;&quot; &amp; CR
 		sA = sA &amp; &quot;&lt;/navPoint&gt;&quot; &amp; CR
 	next
+	sA = sA &amp; &quot;&lt;navPoint id=&quot;&quot;navPoint-&quot; &amp; trim(i+1) &amp; &quot;&quot;&quot; playOrder=&quot;&quot;&quot; &amp; trim(i+1) &amp; &quot;&quot;&quot;&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;navLabel&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;text&gt;&quot; &amp; fs_NOTE(cLocale)  &amp; &quot;&lt;/text&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/navLabel&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;content src=&quot;&quot;text/backcover.xhtml&quot;&quot;/&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;/navPoint&gt;&quot; &amp; CR
 	sA = sA &amp; &quot;&lt;/navMap&gt;&quot; &amp; CR
 	sA = sA &amp; &quot;&lt;/ncx&gt;&quot; &amp; CR
 	CreateFile(fsStagingDirectoryURL &amp; &quot;/OEBPS/toc.ncx&quot;,sA,&quot;UTF-8&quot;)
@@ -2177,12 +2265,14 @@ function getSlideTitle (optional byval i)
 	oDrawPages=oDoc.getDrawPages()
     oDrawPage=oDrawPages.getByIndex(i)
     sA = &quot;&quot;
-    &apos; Is the name of the slide a good choice? 
+    &apos; Is the name of the slide a good choice? Defaults Slide 10 or Diapositive 10 are not the best choice
+    sB = oDrawpage.Name
     if len(sA) = 0 then
-		if (len(oDrawpage.Name) &gt; 8) or oDrawpage.Name = fs_IMPRINT (fsDocLanguage) then
-			sA = trim (oDrawpage.Name)
+		if (len(sB) &gt; 15 or instr (&quot;0123456789&quot;, right(sB,1)) = 0) or sB = fs_IMPRINT (fsDocLanguage) then
+			sA = trim (sB)
 		endif 
 	endif
+	sB = &quot;&quot;
 	&apos; Is there a text shape that is a good choice? On a normal note form presentation, the
 	&apos; first text shape is the title at the top of the slide.
     if len(sA) = 0 then
@@ -2235,130 +2325,97 @@ function fbSlideNameIsUnique (sA)
     next
 end function
 
-
-sub writeAlternateEpubOpf(optional UUID)
-	&apos; Tip o&apos; the hat to dotEpub.org - create ePub documents with your web browser
-	&apos; Create the Alternate Epub opf file if you prefer to use a single svg image as 
-	&apos; your book cover. Note that some ePub readers do not support the full SVG feature
-	&apos; set, and may change the appearance of your image.
-	if ismissing (UUID) then
-		UUID =  UUIDv4()
+sub writeAlternateEpubOpf(optional sUUID, optional sVersion)
+	&apos; ePub 3 format Opf. 
+	if ismissing (sUUID) then
+		sUUID =  UUIDv4()
+	endif
+	if ismissing (sVersion) then
+		sVersion =  &quot;3.0&quot;
 	endif
 	dim sA, CR as string
 	dim j as integer
 	j = ThisComponent.getDrawPages.getCount()
-	CR = chr$(10)
-	sA = &quot;&lt;?xml version=&quot;&quot;1.0&quot;&quot; encoding=&quot;&quot;UTF-8&quot;&quot; ?&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;package xmlns=&quot;&quot;http://www.idpf.org/2007/opf&quot;&quot; unique-identifier=&quot;&quot;BookID&quot;&quot; version=&quot;&quot;2.0&quot;&quot;&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;metadata xmlns:dc=&quot;&quot;http://purl.org/dc/elements/1.1/&quot;&quot; xmlns:opf=&quot;&quot;http://www.idpf.org/2007/opf&quot;&quot;&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;dc:title&gt;&quot; &amp; fsShortFileName() &amp; &quot;&lt;/dc:title&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;dc:rights&gt;(c) &quot; &amp; fsDocAuthor &amp; &quot; &quot; &amp;  ThisComponent.DocumentProperties.CreationDate.Year() &amp; &quot;&lt;/dc:rights&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;dc:creator opf:role=&quot;&quot;aut&quot;&quot;&gt;&quot; &amp; fsDocAuthor &amp; &quot;&lt;/dc:creator&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;dc:type&gt;Presentation&lt;/dc:type&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;dc:publisher&gt;&quot; &amp; getBranding (bI_SPOKEN_BRANDING)&amp; &quot;&lt;/dc:publisher&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;dc:source&gt;&quot; &amp; getBranding (bI_HOMEPAGE)&amp; &quot;&lt;/dc:source&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;dc:date opf:event=&quot;&quot;publication&quot;&quot;&gt;&quot; &amp;  fsCreationShortDate() &amp; &quot;&lt;/dc:date&gt;&quot; &amp; CR &apos; zero
-	sA = sA &amp; &quot;&lt;dc:language&gt;&quot; &amp; fsDocLanguage &amp; &quot;&lt;/dc:language&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;dc:identifier id=&quot;&quot;BookID&quot;&quot; opf:scheme=&quot;&quot;CustomID&quot;&quot;&gt;&quot; &amp; getBranding (bI_BRANDING) &amp; &quot;-&quot; &amp; UUID &amp; &quot;&lt;/dc:identifier&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;meta name=&quot;&quot;cover&quot;&quot; content=&quot;&quot;CoverImage&quot;&quot; /&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;/metadata&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;manifest&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;item id=&quot;&quot;ncx&quot;&quot; href=&quot;&quot;toc.ncx&quot;&quot; media-type=&quot;&quot;application/x-dtbncx+xml&quot;&quot;/&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;item id=&quot;&quot;estils&quot;&quot; href=&quot;&quot;styles/stylesheet.css&quot;&quot; media-type=&quot;&quot;text/css&quot;&quot;/&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;item id=&quot;&quot;logo&quot;&quot; href=&quot;&quot;/images/icon.png&quot;&quot; media-type=&quot;&quot;image/png&quot;&quot;/&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;item id=&quot;&quot;covertext&quot;&quot; href=&quot;&quot;text/cover.xhtml&quot;&quot; media-type=&quot;&quot;application/xhtml+xml&quot;&quot;/&gt;&quot; &amp; CR
+	CR = chr$(10)	
+	sA = &quot;&lt;?xml version=&quot;&quot;1.0&quot;&quot; encoding=&quot;&quot;UTF-8&quot;&quot;?&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;&lt;package xmlns=&quot;&quot;http://www.idpf.org/2007/opf&quot;&quot; version=&quot;&quot;&quot; &amp; sVersion &amp; &quot;&quot;&quot; unique-identifier=&quot;&quot;uid&quot;&quot;&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;    &lt;metadata xmlns:dc=&quot;&quot;http://purl.org/dc/elements/1.1/&quot;&quot;&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;        &lt;dc:identifier id=&quot;&quot;uid&quot;&quot;&gt;&quot; &amp; sUUID &amp; &quot;&lt;/dc:identifier&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;        &lt;dc:title&gt;&quot; &amp; fsstripXMLTags (fsShortFileName(),true) &amp; &quot;&lt;/dc:title&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;        &lt;dc:creator&gt;&quot; &amp; fsDocAuthor &amp; &quot;&lt;/dc:creator&gt;&quot; &amp; CR
+	if len (fsEditorInfo (&quot;organization&quot;)) = 0 then
+		&apos; Use URL of Home page
+		sA = sA &amp; &quot;        &lt;dc:publisher&gt;&quot; &amp;  getBranding(bI_HOMEPAGE) &amp; &quot;&lt;/dc:publisher&gt;&quot; &amp; CR
+	else
+		sA = sA &amp; &quot;        &lt;dc:publisher&gt;&quot; &amp; fsstripXMLTags(fsEditorInfo (&quot;organization&quot;)) &amp; &quot;&lt;/dc:publisher&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;        &lt;dc:contributor opf:role=&quot;&quot;bkp&quot;&quot;&gt;&quot; &amp; getBranding(bI_HOMEPAGE) &amp; &quot;&lt;/dc:contributor&gt;&quot; &amp; CR
+	endif
+	if len(fsKeywords) &lt;&gt; 0 then
+	sA = sA &amp; &quot;        &lt;dc:subject&gt;&quot; &amp; fsstripXMLTags(fsKeywords) &amp; &quot;&lt;/dc:subject&gt;&quot; &amp; CR
+	endif
+	if len(fsSubject) &lt;&gt; 0 then
+		sA = sA &amp; &quot;        &lt;dc:subject&gt;&quot; &amp; fsstripXMLTags(fsSubject) &amp; &quot;&lt;/dc:subject&gt;&quot; &amp; CR
+	endif
+	sA = sA &amp; &quot;        &lt;dc:language&gt;&quot; &amp; fsDocLanguage &amp; &quot;&lt;/dc:language&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;        &lt;dc:date&gt;&quot; &amp;  fsCreationShortDate() &amp; &quot;&lt;/dc:date&gt;&quot; &amp; CR
+	if len(fsDescription) &lt;&gt; 0 then
+		sA = sA &amp; &quot;        &lt;dc:description&gt;&quot; &amp;  fsstripXMLTags(fsDescription) &amp; &quot;&lt;/dc:description&gt;&quot; &amp; CR
+	endif
+	if int (sVersion) &gt; 2 then
+		sA = sA &amp; &quot;        &lt;meta property=&quot;&quot;dcterms:modified&quot;&quot;&gt;&quot; &amp;  fsNow() &amp; &quot;Z&lt;/meta&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;        &lt;!-- cover meta element included for 2.0 reading system compatibility: --&gt;&quot; &amp; CR
+	endif
+	sA = sA &amp; &quot;        &lt;meta name=&quot;&quot;cover&quot;&quot; content=&quot;&quot;cover&quot;&quot; /&gt;&quot; &amp; CR
+	
+ 	sA = sA &amp; &quot;   &lt;/metadata&gt; &quot; &amp; CR	
+	sA = sA &amp; &quot;   &lt;manifest&gt;&quot; &amp; CR
 	for i=1 To j
-		sA = sA &amp; &quot;&lt;item href=&quot;&quot;text/chapter-&quot; &amp; trim (i) &amp; &quot;.xhtml&quot;&quot; id=&quot;&quot;chapter-&quot; &amp; trim (i) &amp; &quot;&quot;&quot; media-type=&quot;&quot;application/xhtml+xml&quot;&quot;/&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;        &lt;item href=&quot;&quot;text/chapter-&quot; &amp; trim (i) &amp; &quot;.xhtml&quot;&quot; id=&quot;&quot;chapter-&quot; &amp; trim (i) &amp; &quot;&quot;&quot; media-type=&quot;&quot;application/xhtml+xml&quot;&quot;/&gt;&quot; &amp; CR
 	next
 	for i=1 To j
-		sA = sA &amp; &quot;&lt;item href=&quot;&quot;images/image-&quot; &amp; trim (i) &amp; &quot;.jpg&quot;&quot; id=&quot;&quot;dataItem&quot; &amp; trim (i) &amp; &quot;&quot;&quot; media-type=&quot;&quot;image/jpeg&quot;&quot;/&gt;&quot; &amp; CR
-	next	
-	sA = sA &amp; &quot;&lt;item id=&quot;&quot;CoverImage&quot;&quot; href=&quot;&quot;images/cover.jpeg&quot;&quot; media-type=&quot;&quot;image/jpeg&quot;&quot;/&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;item id=&quot;&quot;toc&quot;&quot; media-type=&quot;&quot;application/xhtml+xml&quot;&quot; href=&quot;&quot;text/toc.xhtml&quot;&quot;&gt;&lt;/item&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;/manifest&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;spine toc=&quot;&quot;ncx&quot;&quot;&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;itemref idref=&quot;&quot;covertext&quot;&quot; linear=&quot;&quot;no&quot;&quot;/&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;itemref idref=&quot;&quot;toc_xhtml&quot;&quot; linear=&quot;&quot;no&quot;&quot;/&gt;&quot; &amp; CR
-	for i=1 To j
-		sA = sA &amp; &quot;&lt;itemref idref=&quot;&quot;chapter-&quot; &amp; i &amp; &quot;&quot;&quot; linear=&quot;&quot;yes&quot;&quot;/&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;        &lt;item href=&quot;&quot;images/image-&quot; &amp; trim (i) &amp; &quot;.jpg&quot;&quot; id=&quot;&quot;dataItem&quot; &amp; trim (i) &amp; &quot;&quot;&quot; media-type=&quot;&quot;image/jpeg&quot;&quot;/&gt;&quot; &amp; CR
 	next
-	sA = sA &amp; &quot;&lt;/spine&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;guide&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;reference href=&quot;&quot;text/cover.xhtml&quot;&quot; type=&quot;&quot;cover&quot;&quot; title=&quot;&quot;&quot; &amp; fs_BOOK_COVER(cLocale) &amp; &quot;&quot;&quot;/&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;reference href=&quot;&quot;text/toc.xhtml&quot;&quot; type=&quot;&quot;toc&quot;&quot; title=&quot;&quot;&quot; &amp; fs_TABLE_OF_CONTENTS(cLocale)  &amp;&quot;&quot;&quot;/&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;reference href=&quot;&quot;text/chapter-1.xhtml&quot;&quot; type=&quot;&quot;text&quot;&quot; title=&quot;&quot;&quot; &amp; fsShortFileName() &amp; &quot;&quot;&quot;/&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;/guide&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;        &lt;item href=&quot;&quot;styles/stylesheet.css&quot;&quot; id=&quot;&quot;css&quot;&quot; media-type=&quot;&quot;text/css&quot;&quot; /&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;        &lt;item href=&quot;&quot;styles/page_styles.css&quot;&quot; id=&quot;&quot;estils2&quot;&quot; media-type=&quot;&quot;text/css&quot;&quot; /&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;        &lt;item href=&quot;&quot;images/icon.png&quot;&quot; id=&quot;&quot;logo&quot;&quot; media-type=&quot;&quot;image/png&quot;&quot; /&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;        &lt;item href=&quot;&quot;text/cover.xhtml&quot;&quot; id=&quot;&quot;frontmatter&quot;&quot;  media-type=&quot;&quot;application/xhtml+xml&quot;&quot; /&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;        &lt;item href=&quot;&quot;images/cover.svg&quot;&quot; id=&quot;&quot;backmattersvg&quot;&quot; media-type=&quot;&quot;image/svg+xml&quot;&quot; /&gt;&quot; &amp; CR
+	if int (sVersion) &gt; 2 then
+		sA = sA &amp; &quot;        &lt;item href=&quot;&quot;images/cover.jpeg&quot;&quot; id=&quot;&quot;cover&quot;&quot; media-type=&quot;&quot;image/jpeg&quot;&quot; properties=&quot;&quot;cover-image&quot;&quot; /&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;        &lt;item href=&quot;&quot;text/toc.xhtml&quot;&quot; id=&quot;&quot;nav&quot;&quot; properties=&quot;&quot;nav&quot;&quot; media-type=&quot;&quot;application/xhtml+xml&quot;&quot; /&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;        &lt;item href=&quot;&quot;text/backcover.xhtml&quot;&quot; id=&quot;&quot;backmatter&quot;&quot; properties=&quot;&quot;svg&quot;&quot; media-type=&quot;&quot;application/xhtml+xml&quot;&quot; /&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;        &lt;!-- ncx included for 2.0 reading system compatibility: --&gt;&quot; &amp; CR
+	else 
+		sA = sA &amp; &quot;        &lt;item href=&quot;&quot;images/cover.jpeg&quot;&quot; id=&quot;&quot;cover&quot;&quot; media-type=&quot;&quot;image/jpeg&quot;&quot; /&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;        &lt;item href=&quot;&quot;text/toc.xhtml&quot;&quot; id=&quot;&quot;nav&quot;&quot; media-type=&quot;&quot;application/xhtml+xml&quot;&quot; /&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;        &lt;item href=&quot;&quot;text/backcover.xhtml&quot;&quot; id=&quot;&quot;backmatter&quot;&quot; media-type=&quot;&quot;application/xhtml+xml&quot;&quot; /&gt;&quot; &amp; CR
+	endif
+	sA = sA &amp; &quot;        &lt;item href=&quot;&quot;toc.ncx&quot;&quot; id=&quot;&quot;ncx&quot;&quot; media-type=&quot;&quot;application/x-dtbncx+xml&quot;&quot; /&gt;&quot; &amp; CR	
+	sA = sA &amp; &quot;   &lt;/manifest&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;   &lt;spine toc=&quot;&quot;ncx&quot;&quot;&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;      &lt;itemref idref=&quot;&quot;frontmatter&quot;&quot; linear=&quot;&quot;no&quot;&quot; /&gt;&quot; &amp; CR
+	for i=1 To j
+		sA = sA &amp; &quot;      &lt;itemref idref=&quot;&quot;chapter-&quot; &amp; i &amp; &quot;&quot;&quot; linear=&quot;&quot;yes&quot;&quot; /&gt;&quot; &amp; CR
+	next
+	sA = sA &amp; &quot;      &lt;itemref idref=&quot;&quot;backmatter&quot;&quot; linear=&quot;&quot;no&quot;&quot; /&gt;&quot; &amp; CR
+	sA = sA &amp; &quot;   &lt;/spine&gt;&quot; &amp; CR
+	if int (sVersion) &lt; 3 then
+		sA = sA &amp; &quot;   &lt;guide&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;      &lt;reference href=&quot;&quot;text/cover.xhtml&quot;&quot; type=&quot;&quot;cover&quot;&quot; title=&quot;&quot;&quot; &amp; fs_BOOK_COVER(cLocale) &amp; &quot;&quot;&quot;/&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;      &lt;reference href=&quot;&quot;text/toc.xhtml&quot;&quot; type=&quot;&quot;toc&quot;&quot; title=&quot;&quot;&quot; &amp; fs_TABLE_OF_CONTENTS(cLocale) &amp;&quot;&quot;&quot;/&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;      &lt;reference href=&quot;&quot;text/chapter-1.xhtml&quot;&quot; type=&quot;&quot;text&quot;&quot; title=&quot;&quot;&quot; &amp; fsShortFileName() &amp; &quot;&quot;&quot;/&gt;&quot; &amp; CR
+		sA = sA &amp; &quot;   &lt;/guide&gt;&quot; &amp; CR
+	endif
 	sA = sA &amp; &quot;&lt;/package&gt;&quot;
-	 &apos;ShowDialog (sA)
 	CreateFile(fsStagingDirectoryURL &amp; &quot;/OEBPS/content.opf&quot;,sA,&quot;UTF-8&quot;)
 end sub
 
-sub writeEpubEpbOpf (sUUID, optional bIsEpub)
-	&apos; Publishing information plus a complete
-	&apos; manifest of all files with the exception of
-	&apos; /META-DATA/container.xml and /mimetype
-	&apos; use this opf if you prefer to set up your title page using
-	&apos; an XHTML chapter as your title page and a JPEG image as your
-	&apos; title page icon. 
-	if ismissing (bIsEpub) then
-		bIsEpub = true
+sub writeBasicEpubOpf (optional sUUID)
+	&apos; Use with Calibre epub manager to avoid errors converting or editing ePub 3 files
+	if ismissing (sUUID) then
+		sUUID =  UUIDv4()
 	endif
-	dim sA, CR as string
-	dim i, j as integer
-	CR = chr$(10)
-	j = ThisComponent.getDrawPages.getCount()
-	sA = sA &amp; &quot;&lt;?xml version=&apos;1.0&apos; encoding=&apos;utf-8&apos;?&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;package xmlns=&quot;&quot;http://www.idpf.org/2007/opf&quot;&quot; version=&quot;&quot;2.0&quot;&quot; unique-identifier=&quot;&quot;BookID&quot;&quot;&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;metadata xmlns:xsi=&quot;&quot;http://www.w3.org/2001/XMLSchema-instance&quot;&quot; xmlns:opf=&quot;&quot;http://www.idpf.org/2007/opf&quot;&quot; xmlns:dcterms=&quot;&quot;http://purl.org/dc/terms/&quot;&quot; xmlns:calibre=&quot;&quot;http://calibre.kovidgoyal.net/2009/metadata&quot;&quot; xmlns:dc=&quot;&quot;http://purl.org/dc/elements/1.1/&quot;&quot;&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;dc:contributor opf:role=&quot;&quot;bkp&quot;&quot;&gt;&quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp; &quot; - &quot; &amp; getBranding (bI_BRANDING) &amp; &quot; [&quot; &amp; getBranding (bI_HOMEPAGE ) &amp; &quot;]&quot; &amp; &quot;&lt;/dc:contributor&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;dc:creator opf:role=&quot;&quot;aut&quot;&quot;&gt;&quot; &amp; fsDocAuthor &amp; &quot;&lt;/dc:creator&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;dc:date opf:event=&quot;&quot;publication&quot;&quot;&gt;&quot; &amp; fsCreationShortDate &amp; &quot;&lt;/dc:date&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;dc:identifier id=&quot;&quot;BookID&quot;&quot; opf:scheme=&quot;&quot;UUID&quot;&quot;&gt;&quot; &amp; sUUID &amp; &quot;&lt;/dc:identifier&gt;&quot; &amp; CR 
-	sA = sA &amp; &quot;&lt;dc:language&gt;&quot; &amp; fsDocLanguage &amp; &quot;&lt;/dc:language&gt;&quot; &amp; CR
-	if len(fsSubject) &lt;&gt; 0 then
-		sA = sA &amp; &quot;&lt;dc:subject&gt;&quot; &amp; fsstripXMLTags (fsSubject,true) &amp; &quot;&lt;/dc:subject&gt;&quot; &amp; CR
-	endif
-	if len(fsDescription) &lt;&gt; 0 then
-	 	sA = sA &amp; &quot;&lt;dc:description&gt;&quot; &amp; fsstripXMLTags (fsDescription,true) &amp; &quot;&lt;/dc:description&gt;&quot; &amp; CR 
-	endif
-	sA = sA &amp; &quot;&lt;dc:title&gt;&quot; &amp; fsstripXMLTags (fsShortFileName(),true) &amp; &quot;&lt;/dc:title&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;meta name=&quot;&quot;&quot; &amp; lcase (getBranding (bI_BRANDING)) &amp; &quot;:securityid&quot;&quot; content=&quot;&quot;&quot; &amp; sUUID &amp; &quot;&quot;&quot;/&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;meta name=&quot;&quot;&quot; &amp; lcase (getBranding (bI_BRANDING)) &amp; &quot;:jobid&quot;&quot; content=&quot;&quot;&quot; &amp; &quot;JOB-51E76C0E-&quot; &amp; UUIDv4() &amp; &quot;&quot;&quot;/&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;meta name=&quot;&quot;calibre:timestamp&quot;&quot; content=&quot;&quot;&quot; &amp; fsNow &amp; &quot;&quot;&quot;/&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;meta name=&quot;&quot;calibre:title_sort&quot;&quot; content=&quot;&quot;&quot; &amp; fsTrimArticle (fsstripXMLTags (fsShortFileName(),true)) &amp; &quot;&quot;&quot;/&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;meta name=&quot;&quot;cover&quot;&quot; content=&quot;&quot;cover.jpeg&quot;&quot;/&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;/metadata&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;manifest&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;item href=&quot;&quot;images/cover.jpeg&quot;&quot; id=&quot;&quot;cover.jpeg&quot;&quot; media-type=&quot;&quot;image/jpeg&quot;&quot;/&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;item href=&quot;&quot;images/cover.svg&quot;&quot; id=&quot;&quot;cover_svg&quot;&quot; media-type=&quot;&quot;image/svg+xml&quot;&quot;/&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;item href=&quot;&quot;text/cover.xhtml&quot;&quot; id=&quot;&quot;covertext&quot;&quot; media-type=&quot;&quot;application/xhtml+xml&quot;&quot;/&gt;&quot; &amp; CR
-	for i=1 To j
-		sA = sA &amp; &quot;&lt;item href=&quot;&quot;text/chapter-&quot; &amp; trim (i) &amp; &quot;.xhtml&quot;&quot; id=&quot;&quot;chapter-&quot; &amp; trim (i) &amp; &quot;&quot;&quot; media-type=&quot;&quot;application/xhtml+xml&quot;&quot;/&gt;&quot; &amp; CR
-	next
-	for i=1 To j
-		sA = sA &amp; &quot;	&lt;item href=&quot;&quot;images/image-&quot; &amp; trim (i) &amp; &quot;.jpg&quot;&quot; id=&quot;&quot;dataItem&quot; &amp; trim (i) &amp; &quot;&quot;&quot; media-type=&quot;&quot;image/jpeg&quot;&quot;/&gt;&quot; &amp; CR
-	next
-	sA = sA &amp; &quot;	&lt;item href=&quot;&quot;images/icon.png&quot;&quot; id=&quot;&quot;icon-png&quot; &amp; trim (i) &amp; &quot;&quot;&quot; media-type=&quot;&quot;image/png&quot;&quot;/&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;item href=&quot;&quot;text/toc.xhtml&quot;&quot; id=&quot;&quot;toc_xhtml&quot;&quot; media-type=&quot;&quot;application/xhtml+xml&quot;&quot;/&gt;&quot; &amp; CR
-	
-	sA = sA &amp; &quot;&lt;item href=&quot;&quot;styles/page_styles.css&quot;&quot; id=&quot;&quot;page_css&quot;&quot; media-type=&quot;&quot;text/css&quot;&quot;/&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;item href=&quot;&quot;styles/stylesheet.css&quot;&quot; id=&quot;&quot;css&quot;&quot; media-type=&quot;&quot;text/css&quot;&quot;/&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;item href=&quot;&quot;toc.ncx&quot;&quot; media-type=&quot;&quot;application/x-dtbncx+xml&quot;&quot; id=&quot;&quot;ncx&quot;&quot;/&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;/manifest&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;spine toc=&quot;&quot;ncx&quot;&quot;&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;itemref idref=&quot;&quot;covertext&quot;&quot; linear=&quot;&quot;no&quot;&quot;/&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;itemref idref=&quot;&quot;toc_xhtml&quot;&quot; linear=&quot;&quot;no&quot;&quot;/&gt;&quot; &amp; CR
-	for i=1 To j
-		sA = sA &amp; &quot;&lt;itemref idref=&quot;&quot;chapter-&quot; &amp; i &amp; &quot;&quot;&quot; linear=&quot;&quot;yes&quot;&quot;/&gt;&quot; &amp; CR
-	next
-	sA = sA &amp; &quot;&lt;/spine&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;guide&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;reference href=&quot;&quot;text/cover.xhtml&quot;&quot; type=&quot;&quot;cover&quot;&quot; title=&quot;&quot;&quot; &amp; fs_BOOK_COVER(cLocale) &amp; &quot;&quot;&quot;/&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;reference href=&quot;&quot;text/toc.xhtml&quot;&quot; type=&quot;&quot;toc&quot;&quot; title=&quot;&quot;&quot; &amp; fs_TABLE_OF_CONTENTS(cLocale) &amp;&quot;&quot;&quot;/&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;reference href=&quot;&quot;text/chapter-1.xhtml&quot;&quot; type=&quot;&quot;text&quot;&quot; title=&quot;&quot;&quot; &amp; fsShortFileName() &amp; &quot;&quot;&quot;/&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;/guide&gt;&quot; &amp; CR
-	sA = sA &amp; &quot;&lt;/package&gt;&quot; &amp; CR
-	CreateFile(fsStagingDirectoryURL &amp; &quot;/OEBPS/content.opf&quot;,sA,&quot;UTF-8&quot;)
+	writeAlternateEpubOpf(sUUID, &quot;2.0&quot;)
 end sub
 
 

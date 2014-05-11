@@ -167,7 +167,7 @@ function getBranding(i as integer, optional sLanguage ) as string
 			sBranding(0) = &quot;shackleton&quot; &apos; This is used in determining file locations - one word in English
 			sBranding(1) = &quot;shackleton.0pmoa@m.evarnota.com&quot;
 			sBranding(2) = &quot;http://code.google.com/p/ability-tools/&quot;
-			sBranding(3) = &quot;Powered by &quot;&quot;Camera Tools for Shackleton&quot;&quot;&quot;
+			sBranding(3) = &quot;Powered by &quot;&quot;Camera Tools for Shackleton&quot;&quot;.&quot;
 			sBranding(4) = &quot;my-webcam.png&quot;
 			sBranding(5) = &quot;Camera Tools for Shackleton can record images from your webcams.&quot;
 			sBranding(6) = &quot;Camera Tools for Shackleton&quot;
@@ -184,7 +184,7 @@ function getBranding(i as integer, optional sLanguage ) as string
 			sBranding(0) = &quot;shackleton&quot; &apos; This is used in determining file locations - one word in English
 			sBranding(1) = &quot;convert@shackleton.com&quot;
 			sBranding(2) = &quot;http://code.google.com/p/ability-tools/&quot;
-			sBranding(3) = &quot;Powered by &quot;&quot;Ability Tools for Shackleton&quot;&quot;&quot;
+			sBranding(3) = &quot;Powered by &quot;&quot;Ability Tools for Shackleton&quot;&quot;.&quot;
 			sBranding(4) = &quot;my-publisher.png&quot;
 			sBranding(5) = &quot;Ability Tools for Shackleton can create and publish talking presentations.&quot;
 			sBranding(6) = &quot;Ability Tools for Shackleton&quot;
@@ -201,7 +201,7 @@ function getBranding(i as integer, optional sLanguage ) as string
 			sBranding(0) = &quot;AbilityTools&quot; &apos; This is used in determining file locations - one word in English
 			sBranding(1) = &quot;teacher@my-school.&quot; &amp; lcase (fsDocCountry)
 			sBranding(2) = &quot;http://code.google.com/p/ability-tools/&quot;
-			sBranding(3) = &quot;Powered by &quot;&quot;Ability Tools Preview Edition&quot;&quot; for &quot; &amp; fsGetSetting(&quot;ooname&quot;)
+			sBranding(3) = &quot;Powered by &quot;&quot;Ability Tools Preview Edition&quot;&quot; for &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp; &quot;.&quot;
 			sBranding(4) = &quot;brand-preview.png&quot;
 			sBranding(5) = &quot;Ability Tools Preview Edition can create and publish open and accessible electronic books.&quot;
 			sBranding(6) = &quot;Ability Tools Preview Edition&quot;
@@ -218,7 +218,7 @@ function getBranding(i as integer, optional sLanguage ) as string
 			sBranding(0) = &quot;AbilityTools&quot; &apos; This is used in determining file locations - one word in English
 			sBranding(1) = &quot;teacher@my-school.&quot; &amp; lcase (fsDocCountry)
 			sBranding(2) = &quot;http://code.google.com/p/ability-tools/&quot;
-			sBranding(3) = &quot;Powered by &quot;&quot;Ability Tools&quot;&quot; for &quot; &amp; fsGetSetting(&quot;ooname&quot;)
+			sBranding(3) = &quot;Powered by &quot;&quot;Ability Tools&quot;&quot; for &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp; &quot;.&quot;
 			sBranding(4) = &quot;brand.png&quot;
 			sBranding(5) = &quot;Ability Tools can create and publish open and accessible electronic books.&quot;
 			sBranding(6) = &quot;Ability Tools&quot;
@@ -704,14 +704,14 @@ function fsExportCommands(i as integer, optional sLanguage, optional iBrand ) as
 		select case sLanguage
 		case &quot;fr&quot; &apos;French
 			sA (00) = &quot;Enregistrer et envoyer la présentation (.odp)&quot; &apos; la plupart des marques vont utiliser cette fonctionnalité.
-			sA (03) = &quot;Envoyer un document  (.htm)&quot;
-			sA (07) = &quot;Envoyer un livre de poche (.epub)&quot;
+			sA (03) = &quot;Envoyer un document (.htm)&quot;
+			sA (07) = &quot;Envoyer un livre de poche EPUB2 (.epub)&quot;
 			sA (12) = &quot;Créer un document(.htm)&quot;
 			sA (16) = &quot;Créer un livre de poche (.epub)&quot;
 		case else 
 			sA (00) = &quot;Save and send the presentation (.odp)&quot;
 			sA (03) = &quot;Send document  (.htm)&quot;
-			sA (07) = &quot;Send pocket book (.epub)&quot;
+			sA (07) = &quot;Send pocket book EPUB2 (.epub)&quot;
 			sA (12) = &quot;Create document (.htm)&quot;
 			sA (16) = &quot;Create pocket book (.epub)&quot; 
 		end select
@@ -724,8 +724,8 @@ function fsExportCommands(i as integer, optional sLanguage, optional iBrand ) as
 			sA (03) = &quot;Envoyer un document  (.htm)&quot;
 			sA (04) = &quot;Envoyer un document à contraste élevé (.htm)&quot;
 			sA (05) = &quot;Envoyer un document json mobile (.zip)&quot;
-			sA (06) = &quot;Envoyer un livre de tablette (.epub)&quot;
-			sA (07) = &quot;Envoyer un livre de poche (.epub)&quot;
+			sA (06) = &quot;Envoyer un livre de tablette EPUB3 (.epub)&quot;
+			sA (07) = &quot;Envoyer un livre de poche EPUB2 (.epub)&quot;
 			sA (08) = &quot;Envoyer un document pdf mobile (.zip)&quot;
 			sA (09) = &quot;Envoyer un document pdf archive (.zip)&quot;
 			sA (10) = &quot;Créer Unicode Braille [en-US] (.htm)&quot;
@@ -733,8 +733,8 @@ function fsExportCommands(i as integer, optional sLanguage, optional iBrand ) as
 			sA (12) = &quot;Créer un document(.htm)&quot;
 			sA (13) = &quot;Créer un document de contraste élevé (.htm)&quot;
 			sA (14) = &quot;Créer un fichier json mobile (.zip)&quot;
-			sA (15) = &quot;Créer un livre de tablette (.epub)&quot;
-			sA (16) = &quot;Créer un livre de poche (.epub)&quot;
+			sA (15) = &quot;Créer un livre de tablette EPUB3 (.epub)&quot;
+			sA (16) = &quot;Créer un livre de poche EPUB2 (.epub)&quot;
 			sA (17) = &quot;Créer un document pdf mobile (.zip)&quot;
 			sA (18) = &quot;Créer un document pdf archive (.zip)&quot;
 		case else  &apos;en
@@ -744,8 +744,8 @@ function fsExportCommands(i as integer, optional sLanguage, optional iBrand ) as
 			sA (03) = &quot;Send document (.htm)&quot; 
 			sA (04) = &quot;Send high contrast document (.htm)&quot;
 			sA (05) = &quot;Send json mobile document (.zip)&quot;
-			sA (06) = &quot;Send tablet book (.epub)&quot; 
-			sA (07) = &quot;Send pocket book (.epub)&quot;
+			sA (06) = &quot;Send tablet book EPUB3 (.epub)&quot; 
+			sA (07) = &quot;Send pocket book EPUB2 (.epub)&quot;
 			sA (08) = &quot;Send pdf mobile (.zip)&quot;
 			sA (09) = &quot;Send pdf archive (.zip)&quot;
 			sA (10) = &quot;Create uncompressed Unicode Braille [en-US] (.htm)&quot;
@@ -753,8 +753,8 @@ function fsExportCommands(i as integer, optional sLanguage, optional iBrand ) as
 			sA (12) = &quot;Create document (.htm)&quot; 
 			sA (13) = &quot;Create high contrast document (.htm)&quot;
 			sA (14) = &quot;Create json mobile file (.zip)&quot;
-			sA (15) = &quot;Create tablet book (.epub)&quot; 
-			sA (16) = &quot;Create pocket book (.epub)&quot; 		
+			sA (15) = &quot;Create tablet book EPUB3 (.epub)&quot; 
+			sA (16) = &quot;Create pocket book EPUB2 (.epub)&quot; 		
 			sA (17) = &quot;Create pdf mobile (.zip)&quot;
 			sA (18) = &quot;Create pdf archive (.zip)&quot;
 		end select
@@ -887,7 +887,7 @@ function fsGetCommands(i as integer, optional sLanguage, optional iBrand, option
 			end select		
 	    case 1 &apos; Ability Tools - complete toolkit in French and English...
 	    	&apos; Includes tools that work best on up to date computers, mobile devices 
-	    	&apos; and ePub reading programs that fully comply with the current ePub 2 standards.
+	    	&apos; and ePub reading programs that fully comply with the current ePub 3 standards.
 	    	&apos; Adobe Digital editions on Windows doesn&apos;t render Unicode well - especially Hindi
 	    	&apos; Use 
 	    	select case sLanguage

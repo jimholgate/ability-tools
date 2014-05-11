@@ -1,5 +1,5 @@
 Cette extension pour LibreOffice et OpenOffice.org inclut la capacité
-de lire les notes à voix haute lors d'une présentation. Vous pouvez envoyer les présentation aux collègues et aux enseignants. Vous pouvez les publier en ligne avec les services de stockage.
+de lire les notes à voix haute lors d'une présentation. Vous pouvez envoyer les livres electroniques ou les publier en ligne avec les services de stockage.
 
 Utiliser
 
@@ -7,7 +7,7 @@ Après avoir installé cette extension, fermez l'application, puis redémarrez-l
 
 Droit d'auteur et de licence
 
-(c) 2013 James Holgate Vancouver, BC Canada
+(c) 2014 James Holgate Vancouver, BC Canada
 
 Programmation licence - GPL 2.0 licence. 
 Documentation licence - Creative Commons Licence 2.5 avec Attribution pour Canada 2012.

@@ -13,7 +13,7 @@ margin-left: 0px;
 line-height: 2;
 margin-left: 0px;
 font-size: 125%;
-font-family: courier, "courier new", monotype;
+font-family: courier, "courier new", "droid sans mono", monotype;
 }
 .at-novel {
 margin-left: 0px;
@@ -29,7 +29,7 @@ line-height: 1.2;
 .at-swiss {
 margin-left: 0px;
 font-size: 125%;
-font-family: arial, helvetica, sans-serif;
+font-family: arial, helvetica, "droid sans", sans-serif;
 }
 .body {
 display: block;
@@ -61,7 +61,7 @@ text-transform: none;
 .u33 {
 display: block;
 font-size: 1.29167em;
-font-family: arial, helvetica, sans-serif;
+font-family: arial, helvetica, "droid sans", sans-serif;
 font-variant: normal;
 font-weight: bold;
 letter-spacing: 0;
@@ -87,7 +87,15 @@ white-space: pre;
 span.ccache1 {
 display:none;
 }
-img.pagewidth {
+.pagewidth {
+height: auto;
+width:100%;
+}
+a {
+text-decoration: none;
+font-weight: bolder;
+}
+ {
 height: auto;
 width:100%;
 }

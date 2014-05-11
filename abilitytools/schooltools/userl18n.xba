@@ -684,6 +684,89 @@ function fs_SLIDE(cL)
 	end select
 end function
 
+function fs_GUIDE(cL)
+	select case cL
+	case &quot;af&quot; &apos;afrikaans
+		fs_GUIDE= &quot;Landmerk&quot;
+	case &quot;bg&quot; &apos;bulgarian
+		fs_GUIDE= &quot;забележителност&quot;
+	case &quot;ca&quot; &apos;catalan
+		fs_GUIDE= &quot;Fita&quot;
+	case &quot;cs&quot; &apos;czech
+		fs_GUIDE= &quot;Mezník&quot;
+	case &quot;da&quot; &apos;danish
+		fs_GUIDE= &quot;Landmark&quot;
+	case &quot;de&quot; &apos;german
+		fs_GUIDE= &quot;Meilenstein&quot;
+	case &quot;el&quot; &apos;greek
+		fs_GUIDE= &quot;ορόσημο&quot;
+	case &quot;en&quot; &apos;english
+		fs_GUIDE= &quot;Guide&quot;
+	case &quot;es&quot; &apos;spanish
+		fs_GUIDE= &quot;Mojón&quot;
+	case &quot;et&quot; &apos;estonian
+		fs_GUIDE= &quot;Orientiir&quot;
+	case &quot;fi&quot; &apos;finnish
+		fs_GUIDE= &quot;Maamerkki&quot;
+	case &quot;fr&quot; &apos;french
+		fs_GUIDE= &quot;Guide&quot;
+	case &quot;ga&quot; &apos;irish
+		fs_GUIDE= &quot;Landmark&quot;
+	case &quot;hi&quot; &apos;hindi
+		fs_GUIDE= &quot;भूमि - चिह्न&quot;
+	case &quot;hu&quot; &apos;hungarian
+		fs_GUIDE= &quot;Határkő&quot;
+	case &quot;id&quot; &apos;indonesian
+		fs_GUIDE= &quot;Landmark&quot;
+	case &quot;is&quot; &apos;icelandic
+		fs_GUIDE= &quot;Kennileiti&quot;
+	case &quot;it&quot; &apos;italian
+		fs_GUIDE= &quot;Riferimento&quot;
+	case &quot;ja&quot;, &quot;jp&quot; &apos;japanese
+		fs_GUIDE= &quot;ランドマーク&quot;
+	case &quot;ko&quot; &apos;korean
+		fs_GUIDE= &quot;경계표&quot;
+	case &quot;lv&quot; &apos;latvian
+		fs_GUIDE= &quot;Orientieris&quot;
+	case &quot;lt&quot; &apos;lithuanian
+		fs_GUIDE= &quot;Orientyras&quot;
+	case &quot;mt&quot; &apos;maltese
+		fs_GUIDE= &quot;Landmark&quot;
+	case &quot;nl&quot; &apos;dutch
+		fs_GUIDE= &quot;Mijlpaal&quot;
+	case &quot;no&quot;, &quot;nb&quot;, &quot;nn&quot; &apos;norwegian	
+		fs_GUIDE= &quot;Landmark&quot;
+	case &quot;pl&quot; &apos;polish
+		fs_GUIDE= &quot;Orientacyjny&quot;
+	case &quot;pt&quot; &apos;portuguese
+		fs_GUIDE= &quot;Referência&quot;
+	case &quot;ro&quot; &apos;romanian
+		fs_GUIDE= &quot;Reper&quot;
+	case &quot;ru&quot; &apos;russian
+		fs_GUIDE= &quot;ориентир&quot;
+	case &quot;sk&quot; &apos;slovak
+		fs_GUIDE= &quot;Medzník&quot;
+	case &quot;sl&quot; &apos;slovenian
+		fs_GUIDE= &quot;Landmark&quot;
+	case &quot;sv&quot; &apos;swedish
+		fs_GUIDE= &quot;Landmark&quot;
+	case &quot;tl&quot; &apos;tagalog
+		fs_GUIDE= &quot;Muhon&quot;
+	case &quot;tr&quot; &apos;turkish
+		fs_GUIDE= &quot;Işaret&quot;
+	case &quot;uk&quot; &apos;ukrainian
+		fs_GUIDE= &quot;орієнтир&quot;
+	case &quot;zh&quot; &apos;Chinese
+		if Fsgetsetting(&quot;Country&quot;) &lt;&gt; &quot;tw&quot; then
+			fs_GUIDE= &quot;里程碑&quot;
+		else
+			fs_GUIDE= &quot;里程碑&quot;
+		endif
+	case else &apos;Simple English
+		fs_GUIDE= &quot;Guide&quot;
+	end select
+end function
+
 function fs_EPUB_XML_WARNING (cL)
 	select case cL
 	case &quot;fr&quot;
@@ -694,12 +777,24 @@ function fs_EPUB_XML_WARNING (cL)
 end function
 
 function fs_EPUB_CALIBRE (cL)
+	dim sA as string
 	select case cL
 	case &quot;fr&quot;
-		fs_EPUB_CALIBRE = getBranding ( bI_SPOKEN_BRANDING ) &amp; &quot; produit ePub 2.0 livres. Vous pouvez transférer des livres pour les appareils mobiles utilisant le courrier électronique, un blog, un service de &quot;&quot;cloud&quot;&quot;, ou avec le programme calibre-ebook. Votre public peut lire à l&apos;aide d&apos;un programme informatique ePub ou une extension de navigateur Web comme Readium.org pour Chrome ou ePub Reader pour Firefox. Télécharger le logiciel de calibre de http://calibre-ebook.com&quot;
+		sA = getBranding ( bI_SPOKEN_BRANDING ) &amp; &quot; produit les documents ePub. Pour convertir aux autres formats d&apos;édition, vous pouvez utiliser calibre sur votre ordinateur. &quot;
+		if fsGetOS() = &quot;UNIX&quot; then
+			sA = sA &amp; &quot;Obtenez calibre à l&apos;aide de votre gestionnaire de logiciels.&quot;
+		else
+			sA = sA &amp; &quot;Téléchargez calibre à http://calibre-ebook.com.&quot;
+		endif		
 	case else
-		fs_EPUB_CALIBRE = getBranding ( bI_SPOKEN_BRANDING ) &amp; &quot; makes ePub 2.0 books. You can transfer books to mobile devices using email, a blog, a “cloud” service, or with the calibre-ebook program. Your audience can read it using an ePub computer program or a web browser extension like Readium.org for Chrome or ePub Reader for Firefox. Download calibre software from http://calibre-ebook.com&quot;
+		sA = getBranding ( bI_SPOKEN_BRANDING ) &amp; &quot; makes ePub electronic books. To convert an ePub to other publishing formats, you can use calibre ebook manager on your computer. &quot;
+		if fsGetOS() = &quot;UNIX&quot; then
+			sA = sA &amp; &quot;Use the software manager to download calibre.&quot;
+		else
+			sA = sA &amp; &quot;Download calibre from http://calibre-ebook.com.&quot;
+		endif	
 	end select
+	fs_EPUB_CALIBRE = sA
 end function
 
 function fs_COMPUTER_ASK (cL)
