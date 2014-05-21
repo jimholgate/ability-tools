@@ -126,7 +126,7 @@ sub rppPhotoAlbum (optional iLimit)
 	sA =  fs_MINIMIZE_PRESENTATION(fs_cL)
 	sA = fsReplaceText (sA, &quot;%nn&quot;, CStr (oSlides.Count))
 	ShowDialog(sA) 
-	sA = fsSaveSchoolToolFile(fsGetSetting(&quot;ooname&quot;) &amp; &quot; &quot; &amp; fsReplaceText (fsNow , &quot;:&quot;, &quot;_&quot;), &quot;ODF Presentation (.odp)&quot;,&quot;*.odp&quot;)
+	sA = fsSaveSchoolToolFile(fsGetSetting(&quot;ooname&quot;) &amp; &quot; &quot; &amp; fsReplaceText (fsNow , &quot;:&quot;, &quot;_&quot;), &quot;ODP Presentation (.odp)&quot;,&quot;*.odp&quot;)
 	if sA &lt;&gt; &quot;&quot; then
 		fsSaveAsPresentation(sA)
 	endif
@@ -137,6 +137,23 @@ sub createNewImpressDoc
 	&apos;Create new Impress document
 	oAlbum = StarDesktop.loadComponentFromUrl (&quot;private:factory/simpress&quot;,&quot;_blank&quot;,0,dimarray())
 	
+end sub
+
+sub createNewWriterDoc (optional sMyFile, optional sMyText)
+	dim oDocument, oText, oCursor
+	if isMissing (sMyText) then
+		sMyText = &quot;&quot;
+	endif
+	if isMissing (sMyFile) then
+		sMyFile = &quot;&quot;
+	endif
+	oDocument = StarDesktop.loadComponentFromUrl (&quot;private:factory/swriter&quot;,&quot;_blank&quot;,0,dimarray())
+	oText = oDocument.Text
+	oCursor = oText.createTextCursor()
+	oText.insertString(oCursor,sMyText, FALSE)
+	if len(sMyFile) &lt;&gt; 0 then
+		oDocument.storeAsURL(sMyFile, array())
+	endif
 end sub
 
 sub AddImagesToPresentation
@@ -704,13 +721,13 @@ sub insertWebCam (optional byval iCameraNo, optional byval bMake2D, optional byv
 				if AddGraphic (oAlbum, sA, oSlides.getByIndex (oSlides.Count -1), true, sOnClickURL) = false then
 					exit sub
 				endif				
-				sA = fsOrgMicroformatsVeventXhtml (sC, fsNow(), 2, fsCleanForXtml(sURL))					
+				sA = fsOrgMicroformatsVeventXhtml (sC, fsNow(), 2, fsCleanForXtml(sURL), fsCleanForXtml(fsEditorInfo(&quot;fullname&quot;, false)))					
 			else
 				sC = InputBox ( fs_WEBCAMTITLE (fs_cL), fs_TITLE(fs_cL), sC)
 				if len(sC) = 0 then 
 					exit sub
 				endif
-				sA = fsOrgMicroformatsVeventXhtml (sC, fsNow(), 2, fsCleanForXtml(sURL))
+				sA = fsOrgMicroformatsVeventXhtml (sC, fsNow(), 2, fsCleanForXtml(sURL), fsCleanForXtml(fsEditorInfo(&quot;fullname&quot;, false)))
 				if AddGraphic (oAlbum, sURL, oSlides.getByIndex (oSlides.Count -1), true, sOnClickURL) = false then
 					sA =&quot;&quot;
 					exit sub

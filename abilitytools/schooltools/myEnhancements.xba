@@ -237,7 +237,7 @@ function fsSchoolToolsAddressBox (optional cType, optional i )
 			ccleanedcimagepath = fsCleanForXtml(sA)
 			&apos; ------		
 			&apos;on error goto fsSchoolToolsAddressBoxErr
-			fsSchoolToolsAddressBox = fsOrgMicroformatsVeventXhtml (csummary, cDateTime, 2 , ccleanedcimagepath) &amp; chr$(10) &amp; _
+			fsSchoolToolsAddressBox = fsOrgMicroformatsVeventXhtml (csummary, cDateTime, 2 , ccleanedcimagepath, sFullName) &amp; chr$(10) &amp; _
 			chr$(10) &amp; chr$(10) &amp; &quot;&lt;hr /&gt;&quot; &amp; chr$(10) &amp; _
 			 fsOrgMicroformatsVcardXhtml (sFullName, _
 				corg, _
@@ -280,7 +280,7 @@ function fsSchoolToolsAddressBox (optional cType, optional i )
 				csummary = sFullname
 				cDocTitle = getBranding (bI_SPOKEN_BRANDING)
 			endif
-			fsSchoolToolsAddressBox = fsFixCommonXhtmlProblems( fsOrgMicroformatsVeventCopyrightInfoXhtml (csummary, sA) &amp; chr$(10) &amp; _
+			fsSchoolToolsAddressBox = fsFixCommonXhtmlProblems( fsOrgMicroformatsVeventCopyrightInfoXhtml (csummary, sA,sFullName) &amp; chr$(10) &amp; _
 			chr$(10) &amp; chr$(10) &amp; &quot;&lt;hr /&gt;&quot; &amp; chr$(10) &amp; _
 			fsOrgMicroformatsVcardXhtml (sFullName, _
 				corg, _
@@ -317,12 +317,12 @@ function fsSchoolToolsAddressBox (optional cType, optional i )
 			&apos;endif
 			if len (cimagepath) &lt;&gt; 0 and instr(cimagepath, &quot;http&quot;) = 1 then 
 				if fb_Online_Resource_CarteBlanche() or showdialog (fs_ONLINE_WARNING (cL) &amp; chr$(10) &amp; cimagepath, true) then
-					fsSchoolToolsAddressBox = fsOrgMicroformatsVeventXhtml (csummary, cDateTime, 2, cCleanedcimagepath)
+					fsSchoolToolsAddressBox = fsOrgMicroformatsVeventXhtml (csummary, cDateTime, 2, cCleanedcimagepath,sFullName)
 				else
 					exit function
 				endif
 			else
-				fsSchoolToolsAddressBox = fsOrgMicroformatsVeventXhtml (csummary, cDateTime, 1)
+				fsSchoolToolsAddressBox = fsOrgMicroformatsVeventXhtml (csummary, cDateTime, 1, cCleanedcimagepath,sFullName)
 			endif
 			if cType = &quot;Event&quot; then 
 				&apos; Don&apos;t include the photo as part of the contact&apos;s profile.
@@ -359,9 +359,9 @@ function fsSchoolToolsAddressBox (optional cType, optional i )
 				cimagepath = fsMyURL &amp; &quot;/images/googl-code-ability-tools.png&quot;
 			endif
 			if instr(cimagepath, &quot;http&quot;) = 1 then 
-				fsSchoolToolsAddressBox = fsOrgMicroformatsVeventXhtml (csummary, cDateTime, 2)
+				fsSchoolToolsAddressBox = fsOrgMicroformatsVeventXhtml (csummary, cDateTime, 2, cCleanedcimagepath, sFullName)
 			else
-				fsSchoolToolsAddressBox = fsOrgMicroformatsVeventXhtml (csummary, cDateTime, 1)
+				fsSchoolToolsAddressBox = fsOrgMicroformatsVeventXhtml (csummary, cDateTime, 1, cCleanedcimagepath, sFullName)
 			endif
 			&apos;on error goto fsSchoolToolsAddressBoxErr
 			if ThisComponent.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) then
@@ -454,19 +454,22 @@ sub writeTranscriptToDoc
 	WriteDbgString (fsNotesTranscript())
 end sub
 
-function fsOrgMicroformatsVeventCopyrightInfoXhtml (fullname , optional sURL)
+function fsOrgMicroformatsVeventCopyrightInfoXhtml (sdesc , optional sURL, optional sFullName)
 	&apos;This returns a minimal copyright date phrase with year showing and precise date as title overlay
 	if isMissing (sURL) then
 		sURL = &quot;&quot;
 	endif
+	if isMissing (sFullName) then
+		sFullName = &quot;&quot;
+	endif
 	dim cNow as string
 	cNow = fsNow()
-	fsOrgMicroformatsVeventCopyrightInfoXhtml = fsOrgMicroformatsVeventXhtml (fullname, left(cNow,instr(cNow,&quot;T&quot;) - 1), 300, sURL )
+	fsOrgMicroformatsVeventCopyrightInfoXhtml = fsOrgMicroformatsVeventXhtml (sdesc, left(cNow,instr(cNow,&quot;T&quot;) - 1), 300, sURL,sFullName )
 end function
 
-function fsOrgMicroformatsVeventXhtml (csummary, optional cNow, optional iVerbose, optional cURL )
+function fsOrgMicroformatsVeventXhtml (csummary, optional cNow, optional iVerbose, optional cURL, optional cMyName )
 	&apos;This returns a title and date in xhtml with year and precise date as title overlay
-	dim cNow2 as string
+	dim cNow2,cNow3 as string
 	dim sA as string
 	if ismissing (cNow) then
 		cNow = fsNow()
@@ -479,14 +482,18 @@ function fsOrgMicroformatsVeventXhtml (csummary, optional cNow, optional iVerbos
 	if ismissing (iVerbose) then
 		iVerbose = 1
 	endif
-	cNow2 = left(cNow,instr(cNow,&quot;T&quot;) - 1)
+	if ismissing (cMyName) then
+		cMyName = fsCleanForXtml(fsEditorInfo(&quot;fullname&quot;, false))
+	endif
+	cNow2 = fsReplaceText(cNow,&quot;:&quot;,&quot;-&quot;) &apos;change time format for epub3 id label 
+	cNow3 = left(cNow,instr(cNow,&quot;T&quot;)-1) &apos;Short date for display
 	if len(csummary) = 0 then
 		&apos;You didn&apos;t enter a title for the picture
 		csummary = fs_IMAGE (fs_cL)
 	endif
 	select case iVerbose
 	case 0 &apos; plain xhtml
-		sA = &quot;&lt;div id=&quot;&quot;x-no.org.microformats.vevent-&quot; &amp; cNow &amp; &quot;&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; _
+		sA = &quot;&lt;div id=&quot;&quot;x-no.org.microformats.vevent-&quot; &amp; cNow2 &amp; &quot;&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; _
 		&quot;&lt;div&gt;&quot; &amp; chr$(10) &amp; _
 		&quot;&lt;h2&gt;&quot; &amp; csummary &amp; &quot;&lt;/h2&gt; &quot; &amp; chr$(10) &amp; _
 	 	&quot;&lt;span&gt;&quot; &amp; cNow2 &amp; &quot;&lt;/span&gt;&quot; &amp; chr$(10) &amp; _
@@ -496,15 +503,15 @@ function fsOrgMicroformatsVeventXhtml (csummary, optional cNow, optional iVerbos
 		sA = &quot;&lt;div id=&quot;&quot;x-small.org.microformats.vevent-&quot; &amp; cNow2 &amp; &quot;&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; _
 		&quot;&lt;div class=&quot;&quot;vevent&quot;&quot; title=&quot;&quot;&quot; &amp; fs_EVENT (fsDocLanguage) &amp; &quot;&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; _
 		&quot;&lt;h2 class=&quot;&quot;summary&quot;&quot;&gt;&quot; &amp; csummary &amp; &quot;&lt;/h2&gt; &quot; &amp; chr$(10) &amp; _
-	 	&quot;&lt;span class=&quot;&quot;dtstart&quot;&quot; title=&quot;&quot;&quot; &amp; cNow &amp; &quot;&quot;&quot;&gt;&quot; &amp; cNow2 &amp; &quot;&lt;/span&gt;&quot; &amp; chr$(10) &amp; _
+	 	&quot;&lt;span class=&quot;&quot;dtstart&quot;&quot; title=&quot;&quot;&quot; &amp; cNow &amp; &quot;&quot;&quot;&gt;&quot; &amp; cNow3 &amp; &quot;&lt;/span&gt;&quot; &amp; chr$(10) &amp; _
 		&quot;&lt;/div&gt;&quot; &amp; chr$(10) &amp; _
 		&quot;&lt;/div&gt;&quot;
 	case 2 &apos; verbose microformat vevent - best practice for annotating a web resource
-		sA = &quot;&lt;div id=&quot;&quot;x-big.org.microformats.vevent-&quot; &amp; left(fsNow(),instr(fsNow(),&quot;T&quot;) - 1) &amp; &quot;&quot;&quot;&gt;&quot; &amp; _
+		sA = &quot;&lt;div id=&quot;&quot;x-big.org.microformats.vevent-&quot; &amp; cNow2 &amp; &quot;&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; _
 		&quot;&lt;div class=&quot;&quot;vevent&quot;&quot; title=&quot;&quot;&quot; &amp; fs_EVENT (fsDocLanguage) &amp; &quot;&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; _
 		&quot;&lt;h2 class=&quot;&quot;summary&quot;&quot;&gt;&quot; &amp; csummary &amp; &quot;&lt;/h2&gt; &quot; &amp; chr$(10) &amp; _
-	 	&quot;&lt;span class=&quot;&quot;dtstart&quot;&quot; title=&quot;&quot;&quot; &amp; cNow &amp; &quot;&quot;&quot;&gt;&quot; &amp; cNow2 &amp; &quot;&lt;/span&gt;&quot; &amp; chr$(10) &amp; _
-	 	&quot;&lt;span class=&quot;&quot;description ccache1&quot;&quot;&gt;&quot; &amp; &quot; &quot; &amp; fsCleanForXtml(fsEditorInfo(&quot;fullname&quot;, false)) &amp; _
+	 	&quot;&lt;span class=&quot;&quot;dtstart&quot;&quot; title=&quot;&quot;&quot; &amp; cNow &amp; &quot;&quot;&quot;&gt;&quot; &amp; cNow3 &amp; &quot;&lt;/span&gt;&quot; &amp; chr$(10) &amp; _
+	 	&quot;&lt;span class=&quot;&quot;description ccache1&quot;&quot;&gt;&quot; &amp; &quot; &quot; &amp; cMyName &amp; _
 		&quot;; &quot; &amp; fsCleanForXtml(fsShortFileName) &amp; _
 		&quot;; &quot; &amp; fsCleanForXtml(fsEditorInfo(&quot;o&quot;, false)) &amp; _
 		&quot;;&lt;/span&gt;&quot; &amp; chr$(10)
@@ -514,22 +521,22 @@ function fsOrgMicroformatsVeventXhtml (csummary, optional cNow, optional iVerbos
 		sA = sA &amp; &quot;&lt;/div&gt;&quot; &amp; chr$(10) &amp; _
 		&quot;&lt;/div&gt;&quot;		
 	case 300 &apos; format for imprint or cover page.
-		sA = &quot;&lt;div  id=&quot;&quot;x-imprint.org.microformats.vevent-&quot; &amp; cNow &amp; &quot;&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; _
+		sA = &quot;&lt;div  id=&quot;&quot;x-imprintorg.microformats.vevent-&quot; &amp; cNow2 &amp; &quot;&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; _
 		&quot;&lt;div class=&quot;&quot;vevent&quot;&quot; title=&quot;&quot;&quot; &amp; fs_EVENT (fsDocLanguage) &amp; &quot;&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; _
 		&quot;&lt;h2 class=&quot;&quot;summary&quot;&quot;&gt;&quot; &amp; csummary &amp; &quot;&lt;/h2&gt; &quot; &amp; chr$(10) &amp; _
-		&quot;&lt;span class=&quot;&quot;description&quot;&quot;&gt;© &quot; &amp; fsCleanForXtml(fsEditorInfo(&quot;fullname&quot;, false)) &amp; &quot;&lt;/span&gt; &quot; &amp; chr$(10) &amp; _
-	 	&quot;&lt;span class=&quot;&quot;dtstart&quot;&quot; title=&quot;&quot;&quot; &amp; cNow2 &amp; &quot;&quot;&quot;&gt;&quot; &amp; year(now) &amp; &quot;&lt;/span&gt;&quot;  &amp; chr$(10)
+		&quot;&lt;span class=&quot;&quot;description&quot;&quot;&gt;© &quot; &amp; cMyName &amp; &quot;&lt;/span&gt; &quot; &amp; chr$(10) &amp; _
+	 	&quot;&lt;span class=&quot;&quot;dtstart&quot;&quot; title=&quot;&quot;&quot; &amp; cNow &amp; &quot;&quot;&quot;&gt;&quot; &amp; year(now) &amp; &quot;&lt;/span&gt;&quot;  &amp; chr$(10)
 		if len(cURL) &lt;&gt; 0 then 
 			sA = sA &amp; &quot;&lt;span class=&quot;&quot;url ccache1&quot;&quot;&gt;&quot; &amp; cURL &amp; &quot;&lt;/span&gt;&quot;
 		endif
 		sA = sA &amp; &quot;&lt;/div&gt;&quot; &amp; chr$(10) &amp; _
 		&quot;&lt;/div&gt;&quot;
 	case else &apos; verbose microformat vevent - best practice for annotating a web resource
-		sA = &quot;&lt;div id=&quot;&quot;x-big.org.microformats.vevent-&quot; &amp; cNow &amp; &quot;&quot;&quot;&gt;&quot; &amp; _
+		sA = &quot;&lt;div id=&quot;&quot;x-big.org.microformats.vevent-&quot; &amp; cNow2 &amp; &quot;&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; _
 		&quot;&lt;div class=&quot;&quot;vevent&quot;&quot; title=&quot;&quot;&quot; &amp; fs_EVENT (fsDocLanguage) &amp; &quot;&quot;&quot;&gt;&quot; &amp; chr$(10) &amp; _
 		&quot;&lt;h2 class=&quot;&quot;summary&quot;&quot;&gt;&quot; &amp; csummary &amp; &quot;&lt;/h2&gt; &quot; &amp; chr$(10) &amp; _
-	 	&quot;&lt;span class=&quot;&quot;dtstart&quot;&quot; title=&quot;&quot;&quot; &amp; cNow2 &amp; &quot;&quot;&quot;&gt;&quot; &amp; cNow2 &amp; &quot;&lt;/span&gt;&quot; &amp; chr$(10) &amp; _
-	 	&quot;&lt;span class=&quot;&quot;description ccache1&quot;&quot;&gt;&quot; &amp; &quot;AUTHOR=&quot; &amp; fsCleanForXtml(fsEditorInfo(&quot;fullname&quot;, false)) &amp; _
+	 	&quot;&lt;span class=&quot;&quot;dtstart&quot;&quot; title=&quot;&quot;&quot; &amp; cNow &amp; &quot;&quot;&quot;&gt;&quot; &amp; cNow3 &amp; &quot;&lt;/span&gt;&quot; &amp; chr$(10) &amp; _
+	 	&quot;&lt;span class=&quot;&quot;description ccache1&quot;&quot;&gt;&quot; &amp; &quot;AUTHOR=&quot; &amp; cMyName &amp; _
 		&quot;;TITLE=&quot; &amp; fsCleanForXtml(fsShortFileName) &amp; _
 		&quot;;ORG=&quot; &amp; fsCleanForXtml(fsEditorInfo(&quot;o&quot;, false)) &amp; _
 		&quot;;&lt;/span&gt;&quot; &amp; chr$(10)
@@ -822,6 +829,8 @@ function fsSchoolToolsInputBox(optional sMsg as string, optional sTitle as strin
 	f_dlgImpressAsk.GetControl(&quot;CommandButton11&quot;).model.helpText = fs_APPEARANCE(fs_cL)
 	f_dlgImpressAsk.GetControl(&quot;CommandButton12&quot;).model.ImageURL=fsMyURL &amp; &quot;/images/config-lang_16.png&quot;
 	f_dlgImpressAsk.GetControl(&quot;CommandButton12&quot;).model.helpText = fs_LANGUAGE(fs_cL)
+	f_dlgImpressAsk.GetControl(&quot;CommandButton13&quot;).model.ImageURL=fsMyURL &amp; &quot;/images/textToSpeech_16h.png&quot;
+	f_dlgImpressAsk.GetControl(&quot;CommandButton13&quot;).model.helpText = fs_READ_LAST_WORD(fs_cL)
 	&apos;Default to reading text in different languages if user has set the extension up to read multilingual text
 	if fileExists (fsSpeechSettingURL) then
 		f_dlgImpressAsk.GetControl(&quot;CommandButton12&quot;).model.State = 1
@@ -837,6 +846,7 @@ function fsSchoolToolsInputBox(optional sMsg as string, optional sTitle as strin
 		&apos; Use language of the slide note or the default document language
 		f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Text = fsGuessNoteLanguage
 	endif
+	updateDialog3LanguageTip
 	if sMsg=&quot;&quot; then
 		f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.PositionY = 2 + f_dlgImpressAsk.GetControl(&quot;CommandButton9&quot;).model.height
 		f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Height = 4 + f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Height + f_dlgImpressAsk.GetControl(&quot;Label1&quot;).Model.Height
@@ -880,6 +890,15 @@ function fsSchoolToolsInputBox(optional sMsg as string, optional sTitle as strin
 		endif
 	endif
 end function
+
+sub updateDialog3LanguageTip
+	select case fs_cL
+	case &quot;fr&quot;
+		f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.helpText = isoToFrench (f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Text)
+	case else
+		f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.helpText = isoToEnglish (f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Text)
+	end select
+end sub
 
 Function fsSelectionLanguage as String
    	Dim oDoc,oVC,sA,longI,sB,sC,sD
@@ -974,7 +993,7 @@ sub startEditingFirstNote
 		else
 			csummary = getBranding (bI_SPOKEN_BRANDING)
 		endif
-		sA = fsSaveSchoolToolFile(csummary, &quot;ODF Presentation (.odp)&quot;,&quot;*.odp&quot;)
+		sA = fsSaveSchoolToolFile(csummary, &quot;ODP Presentation (.odp)&quot;,&quot;*.odp&quot;)
 		if sA &lt;&gt; &quot;&quot; then
 			fsSaveAsPresentation(sA)
 		endif
@@ -1204,6 +1223,7 @@ sub updateLanguageDisplay
 		fontStyled.Slant = 2 
 	endif
 	f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).Model.FontDescriptor = fontStyled
+	updateDialog3LanguageTip
 end sub
 
 sub setNoteLanguage(sA, optional nPage)
@@ -1242,6 +1262,38 @@ sub setNoteLanguage(sA, optional nPage)
 		ThisComponent.getDrawPages.getByIndex( nPage ).getNotesPage.getByIndex(fiGetSlideNoteIndex).CharLocale = sLocale
 	endif
 	thisComponent.setModified(true)
+end sub
+
+sub setDocLanguage(sA)
+	&apos;sA is the language in the form en-CA
+	dim sLocale as new com.sun.star.lang.Locale
+	dim sB as string
+	dim sC as string
+	if len (sA) &lt; 2 then
+		exit sub
+	endif
+	if instr(sA, &quot;-&quot;) = 4 then
+		sB = lcase(left(sA, 3))
+		sC = ucase(mid(sA, 5, 7)
+	else
+		sB = lcase(left(sA, 2))
+		sC = ucase(mid(sA, 4, 6)
+	endif
+	if fbisAsian (sB) then
+		&apos; The Asian language is stored - notepad always defaults to showing a Western language. 
+		sLocale.Language = sB
+		sLocale.Country = sC
+		ThisComponent.CharLocaleAsian = sLocale
+	elseif fbisComplex (sB) then
+		&apos; The Complex language is stored - notepad always defaults to showing a Western language. 
+		sLocale.Language = sB
+		sLocale.Country = sC
+		ThisComponent.CharLocaleComplex = sLocale
+	else
+		sLocale.Language = sB
+		sLocale.Country = sC
+		ThisComponent.CharLocale = sLocale
+	endif
 end sub
 
 sub hideEditControls
@@ -1530,6 +1582,59 @@ sub SchoolToolsTextEditorStyle
 	f_dlgImpressAsk.GetControl(&quot;CommandButton2&quot;).Model.PositionX = f_dlgImpressAsk.GetControl(&quot;CommandButton1&quot;).Model.PositionX -( f_dlgImpressAsk.GetControl(&quot;CommandButton1&quot;).Model.Width + 5)
 	if fbAppearsToBeXML(f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text) then
 		f_dlgImpressAsk.GetControl(&quot;CommandButton8&quot;).model.Enabled = true 
+	endif
+end sub
+
+sub SchoolToolsBlindTextSpeaker
+	if B_DEBUG = false then
+		on error goto SchoolToolsBlindTextSpeakerErr
+	endif
+	dim sA,sB,CR as string
+	dim bB as Boolean
+	bB = true
+	CR = chr$(10)
+	if f_dlgImpressAsk.GetControl(&quot;CommandButton13&quot;).model.helpText = fs_STOP_READING (fs_cL) then
+		sB = f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text
+		select case right(sB,1)
+		case &quot; &quot;
+			if bB = true and right(sB,2) &lt;&gt; &quot;  &quot; then
+				sA = fsGetLastWord (sB)
+				if instr (sA, CR) = false then
+					SchoolToolsSpeakLang (sA)
+				else
+					sA = fsGetLastWord (sA, CR)
+					SchoolToolsSpeakLang (sA)
+				endif
+				bB = false
+			endif
+		case CR
+			if bB = true and right(sB,2) &lt;&gt; CR &amp; CR and right(sB,2) &lt;&gt; &quot; &quot; &amp; CR then
+				sA = fsGetLastWord (sB)
+				SchoolToolsSpeakLang (sA)
+				bB = false
+			endif
+		case else
+			bB = true
+		end select
+	endif
+	exit sub
+	SchoolToolsBlindTextSpeakerErr:
+	if f_dlgImpressAsk.GetControl(&quot;CommandButton13&quot;).model.helpText = fs_STOP_READING (fs_cL) then
+		f_dlgImpressAsk.GetControl(&quot;CommandButton13&quot;).model.helpText = fs_READ_LAST_WORD (fs_cL)
+	endif
+	exit sub
+end sub
+
+sub SchoolToolsBlindTextSpeakerToggle
+	if f_dlgImpressAsk.GetControl(&quot;CommandButton13&quot;).model.helpText = fs_STOP_READING (fs_cL) then
+		&apos;synthesizeSpeech ( &quot;tk&quot;, &quot;en-US&quot; )
+		synthesizeSpeech (fs_STOP_READING (fs_cL), fs_cL)
+		f_dlgImpressAsk.GetControl(&quot;CommandButton13&quot;).model.helpText = fs_READ_LAST_WORD (fs_cL)
+	else
+		f_dlgImpressAsk.GetControl(&quot;CommandButton13&quot;).model.helpText = fs_STOP_READING (fs_cL)
+		&apos;synthesizeSpeech ( &quot;kkt&quot;, &quot;en-US&quot; )
+		synthesizeSpeech (fs_READ_LAST_WORD (fs_cL), fs_cL)
+		f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text = rtrim(f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text)
 	endif
 end sub
 
@@ -1957,7 +2062,7 @@ sub SchoolToolsDialogSave
 	endif
 end sub
 
-sub SchoolToolsDialogSaveAs
+sub SchoolToolsDialogSaveAs 
 	&apos; &quot;Save As...&quot;
 	&apos; Always prompt for file name to save to.
 	dim sFile as string
@@ -1982,8 +2087,10 @@ sub SchoolToolsDialogSaveAs
 		sFile = fsSaveSchoolToolFile(sFilePrompt, fs_NOTE(fs_cL) &amp; &quot; (.smil)&quot;, &quot;*.smil&quot;)
 	else
 		sB = f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text
-		sB = fsAlterStringMarkup (sB, &quot;&lt;div&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;p&gt;&quot;, &quot;&lt;/p&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;p&gt;&quot;, &quot;&lt;/p&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/div&gt;&quot;, true
-		sFile = fsSaveSchoolToolFile(sFilePrompt, fs_NOTE(fs_cL) &amp; &quot; (.xhtml)&quot;, &quot;*.xhtml&quot;)
+		sFile = fsSaveSchoolToolFile(sFilePrompt) &apos; file save as... xhtml or plain text
+		if right (sFile, 6) = &quot;.xhtml&quot; then
+			sB = fsAlterStringMarkup (sB, &quot;&lt;div&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;p&gt;&quot;, &quot;&lt;/p&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;p&gt;&quot;, &quot;&lt;/p&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/div&gt;&quot;, true
+		endif	
 	endif
 	finishSchoolToolsDialogSave (sFile, sB)
 end sub
@@ -2008,7 +2115,7 @@ sub finishSchoolToolsDialogSave (sFile, optional sB)
 			&apos; approximation, because different ePub viewers and web browsers will not always render xhtml the same.
 			&apos; Most ePub readers require strict xhtml - no &amp;nbsp; &lt;br&gt; &lt;/li&gt; etc. Tags are lower case.
 			&apos; An html5 compatible webkit browser is recommended for checking iBook, txtr, and Readium xhtml.
-			sA = fsXhtmlPreviewHeaderCode( sFile, f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Text, &quot;&quot;, &quot;image-&quot; &amp; trim (str (fnCurrentCard + 1)) &amp; &quot;.jpg&quot; )
+			sA = fsXhtmlPreviewHeaderCode( sFile, f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Text, &quot;&quot;, &quot;image-&quot; &amp; trim (str (fnCurrentCard + 1)) &amp; &quot;.jpg&quot;, &quot;2.0&quot; )
 			sA = sA &amp; &quot;&lt;body&gt;&quot; &amp; CR
 			sA = sA &amp; sB &amp; CR
 			sA = sA &amp; &quot;&lt;/body&gt;&quot; &amp; CR
@@ -2019,7 +2126,7 @@ sub finishSchoolToolsDialogSave (sFile, optional sB)
 			sA = sA &amp; sB &amp; CR
 		case &quot;&lt;body&quot;
 			&apos; We add a head section to view results with your default browser.
-			sA = fsXhtmlPreviewHeaderCode( sfFile, f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Text, &quot;&quot;, &quot;image-&quot; &amp; trim (str (fnCurrentCard + 1)) &amp; &quot;.jpg&quot; )
+			sA = fsXhtmlPreviewHeaderCode( sfFile, f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Text, &quot;&quot;, &quot;image-&quot; &amp; trim (str (fnCurrentCard + 1)) &amp; &quot;.jpg&quot;, &quot;2.0&quot; )
 			sA = sA &amp; sB &amp; CR
 			sA = sA &amp; &quot;&lt;/html&gt;&quot;
 		case &quot;&lt;html&quot;
@@ -2201,6 +2308,21 @@ sub AlterThisNoteMarkup (optional sPrefix, optional sMidfix, optional sSuffix, o
 		UpdateSlideNote (sA)
 	endif
 end sub 
+
+Function fsGetLastWord(ByVal strA as String, optional sSep as string)
+	Dim MaxIndex as Integer
+	Dim SepList() as String	
+	if isMissing (sSep) then
+		sSep = &quot; &quot;
+	endif
+	strA = rtrim (&quot; &quot; &amp; strA)
+	if len (strA) &lt;&gt; 0 then 	
+		SepList() = ArrayoutofString(strA,sSep, MaxIndex)
+		fsGetLastWord = SepList(MaxIndex)
+	else
+		fsGetLastWord = &quot; &quot;
+	endif
+End Function
 
 function fsAlterStringMarkup (byval sA, optional sPrefix, optional sMidfix, optional sSuffix, optional bCleanXML)
 	&apos; Replaces chr$(10) with a tag. 

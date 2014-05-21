@@ -30,6 +30,15 @@ function fs_PUBLISH (cL)
 	end select
 end function
 
+function fs_READ_LAST_WORD (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_READ_LAST_WORD = &quot;Lire le dernier mot en tapant&quot;
+	case else
+		fs_READ_LAST_WORD = &quot;Read the last word as you type&quot;
+	end select
+end function
+
 function fs_COMPANY (cL)
 	select case cL
 	case &quot;fr&quot;
@@ -819,9 +828,9 @@ end function
 function fs_EXPORT_SELECTION (cL)
 	select case cL
 	case &quot;fr&quot;
-		fs_EXPORT_SELECTION = &quot;Exporter le texte à une note dans une nouvelle présentation &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp; &quot;.&quot;
+		fs_EXPORT_SELECTION = &quot;Éditer et exporter le texte.&quot;
 	case else
-		fs_EXPORT_SELECTION = &quot;Export the text to a note in a new &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp; &quot; presentation.&quot;
+		fs_EXPORT_SELECTION = &quot;Edit and export the text.&quot;
 	end select
 end function
 
@@ -1386,6 +1395,15 @@ function fs_COMPUTER_STOP (cL)
 		fs_COMPUTER_STOP = &quot;ordinateur arrêt&quot;
 	case else
 		fs_COMPUTER_STOP = &quot;computer stop&quot;
+	end select
+end function
+
+function fs_STOP_READING (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_STOP_READING = &quot;Arrêter de lire en tapant&quot;
+	case else
+		fs_STOP_READING = &quot;Stop reading as you type&quot;
 	end select
 end function
 

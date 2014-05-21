@@ -510,6 +510,10 @@ function fsNotesMenuSettingURL
 	fsNotesMenuSettingURL=createUnoService(&quot;com.sun.star.util.PathSettings&quot;).userConfig &amp; &quot;/impresstools/notes-menu.ini&quot;
 end function
 
+function fsReadNoteContinuouslyToggleURL
+	fsReadNoteContinuouslyToggleURL=createUnoService(&quot;com.sun.star.util.PathSettings&quot;).userConfig &amp; &quot;/impresstools/blind-type.ini&quot;
+end function
+
 function fsTemporaryJsonURL
 	fsTemporaryJsonURL = fsStagingDirectoryURL &amp; &quot;/data.json&quot;
 end function
@@ -1307,7 +1311,7 @@ function makeCalibreEpub (optional ntype)
 		case 6 &apos; Yes
 			oSvc = createUnoService(&quot;com.sun.star.system.SystemShellExecute&quot;)
 			oSvc.execute(cURL,&quot;&quot;,iNO_SYSTEM_ERROR_MESSAGE)
-		case else  &apos; No
+		case else  &apos; No 
 			&apos; Don&apos;t show the dialogue again.
 			CreateFile((createUnoService(&quot;com.sun.star.util.PathSettings&quot;).userConfig &amp; &quot;/impresstools/calibre.txt&quot;),cURL,&quot;UTF-8&quot;)
 		end select
@@ -1320,22 +1324,47 @@ function makeCalibreEpub (optional ntype)
 	end select
 end function
 
-function fsSaveSchoolToolFile(optional sDefault, optional sFileDesc, optional sFileExtension ) 
+function fsSaveSchoolToolFile(optional sDefault, optional sA, optional sB ) 
 	&apos; Adapted from http://www.oooforum.org/forum/viewtopic.phtml?t=27188
 	&apos; by Danny Brewer et. al.
+	if NOT GlobalScope.BasicLibraries.isLibraryLoaded(&quot;Tools&quot;) then 
+		GlobalScope.BasicLibraries.loadLibrary(&quot;Tools&quot;)
+	endif
 	dim oDoc, oDocCtrl, oDocFrame, sFilePickerArgs, oFilePicker, sFiles
 	dim sFileURL, sDirectory
+	dim sFileDesc (0) as string
+	dim sFileExtension (0) as string
 	oDoc = ThisComponent 
 	oDocCtrl = oDoc.getCurrentController() 
 	oDocFrame = oDocCtrl.getFrame() 
 	if ismissing (sDefault) then
-		sDefault = &quot;epub 3 (.epub)&quot;
+		sDefault = fs_NOTE(fs_cL)
+	else
+		while len (sDefault) &lt;&gt; 0 and instr(&quot; .:/\&quot;, right(sDefault,1)) &lt;&gt; 0 
+			sDefault = left (sDefault, len(sDefault) - 1)
+		wend		
 	endif
-	if ismissing (sFileDesc) then
-		sFileDesc = &quot;epub 3 (.epub)&quot;
+	if ismissing (sA) then
+		redim sFileDesc (1) as string
+		sFileDesc(0) = fs_NOTE(fs_cL) &amp;&quot; (.xhtml)&quot;
+		sFileDesc(1) = fs_NOTE(fs_cL) &amp;&quot; (.txt)&quot;
+	else
+		if instr(sA, &quot;,&quot;) = 0 then
+			sFileDesc(0) = sA
+		else
+			sFileDesc = ArrayOutOfString(sA, &quot;,&quot;)
+		endif
 	endif
-	if ismissing (sFileExtension) then
-		sFileExtension = &quot;*.epub&quot;
+	if ismissing (sB) then
+		redim sFileExtension (1) as string
+		sFileExtension(0) = &quot;*.xhtml&quot;
+		sFileExtension(1) = &quot;*.txt&quot;
+	else
+		if instr(sB, &quot;,&quot;) = 0 then
+			sFileExtension(0) = sB
+		else
+			sFileExtension = ArrayOutOfString(sB, &quot;,&quot;)
+		endif
 	endif
 	
 	sDirectory = CreateUnoService(&quot;com.sun.star.util.PathSettings&quot;).Work
@@ -1345,9 +1374,11 @@ function fsSaveSchoolToolFile(optional sDefault, optional sFileDesc, optional sF
 		.Initialize ( sFilePickerArgs() ) 
 		&apos;sDirectory = oFilePicker.getDisplayDirectory 
 		.SetDisplayDirectory (sDirectory) 
-		.SetDefaultName (sdefault) 
-		.AppendFilter( sFileDesc, sFileExtension ) 
-		.SetCurrentFilter( sFileDesc, sFileExtension ) 
+		.SetDefaultName (sdefault)
+		for n = lbound(sFileDesc) to ubound (sFileDesc)
+			.AppendFilter( sFileDesc(n), sFileExtension(n) ) 
+		next
+		.SetCurrentFilter( sFileDesc(lbound(sFileDesc)), sFileExtension(lbound(sFileDesc)) ) 
 		.SetValue(com.sun.star.ui.dialogs.ExtendedFilePickerElementIds.CHECKBOX_AUTOEXTENSION, 0, true) 
 		.SetValue(com.sun.star.ui.dialogs.ExtendedFilePickerElementIds.CHECKBOX_PASSWORD, 0, false) 
 		.EnableControl(com.sun.star.ui.dialogs.ExtendedFilePickerElementIds.CHECKBOX_PASSWORD, false) 
@@ -1359,7 +1390,7 @@ function fsSaveSchoolToolFile(optional sDefault, optional sFileDesc, optional sF
 	else 
 		end
 	endif 
-end function 
+end function
 
 function MakeEpub30
 	&apos; sUUID is a required unique id number for each ePub publication
@@ -1367,7 +1398,7 @@ function MakeEpub30
 	dim sVersion as string
 	dim odoc, octl, oBar, sFileOut
 	sVersion = &quot;3.0&quot; &apos; ePub version
-	sFileOut = fsSaveSchoolToolFile(fsShortFileName(), &quot;epub 3 (.epub)&quot;, &quot;*.epub&quot;)
+	sFileOut = fsSaveSchoolToolFile(fsShortFileName(), &quot;ePub 3 (.epub)&quot;, &quot;*.epub&quot;)
 	viewNormal () &apos; required for jpeg export
 	CleanUpStagingDirectory(true)
 	if fileExists ( sFileOut ) then
@@ -1383,8 +1414,7 @@ function MakeEpub30
 	writeEpubBackCoverText (sUUID, sVersion)
 	writeEpubTableOfContentsPage (sUUID, sVersion) &apos; ok write toc page
 	writeEpubBookCss (sUUID) &apos; ok we might want to customize this. Currently optimal for iBooks
-	writeEpubChapter (sUUID, sVersion) &apos; Adobe Digital Editions occasionally randomly fails to show an image - why?
-		&apos; Also Adobe Digital Editions fails to show Hindi fonts in Windows. Chinese is okay.
+	writeEpubChapter (sUUID, sVersion)
 	writeEpubEpbNcx (sUUID) &apos; ok write Daisy index. No issues.
 	writeAlternateEpubOpf (sUUID, sVersion) &apos; ePub 3 for tablets. 
 	writeEpubImages (sUUID) &apos; ok we might want to customize this. Currently optimal for iBooks 
@@ -2294,7 +2324,7 @@ function getSlideTitle (optional byval i)
 		sA = fsSuperTrim (sA)  
 		sA = fsstripXMLTags (sA)
 		sA = fsSuperTrim (sA) 
-		sA = fsReplaceText(sA,chr(10),&quot; &quot;)  
+		sA = stripControlChrs (sA)
 		if len(sA) &gt; 30 then 
 			j = iGetBreakPoint (sA, 30)
 			sA = left(sA, j) &amp; &quot;...&quot;
@@ -2348,7 +2378,6 @@ sub writeAlternateEpubOpf(optional sUUID, optional sVersion)
 		sA = sA &amp; &quot;        &lt;dc:publisher&gt;&quot; &amp;  getBranding(bI_HOMEPAGE) &amp; &quot;&lt;/dc:publisher&gt;&quot; &amp; CR
 	else
 		sA = sA &amp; &quot;        &lt;dc:publisher&gt;&quot; &amp; fsstripXMLTags(fsEditorInfo (&quot;organization&quot;)) &amp; &quot;&lt;/dc:publisher&gt;&quot; &amp; CR
-		sA = sA &amp; &quot;        &lt;dc:contributor opf:role=&quot;&quot;bkp&quot;&quot;&gt;&quot; &amp; getBranding(bI_HOMEPAGE) &amp; &quot;&lt;/dc:contributor&gt;&quot; &amp; CR
 	endif
 	if len(fsKeywords) &lt;&gt; 0 then
 	sA = sA &amp; &quot;        &lt;dc:subject&gt;&quot; &amp; fsstripXMLTags(fsKeywords) &amp; &quot;&lt;/dc:subject&gt;&quot; &amp; CR

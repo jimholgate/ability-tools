@@ -27,9 +27,13 @@ margin-left: 7%;
 line-height: 1.2;
 }
 .at-swiss {
-margin-left: 0px;
-font-size: 125%;
 font-family: arial, helvetica, "droid sans", sans-serif;
+}
+.at-roman {
+font-family: "times new roman", times, "droid serif", serif;
+}
+.at-mono {
+font-family: courier, "courier new", "droid sans mono", monotype;
 }
 .body {
 display: block;
@@ -95,7 +99,7 @@ a {
 text-decoration: none;
 font-weight: bolder;
 }
- {
+pagewidth {
 height: auto;
 width:100%;
 }

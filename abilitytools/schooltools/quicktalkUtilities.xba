@@ -3,6 +3,7 @@
 <script:module xmlns:script="http://openoffice.org/2000/script" script:name="quicktalkUtilities" script:language="StarBasic">REM  *****  BASIC  *****
 sub exportSelectionAsODP
 	dim sA, sB, sC as string
+	dim n as integer
 	dim oAlbum
 	sB = &quot;&quot;
 	sA = fsGetTextSelection()
@@ -12,27 +13,75 @@ sub exportSelectionAsODP
 		if len(sB) = 0 then 
 			sB = getBranding( bI_SPOKEN_BRANDING )
 		endif
-		sC = fsSaveSchoolToolFile(sB , &quot;ODF Presentation (.odp)&quot;,&quot;*.odp&quot;)
-		if len (sC) &lt;&gt; 0 then
-			if fileExists(sC) then
-				showDialog (fs_FILE_IS_IN_USE (fs_cL) , false)
-			else
-				oAlbum = StarDesktop.loadComponentFromUrl (fsMyURL &amp; &quot;/templates/narrow.otp&quot;,&quot;_blank&quot;,0,dimarray())
-				UpdateSlideNote (sA)
-				UpdateSlideTitle (ConvertFromURL(GetFileNameWithoutExtension( sC,&quot;/&quot;)))
-				UpdateSlideName (ConvertFromURL(GetFileNameWithoutExtension( sC,&quot;/&quot;)))
-				if f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Enabled then
-					setNoteLanguage (f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Text)
+		sB = stripControlChrs (sB)
+		sC = fsSaveSchoolToolFile(sB ,byval &quot;ODT Document (.odt),ODP Presentation (.odp),&quot; &amp; fs_NOTE(fs_cL) &amp;&quot; (.xhtml),&quot; &amp; fs_NOTE(fs_cL) &amp;&quot; (.txt)&quot; , &quot;*.odt,*.odp,*.xhtml,*.txt&quot;)
+		while len (sC) &lt;&gt; 0
+			if right(sC,4) = &quot;.odp&quot; then
+				if fileExists(sC) then
+					showDialog (fs_FILE_IS_IN_USE (fs_cL) , false)
+					sC = fsSaveSchoolToolFile(sB ,byval &quot;ODP Presentation (.odp)&quot;,&quot;*.odp&quot;)
+				else
+					oAlbum = StarDesktop.loadComponentFromUrl (fsMyURL &amp; &quot;/templates/narrow.otp&quot;,&quot;_blank&quot;,0,dimarray())
+					UpdateSlideNote (sA)
+					UpdateSlideTitle (ConvertFromURL(GetFileNameWithoutExtension( sC,&quot;/&quot;)))
+					UpdateSlideName (ConvertFromURL(GetFileNameWithoutExtension( sC,&quot;/&quot;)))
+					if f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Enabled then
+						setNoteLanguage (f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Text)
+						setDocLanguage (f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Text)
+					endif
+					fsSaveAsPresentation(sC)
+					sC=&quot;&quot;
 				endif
-				fsSaveAsPresentation(sC)
+			elseif right(sC,6) = &quot;.xhtml&quot; then
+				if fbAppearsToBeXML (sA) then
+					&apos; Don&apos;t add more XML
+				else
+					sA = fsAlterStringMarkup (sA, &quot;&lt;div&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;p&gt;&quot;, &quot;&lt;/p&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;p&gt;&quot;, &quot;&lt;/p&gt;&quot; &amp; chr$(10) &amp; &quot;&lt;/div&gt;&quot;, true
+				endif
+				finishSchoolToolsDialogSave (sC, sA) &apos; Add headers and footers etc., then save
+				sC=&quot;&quot;
+			elseif right(sC,4) = &quot;.txt&quot; then
+				&apos;Save it as UTF-8 encoded text
+				CreateFile(sC,sA,&quot;utf-8&quot;)
+				sC=&quot;&quot;
+			elseif right(sC,4) = &quot;.odt&quot; then
+				&apos;Save it as a swriter file
+				if fileExists(sC) then
+					showDialog (fs_FILE_IS_IN_USE (fs_cL) , false)
+					sC = fsSaveSchoolToolFile(sB ,byval &quot;ODT Document (.odt)&quot;,&quot;*.odt&quot;)
+				else
+					createNewWriterDoc (&quot;&quot;, sA)
+					if f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Enabled then
+						setDocLanguage (f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Text)
+						ThisComponent.storeAsURL(sC, array())
+					endif
+					sC=&quot;&quot;
+				endif
+			else
+				showDialog (fs_NO_ACTION (fs_cL) , false)
+				sC = fsSaveSchoolToolFile(sB ,byval &quot;ODP Presentation (.odp),ODT Document (.odt),&quot; &amp; fs_NOTE(fs_cL) &amp;&quot; (.xhtml),&quot; &amp; fs_NOTE(fs_cL) &amp;&quot; (.txt)&quot; , &quot;*.odp,*.odt,*.xhtml,*.txt&quot;)
 			endif
-		endif
+		wend
 	endif
 end sub
 
 sub textMagnifierButton
 	exportSelectionAsODP
 end sub
+
+function stripControlChrs(byval sB)	
+	if len (sB) &lt;&gt; 0 then
+		for n = 1 to 31 &apos;Remove control characters
+			sB = fsReplaceText(sB,chr$(n),&quot; &quot;)
+		next
+		sB = fsReplaceText(sB,&quot;/&quot;,&quot; &quot;)
+		sB = fsReplaceText(sB,&quot;\&quot;,&quot; &quot;)
+		sB = fsReplaceText(sB,&quot;:&quot;,&quot; &quot;)
+	else
+		stripControlChrs=&quot;&quot;
+	endif
+	stripControlChrs = sB
+end function
 
 sub textReaderButton
 	dim sA, sB as string

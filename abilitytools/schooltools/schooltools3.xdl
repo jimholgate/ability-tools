@@ -12,44 +12,45 @@
  <dlg:bulletinboard>
   <dlg:textfield dlg:style-id="0" dlg:id="TextField1" dlg:tab-index="0" dlg:left="2" dlg:top="52" dlg:width="246" dlg:height="100" dlg:tabstop="true" dlg:hide-inactive-selection="false" dlg:vscroll="true" dlg:multiline="true">
    <script:event script:event-name="on-mouseover" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.upDateSchoolToolsNewStatus?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-textchange" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsBlindTextSpeaker?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:textfield>
   <dlg:button dlg:id="CommandButton1" dlg:tab-index="1" dlg:left="199" dlg:top="158" dlg:width="43" dlg:height="18" dlg:default="true" dlg:value="OK" dlg:button-type="ok">
    <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:schooltools.schooltools.Dialog3_OK_MouseUp?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:button>
   <dlg:button dlg:id="CommandButton2" dlg:tab-index="2" dlg:left="151" dlg:top="158" dlg:width="43" dlg:height="18" dlg:value="Cancel" dlg:button-type="cancel"/>
-  <dlg:button dlg:id="CommandButton4" dlg:tab-index="4" dlg:left="0" dlg:top="0" dlg:width="18" dlg:height="22" dlg:tabstop="false" dlg:grab-focus="false">
-   <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsDialogFileOpen?language=Basic&amp;location=application" script:language="Script"/>
+  <dlg:button dlg:id="CommandButton4" dlg:tab-index="4" dlg:left="0" dlg:top="0" dlg:width="18" dlg:height="22" dlg:tabstop="true" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsDialogFileOpen?language=Basic&amp;location=application" script:language="Script"/>
    <script:event script:event-name="on-mouseover" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.upDateSchoolToolsNewStatus?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:button>
-  <dlg:button dlg:id="CommandButton3" dlg:tab-index="5" dlg:left="95" dlg:top="0" dlg:width="18" dlg:height="22" dlg:tabstop="false" dlg:grab-focus="false">
-   <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsNew?language=Basic&amp;location=application" script:language="Script"/>
+  <dlg:button dlg:id="CommandButton3" dlg:tab-index="9" dlg:left="95" dlg:top="0" dlg:width="18" dlg:height="22" dlg:tabstop="true" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsNew?language=Basic&amp;location=application" script:language="Script"/>
    <script:event script:event-name="on-mouseover" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.upDateSchoolToolsNewStatus?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:button>
-  <dlg:button dlg:id="CommandButton5" dlg:tab-index="7" dlg:left="19" dlg:top="0" dlg:width="18" dlg:height="22" dlg:tabstop="false" dlg:grab-focus="false">
-   <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsDialogSave?language=Basic&amp;location=application" script:language="Script"/>
+  <dlg:button dlg:id="CommandButton5" dlg:tab-index="5" dlg:left="19" dlg:top="0" dlg:width="18" dlg:height="22" dlg:tabstop="true" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsDialogSave?language=Basic&amp;location=application" script:language="Script"/>
    <script:event script:event-name="on-mouseover" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.upDateSchoolToolsNewStatus?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:button>
-  <dlg:button dlg:id="CommandButton6" dlg:tab-index="8" dlg:left="38" dlg:top="0" dlg:width="18" dlg:height="22" dlg:tabstop="false" dlg:grab-focus="false">
-   <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsDialogSaveAs?language=Basic&amp;location=application" script:language="Script"/>
+  <dlg:button dlg:id="CommandButton6" dlg:tab-index="6" dlg:left="38" dlg:top="0" dlg:width="18" dlg:height="22" dlg:tabstop="true" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsDialogSaveAs?language=Basic&amp;location=application" script:language="Script"/>
    <script:event script:event-name="on-mouseover" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.upDateSchoolToolsNewStatus?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:button>
-  <dlg:button dlg:id="CommandButton7" dlg:tab-index="9" dlg:left="76" dlg:top="0" dlg:width="18" dlg:height="22" dlg:tabstop="false" dlg:grab-focus="false">
-   <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsPasteToTextEditor?language=Basic&amp;location=application" script:language="Script"/>
+  <dlg:button dlg:id="CommandButton7" dlg:tab-index="8" dlg:left="76" dlg:top="0" dlg:width="18" dlg:height="22" dlg:tabstop="true" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsPasteToTextEditor?language=Basic&amp;location=application" script:language="Script"/>
    <script:event script:event-name="on-mouseover" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.upDateSchoolToolsNewStatus?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:button>
-  <dlg:button dlg:id="CommandButton8" dlg:tab-index="10" dlg:left="114" dlg:top="0" dlg:width="18" dlg:height="22" dlg:tabstop="false" dlg:grab-focus="false">
-   <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsPreviewNote?language=Basic&amp;location=application" script:language="Script"/>
+  <dlg:button dlg:id="CommandButton8" dlg:tab-index="10" dlg:left="114" dlg:top="0" dlg:width="18" dlg:height="22" dlg:tabstop="true" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsPreviewNote?language=Basic&amp;location=application" script:language="Script"/>
    <script:event script:event-name="on-mouseover" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.upDateSchoolToolsNewStatus?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:button>
-  <dlg:button dlg:style-id="1" dlg:id="CommandButton11" dlg:tab-index="13" dlg:left="171" dlg:top="0" dlg:width="18" dlg:height="22" dlg:tabstop="false" dlg:toggled="1" dlg:grab-focus="false">
-   <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsTextEditorStyle?language=Basic&amp;location=application" script:language="Script"/>
+  <dlg:button dlg:style-id="1" dlg:id="CommandButton11" dlg:tab-index="13" dlg:left="171" dlg:top="0" dlg:width="18" dlg:height="22" dlg:tabstop="true" dlg:toggled="1" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsTextEditorStyle?language=Basic&amp;location=application" script:language="Script"/>
    <script:event script:event-name="on-mouseover" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.upDateSchoolToolsNewStatus?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:button>
-  <dlg:button dlg:id="CommandButton12" dlg:tab-index="14" dlg:left="152" dlg:top="0" dlg:width="18" dlg:height="22" dlg:tabstop="false" dlg:toggled="1" dlg:grab-focus="false">
-   <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsLanguage?language=Basic&amp;location=application" script:language="Script"/>
+  <dlg:button dlg:id="CommandButton12" dlg:tab-index="12" dlg:left="152" dlg:top="0" dlg:width="18" dlg:height="22" dlg:tabstop="true" dlg:toggled="1" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsLanguage?language=Basic&amp;location=application" script:language="Script"/>
    <script:event script:event-name="on-mouseover" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.upDateSchoolToolsNewStatus?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:button>
-  <dlg:combobox dlg:id="ComboBox1" dlg:tab-index="15" dlg:disabled="true" dlg:left="3" dlg:top="158" dlg:width="55" dlg:height="18" dlg:value="..." dlg:spin="true">
+  <dlg:combobox dlg:id="ComboBox1" dlg:tab-index="3" dlg:disabled="true" dlg:left="3" dlg:top="158" dlg:width="55" dlg:height="18" dlg:value="..." dlg:spin="true">
    <dlg:menupopup>
     <dlg:menuitem dlg:value="af-ZA"/>
     <dlg:menuitem dlg:value="ar-AE"/>
@@ -184,22 +185,26 @@
    <script:event script:event-name="on-textchange" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.updateLanguageDisplay?language=Basic&amp;location=application" script:language="Script"/>
    <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.updateLanguageDisplay?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:combobox>
-  <dlg:button dlg:id="CommandButton10" dlg:tab-index="12" dlg:left="57" dlg:top="0" dlg:width="18" dlg:height="22" dlg:tabstop="false" dlg:grab-focus="false">
-   <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsShare?language=Basic&amp;location=application" script:language="Script"/>
+  <dlg:button dlg:id="CommandButton10" dlg:tab-index="7" dlg:left="57" dlg:top="0" dlg:width="18" dlg:height="22" dlg:tabstop="true" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsShare?language=Basic&amp;location=application" script:language="Script"/>
    <script:event script:event-name="on-mouseover" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.upDateSchoolToolsNewStatus?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:button>
-  <dlg:button dlg:id="CommandButton9" dlg:tab-index="11" dlg:left="133" dlg:top="0" dlg:width="18" dlg:height="22" dlg:tabstop="false" dlg:grab-focus="false">
-   <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsSpeak?language=Basic&amp;location=application" script:language="Script"/>
+  <dlg:button dlg:id="CommandButton9" dlg:tab-index="11" dlg:left="133" dlg:top="0" dlg:width="18" dlg:height="22" dlg:tabstop="true" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsSpeak?language=Basic&amp;location=application" script:language="Script"/>
    <script:event script:event-name="on-mouseover" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.upDateSchoolToolsNewStatus?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:button>
-  <dlg:textfield dlg:style-id="2" dlg:id="Serif" dlg:tab-index="16" dlg:visible="false" dlg:left="223" dlg:top="44" dlg:width="29" dlg:height="16" dlg:value="Serif"/>
-  <dlg:textfield dlg:style-id="3" dlg:id="DefaultFont" dlg:tab-index="17" dlg:visible="false" dlg:left="223" dlg:top="27" dlg:width="29" dlg:height="16" dlg:printable="false" dlg:value="DefaultFont"/>
-  <dlg:textfield dlg:style-id="4" dlg:id="Monospace" dlg:tab-index="18" dlg:visible="false" dlg:left="223" dlg:top="60" dlg:width="29" dlg:height="16" dlg:value="Monospace"/>
-  <dlg:text dlg:id="Label1" dlg:tab-index="3" dlg:left="2" dlg:top="24" dlg:width="245" dlg:height="25" dlg:value="Label1" dlg:multiline="true">
+  <dlg:textfield dlg:style-id="2" dlg:id="Serif" dlg:tab-index="17" dlg:visible="false" dlg:left="223" dlg:top="44" dlg:width="29" dlg:height="16" dlg:tabstop="false" dlg:value="Serif"/>
+  <dlg:textfield dlg:style-id="3" dlg:id="DefaultFont" dlg:tab-index="18" dlg:visible="false" dlg:left="223" dlg:top="27" dlg:width="29" dlg:height="16" dlg:printable="false" dlg:tabstop="false" dlg:value="DefaultFont"/>
+  <dlg:textfield dlg:style-id="4" dlg:id="Monospace" dlg:tab-index="19" dlg:visible="false" dlg:left="223" dlg:top="60" dlg:width="29" dlg:height="16" dlg:tabstop="false" dlg:value="Monospace"/>
+  <dlg:text dlg:id="Label1" dlg:tab-index="15" dlg:left="2" dlg:top="24" dlg:width="245" dlg:height="25" dlg:value="Label1" dlg:multiline="true">
    <script:event script:event-name="on-mouseover" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.upDateSchoolToolsNewStatus?language=Basic&amp;location=application" script:language="Script"/>
    <script:event script:event-name="on-mouseup" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsReadQuestion?language=Basic&amp;location=application" script:language="Script"/>
   </dlg:text>
-  <dlg:filecontrol dlg:id="Destination1" dlg:tab-index="6" dlg:visible="false" dlg:left="3" dlg:top="158" dlg:width="43" dlg:height="18" dlg:printable="false" dlg:tabstop="false"/>
-  <dlg:textfield dlg:style-id="4" dlg:id="styleNo" dlg:tab-index="19" dlg:visible="false" dlg:left="223" dlg:top="76" dlg:width="29" dlg:height="16" dlg:value="0"/>
+  <dlg:filecontrol dlg:id="Destination1" dlg:tab-index="16" dlg:visible="false" dlg:left="3" dlg:top="158" dlg:width="43" dlg:height="18" dlg:printable="false" dlg:tabstop="true"/>
+  <dlg:textfield dlg:style-id="4" dlg:id="styleNo" dlg:tab-index="20" dlg:visible="false" dlg:left="223" dlg:top="76" dlg:width="29" dlg:height="16" dlg:tabstop="false" dlg:value="0"/>
+  <dlg:button dlg:style-id="1" dlg:id="CommandButton13" dlg:tab-index="14" dlg:left="190" dlg:top="0" dlg:width="18" dlg:height="22" dlg:tabstop="true" dlg:toggled="1" dlg:grab-focus="false">
+   <script:event script:event-name="on-performaction" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.SchoolToolsBlindTextSpeakerToggle?language=Basic&amp;location=application" script:language="Script"/>
+   <script:event script:event-name="on-mouseover" script:macro-name="vnd.sun.star.script:schooltools.myEnhancements.upDateSchoolToolsNewStatus?language=Basic&amp;location=application" script:language="Script"/>
+  </dlg:button>
  </dlg:bulletinboard>
 </dlg:window>
