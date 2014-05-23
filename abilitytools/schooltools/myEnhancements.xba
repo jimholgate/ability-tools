@@ -829,7 +829,7 @@ function fsSchoolToolsInputBox(optional sMsg as string, optional sTitle as strin
 	f_dlgImpressAsk.GetControl(&quot;CommandButton11&quot;).model.helpText = fs_APPEARANCE(fs_cL)
 	f_dlgImpressAsk.GetControl(&quot;CommandButton12&quot;).model.ImageURL=fsMyURL &amp; &quot;/images/config-lang_16.png&quot;
 	f_dlgImpressAsk.GetControl(&quot;CommandButton12&quot;).model.helpText = fs_LANGUAGE(fs_cL)
-	f_dlgImpressAsk.GetControl(&quot;CommandButton13&quot;).model.ImageURL=fsMyURL &amp; &quot;/images/textToSpeech_16h.png&quot;
+	f_dlgImpressAsk.GetControl(&quot;CommandButton13&quot;).model.ImageURL=fsMyURL &amp; &quot;/images/PlaySpeech_16.png&quot;
 	f_dlgImpressAsk.GetControl(&quot;CommandButton13&quot;).model.helpText = fs_READ_LAST_WORD(fs_cL)
 	&apos;Default to reading text in different languages if user has set the extension up to read multilingual text
 	if fileExists (fsSpeechSettingURL) then
