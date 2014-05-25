@@ -33,9 +33,9 @@ end function
 function fs_READ_LAST_WORD (cL)
 	select case cL
 	case &quot;fr&quot;
-		fs_READ_LAST_WORD = &quot;Lire le dernier mot en tapant&quot;
+		fs_READ_LAST_WORD = &quot;Lire le dernier mot&quot;
 	case else
-		fs_READ_LAST_WORD = &quot;Read the last word as you type&quot;
+		fs_READ_LAST_WORD = &quot;Read the last word&quot;
 	end select
 end function
 
@@ -1687,13 +1687,28 @@ function fs_READ_PROMPT (cL)
 	end select
 end function
 
-function fs_TO_STOP_SPEECH (cL)
-	select case cL
-	case &quot;fr&quot;
-		fs_TO_STOP_SPEECH = &quot;Pour désactiver la synthèse vocale, appuyez brièvement sur une touche de direction ou la touche « ESC ». Vous pouvez également cliquer dans la fenêtre de document avec la souris.&quot;
+function fs_ABOUT_READ_LAST_WORD (cL)
+	dim sA as string
+	select case fsGetOS()
+	case &quot;WINDOWS&quot;
+		&apos; Due to the latency in Windows, we can&apos;t reliably follow the text 
+		&apos; with speech in real time. Instead, we will go to the end of the 
+		&apos; document and read the last word.
+		select case cL
+		case &quot;fr&quot;
+			sA = &quot;Sur un ordinateur Windows, ce bouton déplace le curseur à la fin du document et lit le dernier mot.&quot;
+		case else
+			sA = &quot;On the Windows platform, this button moves the cursor to the end of the document and reads the last word.&quot;
+		end select
 	case else
-		fs_TO_STOP_SPEECH =&quot;To turn speech off, tap a direction key or the “ESC” key. You can also click anywhere in the document window with the mouse.&quot;
+		select case cL
+		case &quot;fr&quot;
+			sA = &quot;Pour désactiver la synthèse vocale, appuyez brièvement sur une touche de direction ou la touche « ESC ». Vous pouvez également cliquer dans la fenêtre de document avec la souris.&quot;
+		case else
+			sA = &quot;To turn speech off, tap a direction key or the “ESC” key. You can also click anywhere in the document window with the mouse.&quot;
+		end select
 	end select
+	fs_ABOUT_READ_LAST_WORD = sA
 end function
 &apos;----
 

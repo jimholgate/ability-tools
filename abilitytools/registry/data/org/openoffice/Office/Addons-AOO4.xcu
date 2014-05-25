@@ -159,9 +159,9 @@
                         <prop oor:name="URL" oor:type="xs:string"><value>vnd.sun.star.script:schooltools.quicktalkUtilities.ReadLastWordAloudinWriter?language=Basic&amp;location=application</value>
                         </prop>
                         <prop oor:name="Title" oor:type="xs:string">
-                            <value>Read as you type</value>
-                            <value xml:lang="en">Read as you type</value>
-                            <value xml:lang="fr">Read as you type</value>
+                            <value>Read last word</value>
+                            <value xml:lang="en">Read last word</value>
+                            <value xml:lang="fr">Lire le dernier mot</value>
                         </prop>
                         <prop oor:name="Target" oor:type="xs:string">
                             <value>_self</value>
@@ -287,9 +287,9 @@
                 <prop oor:name="URL" oor:type="xs:string"><value>vnd.sun.star.script:schooltools.quicktalkUtilities.ReadLastWordAloudinWriter?language=Basic&amp;location=application</value>
                 </prop>
                 <prop oor:name="Title" oor:type="xs:string">
-                    <value>Read as you type</value>
-                    <value xml:lang="en">Read as you type</value>
-                    <value xml:lang="fr">Read as you type</value>
+                    <value>Read last word</value>
+                    <value xml:lang="en">Read last word</value>
+                    <value xml:lang="fr">Lire le dernier mot</value>
                 </prop>
                 <prop oor:name="Target" oor:type="xs:string">
                     <value>_self</value>
