@@ -510,8 +510,8 @@ function fsNotesMenuSettingURL
 	fsNotesMenuSettingURL=createUnoService(&quot;com.sun.star.util.PathSettings&quot;).userConfig &amp; &quot;/impresstools/notes-menu.ini&quot;
 end function
 
-function fsReadNoteContinuouslyToggleURL
-	fsReadNoteContinuouslyToggleURL=createUnoService(&quot;com.sun.star.util.PathSettings&quot;).userConfig &amp; &quot;/impresstools/blind-type.ini&quot;
+function fsHasReadContinuousReadingHelpURL
+	fsHasReadContinuousReadingHelpURL=createUnoService(&quot;com.sun.star.util.PathSettings&quot;).userConfig &amp; &quot;/impresstools/has-read-help.ini&quot;
 end function
 
 function fsTemporaryJsonURL

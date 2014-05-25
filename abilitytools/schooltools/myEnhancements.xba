@@ -451,7 +451,8 @@ sub writeTranscriptToDoc
 	if NOT GlobalScope.BasicLibraries.isLibraryLoaded(&quot;Tools&quot;) then 
 		GlobalScope.BasicLibraries.loadLibrary(&quot;Tools&quot;)
 	endif
-	WriteDbgString (fsNotesTranscript())
+	&apos;WriteDbgString (fsNotesTranscript())
+	createNewWriterDoc (&quot;&quot;, fsNotesTranscript())
 end sub
 
 function fsOrgMicroformatsVeventCopyrightInfoXhtml (sdesc , optional sURL, optional sFullName)
@@ -2310,6 +2311,9 @@ sub AlterThisNoteMarkup (optional sPrefix, optional sMidfix, optional sSuffix, o
 end sub 
 
 Function fsGetLastWord(ByVal strA as String, optional sSep as string)
+	if NOT GlobalScope.BasicLibraries.isLibraryLoaded(&quot;Tools&quot;) then 
+		GlobalScope.BasicLibraries.loadLibrary(&quot;Tools&quot;)
+	endif
 	Dim MaxIndex as Integer
 	Dim SepList() as String	
 	if isMissing (sSep) then

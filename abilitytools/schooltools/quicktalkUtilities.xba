@@ -1,6 +1,99 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!DOCTYPE script:module PUBLIC "-//OpenOffice.org//DTD OfficeDocument 1.0//EN" "module.dtd">
 <script:module xmlns:script="http://openoffice.org/2000/script" script:name="quicktalkUtilities" script:language="StarBasic">REM  *****  BASIC  *****
+
+Global oDocView
+Global oKeyHandler
+Global oMouseClickHandler
+
+Sub ReadLastWordAloudinWriter
+	&apos;Reards the last word of the writer document aloud as you type. To stop
+	&apos;reading aloud, hit the escape key or a direction key, or click the mouse.
+	&apos;See also Pitonyak, Andrew. Useful macro information for OpenOffice.org. March 21, 2013.
+	if fileExists(fsHasReadContinuousReadingHelpURL) = false then	
+		CreateFile(fsHasReadContinuousReadingHelpURL,fsNow(),&quot;UTF-8&quot;)
+		ShowDialog(fs_TO_STOP_SPEECH (fs_cL))
+	endif
+	on error resume next
+	UnRegisterMyKeyMouseHandler
+	gotoEnd
+	oDocView = ThisComponent.getCurrentController
+	oKeyHandler = createUnoListener(&quot;MyApp_&quot;, &quot;com.sun.star.awt.XKeyHandler&quot;)
+	oDocView.addKeyHandler(oKeyHandler)
+	oMouseClickHandler = createUnoListener(&quot;MyApp_&quot;, &quot;com.sun.star.awt.XMouseClickHandler&quot;)
+	oDocView.addMouseClickHandler(oMouseClickHandler)
+End Sub
+
+Sub UnRegisterMyKeyMouseHandler
+	oDocView.removeKeyHandler(oKeyHandler)
+	oDocView.removeMouseClickHandler(oMouseClickHandler)
+End Sub
+
+Sub MyApp_disposing(oEvt)
+	&apos;msgBox (&quot;Stopping event handlers&quot;)
+End Sub
+
+Function MyApp_mousePressed(oEvt) As Boolean
+	UnRegisterMyKeyMouseHandler
+End Function
+
+Function MyApp_KeyPressed(oEvt) As Boolean
+	dim sA as string
+	dim iA as integer
+	sA = oEvt.KeyChar
+	iA = oEvt.KeyCode
+  select case sA
+    case &quot; &quot;, &quot;?&quot;, &quot;.&quot;, &quot;!&quot;, &quot;,&quot;,&quot;;&quot;, &quot;:&quot;,&quot;&quot;&quot;&quot;,&quot;&lt;&quot;,&quot;&gt;&quot;,&quot;(&quot;,&quot;)&quot;,&quot;[&quot;,&quot;]&quot;,&quot;-&quot;,&quot;“&quot;,&quot;”&quot;
+       MyApp_KeyPressed = true
+       doTextReader(true)
+       typerightpluschar (sA)
+    case else
+    	&apos; http://www.openoffice.org/api/docs/common/ref/com/sun/star/awt/Key.html
+	    select case iA
+	    case 1280 &apos; return
+	       MyApp_KeyPressed = true
+	       doTextReader(true)
+	       typerightpluschar (chr$(10))
+	    case 1282 &apos; tab
+	    	MyApp_KeyPressed = true
+	    	doTextReader(true)
+	    	typerightpluschar (chr$(9))
+	    case 1281 &apos; escape
+	    	UnRegisterMyKeyMouseHandler
+	    case 1024,1025,1026,1027,1028,1029,1030,1031 
+	    	&apos; direction keys up, down, left, right, home, end, page up, page down
+	    	MyApp_KeyPressed = False
+	    	UnRegisterMyKeyMouseHandler
+	    case else
+	       MyApp_KeyPressed = False
+		end select
+	end select
+End Function
+
+Function MyApp_KeyReleased(oEvt) As Boolean
+	MyApp_KeyReleased = False
+End Function
+
+sub typerightpluschar(optional sA)
+	if ismissing (sA) then
+		sA = &quot; &quot;
+	endif
+	dim document   as object
+	dim dispatcher as object
+	document   = ThisComponent.CurrentController.Frame
+	dispatcher = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
+	dim args1(1) as new com.sun.star.beans.PropertyValue
+	args1(0).Name = &quot;Count&quot;
+	args1(0).Value = 1
+	args1(1).Name = &quot;Select&quot;
+	args1(1).Value = false
+	dispatcher.executeDispatch(document, &quot;.uno:GoRight&quot;, &quot;&quot;, 0, args1())
+	dim args2(0) as new com.sun.star.beans.PropertyValue
+	args2(0).Name = &quot;Text&quot;
+	args2(0).Value = sA
+	dispatcher.executeDispatch(document, &quot;.uno:InsertText&quot;, &quot;&quot;, 0, args2())
+end sub
+
 sub exportSelectionAsODP
 	dim sA, sB, sC as string
 	dim n as integer
@@ -84,8 +177,18 @@ function stripControlChrs(byval sB)
 end function
 
 sub textReaderButton
+	doTextReader (false)
+end sub
+
+sub doTextReader (optional bLastword)
 	dim sA, sB as string
+	if ismissing (bLastword) then
+		bLastword = false
+	endif
 	sA = fsGetTextSelection()
+	if bLastword then
+		sA = fsGetLastWord(sA)
+	endif
 	sB = fsSelectionLanguage &amp; &quot;-&quot; &amp; fsSelectionCountry
 	if fileExists (fsSpeechSettingURL) then 
 		synthesizeSpeech (sA, sB, ENABLE_SYSTEM_LANGUAGES)
@@ -298,4 +401,12 @@ Function fsGetSelectionAndCopy()
 	dispatcher.executeDispatch(document, &quot;.uno:Copy&quot;, &quot;&quot;, 0, Array())
 	fsGetSelectionAndCopy=fsGetClipBoard
 End Function
+
+sub gotoEnd
+	dim document   as object
+	dim dispatcher as object
+	document   = ThisComponent.CurrentController.Frame
+	dispatcher = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
+	dispatcher.executeDispatch(document, &quot;.uno:GoToEndOfDoc&quot;, &quot;&quot;, 0, Array())
+end sub
 </script:module>

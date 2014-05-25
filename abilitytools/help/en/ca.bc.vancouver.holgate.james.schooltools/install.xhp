@@ -48,6 +48,21 @@
             <listitem>
                 Restart the %PRODUCTNAME application.
             </listitem>
+            <switchinline select="sys">
+              <caseinline select="UNIX">
+                <listitem>
+                  Enable sending attachments with Thunderbird mail. Use 
+                    <emph>Tools - Options - Internet - Email</emph>
+                  to display the Email options dialog. In the E-mail program field, enter 
+                    <emph>thunderbird -compose</emph>
+                </listitem>
+              </caseinline>
+              <caseinline select="WINDOWS">
+                <listitem>
+                  If you are using Windows 8, %PRODUCTNAME will not attach files using the default email program. You need a fully featured email program like Outlook.
+                </listitem>
+              </caseinline>
+            </switchinline>
         </list>
 <section id="relatedtopics">
 <embed href="text/shared/guide/accessibility.xhp#accessibility"/>

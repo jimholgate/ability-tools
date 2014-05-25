@@ -1687,6 +1687,14 @@ function fs_READ_PROMPT (cL)
 	end select
 end function
 
+function fs_TO_STOP_SPEECH (cL)
+	select case cL
+	case &quot;fr&quot;
+		fs_TO_STOP_SPEECH = &quot;Pour désactiver la synthèse vocale, appuyez brièvement sur une touche de direction ou la touche « ESC ». Vous pouvez également cliquer dans la fenêtre de document avec la souris.&quot;
+	case else
+		fs_TO_STOP_SPEECH =&quot;To turn speech off, tap a direction key or the “ESC” key. You can also click anywhere in the document window with the mouse.&quot;
+	end select
+end function
 &apos;----
 
 function fsMyURL as string

@@ -800,11 +800,13 @@ function TryHandlingLocally (byval sA as string, byval myKey as string) as boole
 	elseif instr(sA,&quot;(PREVIEW_TRANSCRIPT)&quot;) &lt;&gt; 0 then
 		&apos;msgBox &quot;Show the presentation notes transcript.&quot;
 		s123 = fsSuperTrim(fsstripXMLTags(fsNotesTranscript, true))
-		WriteDbgString (s123)
+		&apos;WriteDbgString (s123)
+		createNewWriterDoc (&quot;&quot;, s123)
 	elseif instr(sA,&quot;(PREVIEW_SUBTITLES)&quot;) &lt;&gt; 0 then
 		&apos;msgBox &quot;Show the presentation subtitles&quot;
 		s123 = fsSuperTrim(fsstripXMLTags(fsQuickSubtitleDoc,true))
-		WriteDbgString (s123)
+		&apos;WriteDbgString (s123)
+		createNewWriterDoc (&quot;&quot;, s123)
 	elseif instr(sA,&quot;(ADD_IMAGE_DIRECTORY_TO_PRESENTATION)&quot;) &lt;&gt; 0 then
 		&apos;msgBox &quot;Import the photos in a directory to this slideshow.&quot;
 		AddImagesToPresentation

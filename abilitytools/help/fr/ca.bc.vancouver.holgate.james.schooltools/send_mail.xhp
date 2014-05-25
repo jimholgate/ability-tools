@@ -35,6 +35,21 @@
             <listitem>
                 L’extension peut utiliser votre programme de messageries pour envoyer le projet.
             </listitem>
+            <switchinline select="sys">
+              <caseinline select="UNIX">
+                <listitem>
+                  Configurez vos options d'envoi pour Thunderbird. Utilisez le menu 
+                    <emph>Outils- Options - Internet - E-mail</emph>
+                  Dans le champ Client de messagerie, entrez  
+                    <emph>thunderbird -compose</emph>.
+                </listitem>
+              </caseinline>
+              <caseinline select="WINDOWS">
+                <listitem>
+                  Si vous utilisez Windows 8, %PRODUCTNAME ne peut pas joindre des fichiers avec le programme de messagerie installé par défaut. Vous avez besoin d'un programme de messagerie complet comme Outlook. 
+                </listitem>
+              </caseinline>
+            </switchinline>
         </list>
         <paragraph role="heading" id="send_mail1.2" xml-lang="fr-FR" level="2">
             Destination 

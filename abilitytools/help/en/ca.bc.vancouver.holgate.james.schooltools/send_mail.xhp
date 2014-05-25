@@ -35,8 +35,23 @@
             <listitem>
                 The extension can use your system’s email program to publish the project.
             </listitem>
+            <switchinline select="sys">
+              <caseinline select="UNIX">
+                <listitem>
+                  Enable sending attachments with Thunderbird mail. Use 
+                    <emph>Tools - Options - Internet - Email</emph>
+                  to display the Email options dialog. In the E-mail program field, enter 
+                    <emph>thunderbird -compose</emph>
+                </listitem>
+              </caseinline>
+                <caseinline select="WINDOWS">
+                  <listitem>
+                  If you are using Windows 8, %PRODUCTNAME will not attach files using the default email program. You need a fully featured email program like Outlook.
+                  </listitem>
+                </caseinline>
+              </switchinline>
             <listitem>
-                For example, to publish an ePub 2 electronic book, export the presentation using the ePub format. You can use the 
+                To publish an ePub electronic book, export the presentation using the ePub format. You can use the 
 			<link href="http://www.readium.org/" name="http://www.readium.org/">
                     Readium</link> 
             	Chromium extension to view it on your desktop, or use calibre to format the electronic book for non-standard mobile devices. For more information about using calibre, visit
