@@ -10,14 +10,23 @@ Sub ReadLastWordAloudinWriter
 	&apos;Reads the last word of the writer document aloud as you type. To stop
 	&apos;reading aloud, hit the escape key or a direction key, or click the mouse.
 	&apos;See also Pitonyak, Andrew. Useful macro information for OpenOffice.org. March 21, 2013.
+	dim sA,sB as string
+			sA=&quot; ?.!,;:&quot;&quot;&lt;&gt;()[]-“”&quot; &amp; chr$(13)  &amp; chr$(10)  &amp; chr$(9)
+		sB= fsGetTextSelection()
+		gotoend
+		goLeft
+		while len (sB) &lt;&gt; 0 and instr(sA,right(sB,1)) &lt;&gt; 0
+			sB= left(sB,len(sB)-1)
+			goLeft
+		wend
+		doTextReader(false)
+		gotoend
 	select case fsGetOS()
 	case &quot;WINDOWS&quot;,&quot;UNKNOWN&quot;
 		&apos; Due to the latency in Windows, we can&apos;t reliably follow the text 
 		&apos; with speech in real time. Instead, we will go to the end of the 
 		&apos; document and read the last word.
-		gotoend
-		doTextReader(false)
-		gotoend
+
 	case else
 		if fileExists(fsHasReadContinuousReadingHelpURL) = false then	
 			CreateFile(fsHasReadContinuousReadingHelpURL,fsNow(),&quot;UTF-8&quot;)
@@ -55,18 +64,24 @@ Function MyApp_KeyPressed(oEvt) As Boolean
   select case sA
     case &quot; &quot;, &quot;?&quot;, &quot;.&quot;, &quot;!&quot;, &quot;,&quot;,&quot;;&quot;, &quot;:&quot;,&quot;&quot;&quot;&quot;,&quot;&lt;&quot;,&quot;&gt;&quot;,&quot;(&quot;,&quot;)&quot;,&quot;[&quot;,&quot;]&quot;,&quot;-&quot;,&quot;“&quot;,&quot;”&quot;
        MyApp_KeyPressed = true
-       doTextReader(true)
+	   if len(fsgetCursorWord) = len(rtrim(fsgetCursorWord)) then
+	       	doTextReader(true)
+	   endif
        typerightpluschar (sA)
     case else
     	&apos; http://www.openoffice.org/api/docs/common/ref/com/sun/star/awt/Key.html
 	    select case iA
 	    case 1280 &apos; return
 	       MyApp_KeyPressed = true
-	       doTextReader(true)
+	       if len(fsgetCursorWord) = len(rtrim(fsgetCursorWord)) then
+	       		doTextReader(true)
+	       endif
 	       typerightpluschar (chr$(10))
 	    case 1282 &apos; tab
 	    	MyApp_KeyPressed = true
-	    	doTextReader(true)
+	       if len(fsgetCursorWord) = len(rtrim(fsgetCursorWord)) then
+	       		doTextReader(true)
+	       endif
 	    	typerightpluschar (chr$(9))
 	    case 1281 &apos; escape
 	    	UnRegisterMyKeyMouseHandler
@@ -88,20 +103,10 @@ sub typerightpluschar(optional sA)
 	if ismissing (sA) then
 		sA = &quot; &quot;
 	endif
-	dim document   as object
-	dim dispatcher as object
-	document   = ThisComponent.CurrentController.Frame
-	dispatcher = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
-	dim args1(1) as new com.sun.star.beans.PropertyValue
-	args1(0).Name = &quot;Count&quot;
-	args1(0).Value = 1
-	args1(1).Name = &quot;Select&quot;
-	args1(1).Value = false
-	dispatcher.executeDispatch(document, &quot;.uno:GoRight&quot;, &quot;&quot;, 0, args1())
-	dim args2(0) as new com.sun.star.beans.PropertyValue
-	args2(0).Name = &quot;Text&quot;
-	args2(0).Value = sA
-	dispatcher.executeDispatch(document, &quot;.uno:InsertText&quot;, &quot;&quot;, 0, args2())
+	Dim oText As Object
+	oText = ThisComponent.Text
+	oText.insertString(oText.getEnd(),sA, False)
+	gotoEnd
 end sub
 
 sub exportSelectionAsODP
@@ -419,4 +424,17 @@ sub gotoEnd
 	dispatcher = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
 	dispatcher.executeDispatch(document, &quot;.uno:GoToEndOfDoc&quot;, &quot;&quot;, 0, Array())
 end sub
+
+Sub goLeft
+	dim document   as object
+	dim dispatcher as object
+	document   = ThisComponent.CurrentController.Frame
+	dispatcher = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
+	dim args1(1) as new com.sun.star.beans.PropertyValue
+	args1(0).Name = &quot;Count&quot;
+	args1(0).Value = 1
+	args1(1).Name = &quot;Select&quot;
+	args1(1).Value = &quot;False&quot;
+	dispatcher.executeDispatch(document, &quot;.uno:GoLeft&quot;, &quot;&quot;, 0, args1())
+End Sub
 </script:module>

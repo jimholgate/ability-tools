@@ -1596,20 +1596,18 @@ sub SchoolToolsBlindTextSpeaker
 	CR = chr$(10)
 	if f_dlgImpressAsk.GetControl(&quot;CommandButton13&quot;).model.helpText = fs_STOP_READING (fs_cL) then
 		sB = f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text
+		sB = fsReplaceText(sB, CR,&quot; &quot;)
 		select case right(sB,1)
 		case &quot; &quot;
-			if bB = true and right(sB,2) &lt;&gt; &quot;  &quot; then
-				sA = fsGetLastWord (sB)
-				if instr (sA, CR) = false then
-					SchoolToolsSpeakLang (sA)
-				else
-					sA = fsGetLastWord (sA, CR)
+			if bB = true and len(sB) = len(rtrim(sB)) + 1 then
+				sA = rtrim(fsGetLastWord (sB))
+				if instr(&quot;?.!,;:&quot;&quot;&lt;&gt;()[]-“”&quot;,right(sA,1)) = 0 then
 					SchoolToolsSpeakLang (sA)
 				endif
 				bB = false
 			endif
-		case CR
-			if bB = true and right(sB,2) &lt;&gt; CR &amp; CR and right(sB,2) &lt;&gt; &quot; &quot; &amp; CR then
+		case &quot;?&quot;, &quot;.&quot;, &quot;!&quot;, &quot;,&quot;,&quot;;&quot;, &quot;:&quot;,&quot;&quot;&quot;&quot;,&quot;&lt;&quot;,&quot;&gt;&quot;,&quot;(&quot;,&quot;)&quot;,&quot;[&quot;,&quot;]&quot;,&quot;-&quot;,&quot;“&quot;,&quot;”&quot;
+			if bB = true and len(sB) = len(rtrim(sB)) then
 				sA = fsGetLastWord (sB)
 				SchoolToolsSpeakLang (sA)
 				bB = false
@@ -1627,14 +1625,13 @@ sub SchoolToolsBlindTextSpeaker
 end sub
 
 sub SchoolToolsBlindTextSpeakerToggle
+	dim sB as string
 	if f_dlgImpressAsk.GetControl(&quot;CommandButton13&quot;).model.helpText = fs_STOP_READING (fs_cL) then
-		&apos;synthesizeSpeech ( &quot;tk&quot;, &quot;en-US&quot; )
-		synthesizeSpeech (fs_STOP_READING (fs_cL), fs_cL)
 		f_dlgImpressAsk.GetControl(&quot;CommandButton13&quot;).model.helpText = fs_READ_LAST_WORD (fs_cL)
 	else
 		f_dlgImpressAsk.GetControl(&quot;CommandButton13&quot;).model.helpText = fs_STOP_READING (fs_cL)
-		&apos;synthesizeSpeech ( &quot;kkt&quot;, &quot;en-US&quot; )
-		synthesizeSpeech (fs_READ_LAST_WORD (fs_cL), fs_cL)
+		sB = f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text
+		SchoolToolsSpeakLang (fsGetLastWord (sB))
 		f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text = rtrim(f_dlgImpressAsk.GetControl(&quot;TextField1&quot;).Model.Text)
 	endif
 end sub
