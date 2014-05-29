@@ -5,14 +5,15 @@
 Global oDocView
 Global oKeyHandler
 Global oMouseClickHandler
+Global bEndOfSentence
 
 Sub ReadLastWordAloudinWriter
 	&apos;Reads the last word of the writer document aloud as you type. To stop
 	&apos;reading aloud, hit the escape key or a direction key, or click the mouse.
 	&apos;See also Pitonyak, Andrew. Useful macro information for OpenOffice.org. March 21, 2013.
 	dim sA,sB as string
-			sA=&quot; ?.!,;:&quot;&quot;&lt;&gt;()[]-“”&quot; &amp; chr$(13)  &amp; chr$(10)  &amp; chr$(9)
-		sB= fsGetTextSelection()
+		sA=&quot; ?.!,;:&quot;&quot;&lt;&gt;()[]-“”&quot; &amp; chr$(13)  &amp; chr$(10)  &amp; chr$(9)
+		sB= fsgetCursorWord()
 		gotoend
 		goLeft
 		while len (sB) &lt;&gt; 0 and instr(sA,right(sB,1)) &lt;&gt; 0
@@ -21,12 +22,12 @@ Sub ReadLastWordAloudinWriter
 		wend
 		doTextReader(false)
 		gotoend
+		bEndOfSentence = true
 	select case fsGetOS()
 	case &quot;WINDOWS&quot;,&quot;UNKNOWN&quot;
 		&apos; Due to the latency in Windows, we can&apos;t reliably follow the text 
 		&apos; with speech in real time. Instead, we will go to the end of the 
 		&apos; document and read the last word.
-
 	case else
 		if fileExists(fsHasReadContinuousReadingHelpURL) = false then	
 			CreateFile(fsHasReadContinuousReadingHelpURL,fsNow(),&quot;UTF-8&quot;)
@@ -62,35 +63,48 @@ Function MyApp_KeyPressed(oEvt) As Boolean
 	sA = oEvt.KeyChar
 	iA = oEvt.KeyCode
   select case sA
-    case &quot; &quot;, &quot;?&quot;, &quot;.&quot;, &quot;!&quot;, &quot;,&quot;,&quot;;&quot;, &quot;:&quot;,&quot;&quot;&quot;&quot;,&quot;&lt;&quot;,&quot;&gt;&quot;,&quot;(&quot;,&quot;)&quot;,&quot;[&quot;,&quot;]&quot;,&quot;-&quot;,&quot;“&quot;,&quot;”&quot;
+    case &quot; &quot;
        MyApp_KeyPressed = true
-	   if len(fsgetCursorWord) = len(rtrim(fsgetCursorWord)) then
+	   if bEndOfSentence = false and len(fsgetCursorWord) = len(rtrim(fsgetCursorWord)) then
+	   		doTextReader(true)
+	   endif
+       typerightpluschar (sA)
+       bEndOfSentence = false
+    case &quot;?&quot;, &quot;.&quot;, &quot;!&quot;, &quot;,&quot;,&quot;;&quot;, &quot;:&quot;,&quot;&quot;&quot;&quot;,&quot;&lt;&quot;,&quot;&gt;&quot;,&quot;(&quot;,&quot;)&quot;,&quot;[&quot;,&quot;]&quot;,&quot;-&quot;,&quot;“&quot;,&quot;”&quot;
+       MyApp_KeyPressed = true
+	   if bEndOfSentence = false and len(fsgetCursorWord) = len(rtrim(fsgetCursorWord)) then
 	       	doTextReader(true)
 	   endif
        typerightpluschar (sA)
+       bEndOfSentence = true
     case else
     	&apos; http://www.openoffice.org/api/docs/common/ref/com/sun/star/awt/Key.html
 	    select case iA
 	    case 1280 &apos; return
 	       MyApp_KeyPressed = true
-	       if len(fsgetCursorWord) = len(rtrim(fsgetCursorWord)) then
+	       if bEndOfSentence = false and len(fsgetCursorWord) = len(rtrim(fsgetCursorWord)) then
 	       		doTextReader(true)
 	       endif
 	       typerightpluschar (chr$(10))
+	       bEndOfSentence = true
 	    case 1282 &apos; tab
 	    	MyApp_KeyPressed = true
-	       if len(fsgetCursorWord) = len(rtrim(fsgetCursorWord)) then
+	       if bEndOfSentence = false and len(fsgetCursorWord) = len(rtrim(fsgetCursorWord)) then
 	       		doTextReader(true)
 	       endif
 	    	typerightpluschar (chr$(9))
+	    	bEndOfSentence = true
 	    case 1281 &apos; escape
 	    	UnRegisterMyKeyMouseHandler
+	    	bEndOfSentence = true
 	    case 1024,1025,1026,1027,1028,1029,1030,1031 
 	    	&apos; direction keys up, down, left, right, home, end, page up, page down
 	    	MyApp_KeyPressed = False
+	    	bEndOfSentence = true
 	    	UnRegisterMyKeyMouseHandler
 	    case else
 	       MyApp_KeyPressed = False
+	       bEndOfSentence = false
 		end select
 	end select
 End Function
