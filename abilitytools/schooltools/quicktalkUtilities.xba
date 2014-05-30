@@ -13,6 +13,7 @@ Sub ReadLastWordAloudinWriter
 	&apos;See also Pitonyak, Andrew. Useful macro information for OpenOffice.org. March 21, 2013.
 	dim sA,sB as string
 		sA=&quot; ?.!,;:&quot;&quot;&lt;&gt;()[]-“”&quot; &amp; chr$(13)  &amp; chr$(10)  &amp; chr$(9)
+		on error resume next
 		sB= fsgetCursorWord()
 		gotoend
 		goLeft

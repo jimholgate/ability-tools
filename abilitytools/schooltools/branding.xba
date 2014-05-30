@@ -872,14 +872,14 @@ function fsGetCommands(i as integer, optional sLanguage, optional iBrand, option
 	    	select case sLanguage
 			case &quot;fr&quot; &apos;French
 				sA(1) = &quot;Aperçu de la transcription&quot;
-				sA(3) = &quot;Lisez les notes et les textes alternatifs pour les aveugles&quot;
+				sA(3) = &quot;Écoutez un projet ePub avec la synthèse vocale.&quot;
 				sA(5) = &quot;Lisez les notes avec la voix du système (Recommandé!)&quot;
 				sA(8) = &quot;Ajouter “&lt;ask&gt;” au debut et “&lt;/ask&gt;” à la fin de cette note.&quot;
 				sA(10) = &quot;Ajouter une image à la fin de ce projet&quot;
 				sA(27) = &quot;Ajouter 2D code 1 à la fin de ce projet&quot;
 			case else  &apos;en
 				sA(1) = &quot;Show a transcript&quot; 
-				sA(3) = &quot;Read notes and alternative text for the blind.&quot; 
+				sA(3) = &quot;Audition ePub project using speech synthesis.&quot; 
 				sA(5) = &quot;Read notes aloud with the system voice (Recommended!)&quot;
 				sA(8) = &quot;Add “&lt;ask&gt;” to the start and “&lt;/ask&gt;” to the end of this note.&quot;
 				sA(10) = &quot;Add an image with a title and a date&quot;
@@ -895,7 +895,7 @@ function fsGetCommands(i as integer, optional sLanguage, optional iBrand, option
 				sA(0) = &quot;Enregistrer l&apos;écran&quot;
 				sA(1) = &quot;Aperçu de la transcription&quot;
 				sA(2) = &quot;Aperçu de cette note en code Braille sans compression (en-US)&quot;
-				sA(3) = &quot;Lisez les notes et les textes alternatifs pour les aveugles&quot;
+				sA(3) = &quot;Écoutez un projet ePub avec la synthèse vocale.&quot;
 				sA(4) = &quot;Lisez les notes avec des voix multilingues et des ressources en-ligne (Attention!)&quot;
 				sA(5) = &quot;Lisez les notes avec la voix du système (Recommandé!)&quot;
 				sA(6) = &quot;Lisez les notes multilingues (Expert!)&quot;
@@ -936,7 +936,7 @@ function fsGetCommands(i as integer, optional sLanguage, optional iBrand, option
 				sA(0) = &quot;Record the desktop&quot;
 				sA(1) = &quot;Read the transcript&quot; 
 				sA(2) = &quot;Read this note aloud and show uncompressed Braille code (en-US)&quot;
-				sA(3) = &quot;Read notes and alternative text for the blind.&quot;
+				sA(3) = &quot;Audition ePub project using speech synthesis.&quot;
 				sA(4) = &quot;Read notes aloud with on-line resources (Caution!)&quot; 
 				sA(5) = &quot;Read notes aloud with the system voice (Recommended!)&quot;
 				sA(6) = &quot;Read notes aloud using different languages (Expert!)&quot;

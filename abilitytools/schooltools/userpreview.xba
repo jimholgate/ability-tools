@@ -71,10 +71,12 @@ end function
 
 sub ReadImpressVeryVerbose (optional iMultiLingual as boolean)
 	&apos; This gives a preview of the presentation roughly as an ePub will sound
-	&apos; on iBooks for iOS with VoiceOver. It plays all the text fields as audio.
-	&apos; The screen does _not_ update as you click through the slides. 
-	&apos; Use &quot;Read notes aloud with the system voice (Recommended!)&quot; if 
-	&apos; you need the screen to update as your computer reads.
+	&apos; on iBooks for iOS with VoiceOver or on Google Books for Android with TalkBack.
+	&apos; It plays all the text as audio, showing the text in a sequence of dialogues
+	&apos; as it reads. The screen updates as you click through the slides. 
+	&apos; Use &quot;Read notes aloud with the system voice (Recommended!)&quot; or the
+	&apos; Orange text balloon icon on the toolbar to present a slideshow
+	&apos; where your computer reads the notes as you advance the slides.
 	&apos; The order that the extension reads text fields corresponds to the 
 	&apos; order of the text field in the presentation. Normally, this means
 	&apos; that the text fields you added first get read first, followed by 
@@ -86,13 +88,20 @@ sub ReadImpressVeryVerbose (optional iMultiLingual as boolean)
 	endif
 	&apos;Listen to the text of the slides in a Impress presentation.
 	&apos;Adapted from code by Danny Brewer at http://www.oooforum.org/forum/viewtopic.phtml?t=10795 
-	dim oDoc, oDrawPages,oDrawPage,oShape,oElem
+	dim oDoc, oDrawPages,oDrawPage,oShape,oElem, pc
 	dim nNumShapes,nShape,nPage,nNumPages,nThisPage, iNo
 	dim cTitle,cDialogTitle
 	dim n1
 	oDoc=ThisComponent 
+	viewNormal()
+	wait 500
+	oDoc.getcurrentcontroller().setCurrentPage(oDoc.drawpages(0))
+	wait 500
 	if oDoc.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) then
-		ThisComponent.Presentation.Start
+		pc = oDoc.Presentation.Controller
+		oDoc.Presentation.Start
+		wait 500
+		ThisComponent.Presentation.Controller.gotoFirstSlide()
 		oDrawPages=oDoc.getDrawPages() 
 		nNumPages=oDrawPages.getCount()
 		oElem=oDoc.getDrawPages().getElementNames() 
@@ -120,15 +129,16 @@ sub ReadImpressVeryVerbose (optional iMultiLingual as boolean)
 						cTitle = fsReplaceText (cTitle,&quot;&lt;img&quot;, fs_IMAGE(fs_cL) &amp; &quot;. &lt;img&quot;)
 						cTitle = fsReplaceText (cTitle,&quot;&lt;blockquote&quot;, fs_BLOCKQUOTE(fs_cL) &amp; &quot;. &lt;blockquote&quot;)
 						cTitle = fsReplaceText (cTitle,&quot;&amp;nbsp;&quot;,&quot; &quot;)
-						cTitle = fsstripXMLTags (cTitle)
+						cTitle = fsSuperTrim(fsstripXMLTags (cTitle))
 						if iMultilingual = false then
 							simpleSpeech (fsReplaceText(cTitle,chr(10),&quot;. &quot;)
 						else
-							synthesizeSpeech (fsReplaceText(cTitle,chr(10),&quot;. &quot;)
+							synthesizeSpeech (fsReplaceText(cTitle,chr(10),&quot;. &quot;), fsLanguageOfNote1(fnCurrentCard))
+							
 						endif 
-					n1= msgBox (cTitle,1,cDialogTitle)
+					n1 = showdialog (cTitle, true)
 					endif
-					if n1=2 then
+					if n1=false then
 						ThisComponent.Presentation.End
 						exit sub 
 					endif
@@ -150,27 +160,30 @@ sub ReadImpressVeryVerbose (optional iMultiLingual as boolean)
 				cTitle = fsReplaceText (cTitle,&quot;&lt;/img&gt;&quot;, &quot;&lt;/img&gt;. &quot; &amp; fs_IMAGE(fs_cL) &amp; &quot;.&quot;)
 				cTitle = fsReplaceText (cTitle,&quot;&lt;blockquote&quot;, fs_BLOCKQUOTE(fs_cL) &amp; &quot;. &lt;blockquote&quot;)
 				cTitle = fsReplaceText (cTitle,&quot;&amp;nbsp;&quot;,&quot; &quot;)
-				cTitle = fsstripXMLTags (cTitle)
+				cTitle = fsSuperTrim(fsstripXMLTags (cTitle))
 				if iMultilingual = false then
 					simpleSpeech (fsReplaceText(cTitle,chr(10),&quot;. &quot;)
 				else
-					synthesizeSpeech (fsReplaceText(cTitle,chr(10),&quot;. &quot;)
+					synthesizeSpeech (fsReplaceText(cTitle,chr(10),&quot;. &quot;), fsLanguageOfNote1(fnCurrentCard))
 				endif 
-				n1= msgBox (cTitle,1,cDialogTitle)
-				if n1=2 then
+				n1 = showdialog (cTitle, true)
+				if n1=false then
 					ThisComponent.Presentation.End
 					exit sub 
+				else
+					&apos;Continue reading
 				endif
 			endif
+			ThisComponent.Presentation.Controller.gotoNextSlide()
 		next
 	endif
 	if iMultilingual = false then
 		simpleSpeech (fs_END_OF_SLIDESHOW(&quot;en&quot;))
 	else
-		synthesizeSpeech (fs_END_OF_SLIDESHOW(fs_cL))
+		synthesizeSpeech (fs_END_OF_SLIDESHOW(fsDocLanguage),fsDocLanguage)
 	endif 
 	ThisComponent.Presentation.End
-	ShowDialog(fs_END_OF_SLIDESHOW(fs_cL))
+	ShowDialog(fs_END_OF_SLIDESHOW(fsDocLanguage))
 end sub
 
 function fnCurrentCard

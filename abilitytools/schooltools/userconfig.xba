@@ -763,7 +763,11 @@ function TryHandlingLocally (byval sA as string, byval myKey as string) as boole
 		CreateFile(fsSpeechSettingURL,&quot;(PLAY_PRESENTATION_ALOUD_ONLINE_VOICE)&quot;,&quot;UTF-8&quot;)
 	elseif instr(sA,&quot;(PLAY_PRESENTATION_VERBOSE)&quot;) &lt;&gt; 0 then
 		&apos;msgBox &quot;Play the full text of the presentation with no visuals.&quot;
-		ReadImpressVeryVerbose
+		if fileExists (fsSpeechSettingURL) then
+			ReadImpressVeryVerbose (true)
+		else
+			ReadImpressVeryVerbose (false)
+		endif
 	elseif instr(sA,&quot;(PREVIEW_AS_AUDIBLE_BRAILLE)&quot;) &lt;&gt; 0 then
 		&apos;msgBox &quot;Preview note as audible Braille&quot;
 		previewNoteAsAudibleBraille
