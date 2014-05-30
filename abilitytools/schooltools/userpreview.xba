@@ -91,7 +91,8 @@ sub ReadImpressVeryVerbose (optional iMultiLingual as boolean)
 	dim oDoc, oDrawPages,oDrawPage,oShape,oElem, pc
 	dim nNumShapes,nShape,nPage,nNumPages,nThisPage, iNo
 	dim cTitle,cDialogTitle
-	dim n1
+	dim b1 as boolean
+	b1 = true
 	oDoc=ThisComponent 
 	viewNormal()
 	wait 500
@@ -136,9 +137,9 @@ sub ReadImpressVeryVerbose (optional iMultiLingual as boolean)
 							synthesizeSpeech (fsReplaceText(cTitle,chr(10),&quot;. &quot;), fsLanguageOfNote1(fnCurrentCard))
 							
 						endif 
-					n1 = showdialog (cTitle, true)
+					b1 = showdialog (cTitle, true)
 					endif
-					if n1=false then
+					if b1=false then
 						ThisComponent.Presentation.End
 						exit sub 
 					endif
@@ -166,8 +167,8 @@ sub ReadImpressVeryVerbose (optional iMultiLingual as boolean)
 				else
 					synthesizeSpeech (fsReplaceText(cTitle,chr(10),&quot;. &quot;), fsLanguageOfNote1(fnCurrentCard))
 				endif 
-				n1 = showdialog (cTitle, true)
-				if n1=false then
+				b1 = showdialog (cTitle, true)
+				if b1=false then
 					ThisComponent.Presentation.End
 					exit sub 
 				else
