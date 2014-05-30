@@ -14,14 +14,16 @@ Sub ReadLastWordAloudinWriter
 	dim sA,sB as string
 		sA=&quot; ?.!,;:&quot;&quot;&lt;&gt;()[]-“”&quot; &amp; chr$(13)  &amp; chr$(10)  &amp; chr$(9)
 		on error resume next
-		sB= fsgetCursorWord()
 		gotoend
 		goLeft
+		sB= fsgetCursorWord()
+		&apos; Skip final punctuation
 		while len (sB) &lt;&gt; 0 and instr(sA,right(sB,1)) &lt;&gt; 0
 			sB= left(sB,len(sB)-1)
 			goLeft
 		wend
-		doTextReader(false)
+		sB= fsgetCursorWord()
+		doTextReader(true)
 		gotoend
 		bEndOfSentence = true
 	select case fsGetOS()
@@ -129,7 +131,7 @@ sub exportSelectionAsODP
 	dim n as integer
 	dim oAlbum
 	sB = &quot;&quot;
-	sA = fsGetTextSelection()
+	sA = fsSuperTrim(fsGetTextSelection(true))
 	sA = fsSchoolToolsInputBox(fs_EXPORT_SELECTION (fs_cL), getBranding (bI_SPOKEN_BRANDING), sA)
 	if len (sA) &lt;&gt; 0 then
 		sB = trim (left (sA, iGetBreakPoint(sA, 30)))
@@ -176,8 +178,8 @@ sub exportSelectionAsODP
 					createNewWriterDoc (&quot;&quot;, sA)
 					if f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Enabled then
 						setDocLanguage (f_dlgImpressAsk.GetControl(&quot;ComboBox1&quot;).model.Text)
-						ThisComponent.storeAsURL(sC, array())
 					endif
+					ThisComponent.storeAsURL(sC, array())
 					sC=&quot;&quot;
 				endif
 			else
@@ -215,9 +217,13 @@ sub doTextReader (optional bLastword)
 	if ismissing (bLastword) then
 		bLastword = false
 	endif
-	sA = fsGetTextSelection()
 	if bLastword then
+		&apos;Clicked Read Last Word button on writer toolbar
+		sA = fsGetTextSelection(false)
 		sA = fsGetLastWord(sA)
+	else
+		&apos;Clicked Read Selection button on a toolbar
+		sA = fsGetTextSelection(true)
 	endif
 	sB = fsSelectionLanguage &amp; &quot;-&quot; &amp; fsSelectionCountry
 	if fileExists (fsSpeechSettingURL) then 
@@ -227,12 +233,17 @@ sub doTextReader (optional bLastword)
 	endif
 end sub
 
-Function fsGetTextSelection() As String
+Function fsGetTextSelection(optional bByParagraph as boolean) As String
 	Dim oDoc   As Object
 	Dim oSelection As Object
 	Dim sSelectedText As String
 	Dim n As Integer
 	On Error Goto TEXTSELECTERROR
+	if ismissing(bByParagraph) then
+		&apos; default selection when is false is to select to the end of the text document
+		&apos; If this value is true, then select to the end of the paragraph only
+		bByParagraph = false
+	endif
 	oDoc=thisComponent
 	sSelectedText = &quot;&quot;
 	If oDoc.SupportsService(&quot;com.sun.star.sheet.SpreadsheetDocument&quot;) Then	
@@ -248,18 +259,22 @@ Function fsGetTextSelection() As String
 		endif
 	Elseif oDoc.supportsService(&quot;com.sun.star.text.TextDocument&quot;) or oDoc.supportsService(&quot;com.sun.star.text.WebDocument&quot;) or oDoc.supportsService(&quot;com.sun.star.text.GlobalDocument&quot;) Then
 		oSelection=oDoc.getCurrentSelection()
-		sSelectedText=&quot;&quot; 	 
+		sSelectedText=&quot;&quot;
 		If oSelection.supportsService(&quot;com.sun.star.text.TextRanges&quot;) Then
 			fsGetSelectionAndCopy()
 			For n=0 To(oSelection.getCount() - 1)
 				sSelectedText=sSelectedText &amp; &quot; &quot; &amp; oSelection.getByIndex(n).getString()
 			Next
 		Else 
-			&apos;sSelectedText=oSelection.getByIndex(0).getString(
 			sSelectedText=fsGetSelectionAndCopy()
 		End If
-		If sSelectedText=&quot; &quot; Then 
-			sSelectedText=fsgetCursortoEnd()
+		If sSelectedText=&quot; &quot; Then
+			if bByParagraph then
+				sSelectedText=fsgetCursortoEnd(true)
+				goright
+			else
+				sSelectedText=fsgetCursortoEnd(false)
+			endif
 		End If
 	Else &apos;unsupported document format
 		sSelectedText=&quot;&quot;
@@ -373,23 +388,45 @@ Function fsDrawProperty(strA) As String
 	fsDrawProperty=s1r
 End Function
 
-Function fsgetCursortoEnd As String
-	selecttoEnd()
-	fsgetCursortoEnd=fsGetSelectionAndCopy
+Function fsgetCursortoEnd (optional bAsPara As boolean) As String
+	dim sA, sB as string
+	if ismissing(bAsPara) then
+		bAsPara = false
+	endif
+	if bAsPara then
+		sA = fsgetCursorWord (false)
+		selecttoEndofParagraph()
+		sB = fsGetSelectionAndCopy
+		if len(sA) = 0 then
+			&apos;msgBox &quot;Table or empty paragraph - move the cursor left before reading next paragraph&quot;
+			goleft
+		else
+			&apos;msgBox &quot;Paragraph - cursor is ready to read next paragraph&quot;
+		endif
+	else
+		selecttoEnd()
+		sB = fsGetSelectionAndCopy
+	endif
+	fsgetCursortoEnd=sB
 End Function
 
-Function fsgetCursorWord As String
+Function fsgetCursorWord (optional bSelectWord as boolean) As String
 	&apos; Function To get a word under the current cursor position.
 	&apos; Adapted from code contributed On 2009-04-25  by JohnV To 
 	&apos; http://www.oooforum.org/forum/viewtopic.phtml?t=83411&amp;highlight=
+	if ismissing(bSelectWord) then 
+		bSelectWord = true
+	endif
 	Dim oDoc,oVC,oTCtring
 	oDoc=ThisComponent
 	oVC=oDoc.getCurrentController.getViewCursor
 	oTC=oDoc.getText.createTextCursorByRange(oVC,False)
 	oTC.gotoEndOfWord(False)
 	oTC.gotoStartOfWord(True)
-	fsgetCursorWord=oTC.String 
-	selectAWord()
+	fsgetCursorWord=oTC.String
+	if bSelectWord then 
+		selectAWord()
+	endif
 End Function
 
 Sub selecttoEnd
@@ -399,6 +436,15 @@ Sub selecttoEnd
 	dispatcher = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
 	dispatcher.executeDispatch(document, &quot;.uno:GoToPrevWord&quot;, &quot;&quot;, 0, Array())
 	dispatcher.executeDispatch(document, &quot;.uno:EndOfDocumentSel&quot;, &quot;&quot;, 0, Array())
+End Sub
+
+Sub selecttoEndofParagraph
+	dim document   as object
+	dim dispatcher as object
+	document   = ThisComponent.CurrentController.Frame
+	dispatcher = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
+	&apos;dispatcher.executeDispatch(document, &quot;.uno:GoToPrevWord&quot;, &quot;&quot;, 0, Array())
+	dispatcher.executeDispatch(document, &quot;.uno:EndOfParaSel&quot;, &quot;&quot;, 0, Array())
 End Sub
 
 Sub InsertPageQuick	
@@ -451,5 +497,18 @@ Sub goLeft
 	args1(1).Name = &quot;Select&quot;
 	args1(1).Value = &quot;False&quot;
 	dispatcher.executeDispatch(document, &quot;.uno:GoLeft&quot;, &quot;&quot;, 0, args1())
+End Sub
+
+Sub goRight
+	dim document   as object
+	dim dispatcher as object
+	document   = ThisComponent.CurrentController.Frame
+	dispatcher = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
+	dim args1(1) as new com.sun.star.beans.PropertyValue
+	args1(0).Name = &quot;Count&quot;
+	args1(0).Value = 1
+	args1(1).Name = &quot;Select&quot;
+	args1(1).Value = &quot;False&quot;
+	dispatcher.executeDispatch(document, &quot;.uno:GoRight&quot;, &quot;&quot;, 0, args1())
 End Sub
 </script:module>

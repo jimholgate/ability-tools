@@ -2325,6 +2325,24 @@ Function fsGetLastWord(ByVal strA as String, optional sSep as string)
 	endif
 End Function
 
+Function fsGetFirstWord(ByVal strA as String, optional sSep as string)
+	if NOT GlobalScope.BasicLibraries.isLibraryLoaded(&quot;Tools&quot;) then 
+		GlobalScope.BasicLibraries.loadLibrary(&quot;Tools&quot;)
+	endif
+	Dim MaxIndex as Integer
+	Dim SepList() as String	
+	if isMissing (sSep) then
+		sSep = &quot; &quot;
+	endif
+	strA = rtrim (&quot; &quot; &amp; strA)
+	if len (strA) &lt;&gt; 0 then 	
+		SepList() = ArrayoutofString(strA,sSep, 0)
+		fsGetFirstWord = SepList(MaxIndex)
+	else
+		fsGetFirstWord = &quot; &quot;
+	endif
+End Function
+
 function fsAlterStringMarkup (byval sA, optional sPrefix, optional sMidfix, optional sSuffix, optional bCleanXML)
 	&apos; Replaces chr$(10) with a tag. 
 	&apos; Also adds a prefix and a suffix.
