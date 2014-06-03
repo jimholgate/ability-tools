@@ -10,8 +10,8 @@
 			<node oor:name="schooltools.OfficeToolBar" oor:op="replace">
 			    <prop oor:name="Title" oor:type="xs:string" oor:localized="true">
                     <value>Ability Tools</value>
-                    <value xml:lang="en-US">Ability Tools</value>
-                    <value xml:lang="fr-FR">Outils d´habilite</value>
+                    <value xml:lang="en">Ability Tools</value>
+                    <value xml:lang="fr">Outils d´habilite</value>
 			    </prop>
                 <node oor:name="ToolBarItems">
                     <node oor:name="m0" oor:op="replace">
@@ -131,8 +131,8 @@
                         </prop>
                         <prop oor:name="Title" oor:type="xs:string" oor:localized="true">
                             <value>Share Project</value>
-                            <value xml:lang="en-US">Share Project</value>
-                            <value xml:lang="fr-FR">Partager le projet</value>
+                            <value xml:lang="en">Share Project</value>
+                            <value xml:lang="fr">Partager le projet</value>
                         </prop>
                         <prop oor:name="Target" oor:type="xs:string">
                             <value>_self</value>
@@ -142,12 +142,12 @@
                         <prop oor:name="Context" oor:type="xs:string"><value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument,com.sun.star.text.WebDocument,com.sun.star.text.GlobalDocument,com.sun.star.drawing.DrawingDocument</value>
                         </prop>
                         <prop oor:name="URL" oor:type="xs:string">
-                            <value>.uno:InsertGraphic</value>
+                            <value>vnd.sun.star.script:schooltools.QuicktalkUtilities.InsertImage?language=Basic&amp;location=application</value>
                         </prop>
                         <prop oor:name="Title" oor:type="xs:string" oor:localized="true">
                             <value>Insert Graphic</value>
-                            <value xml:lang="en-US">Insert Graphic</value>
-                            <value xml:lang="fr-FR">Inserer Graphique</value>
+                            <value xml:lang="en">Insert Graphic</value>
+                            <value xml:lang="fr">Inserer Graphique</value>
                         </prop>
                         <prop oor:name="Target" oor:type="xs:string">
                             <value>_self</value>
@@ -452,7 +452,7 @@
             </node>
             <node oor:name="schooltools.OfficeToolBar.images9" oor:op="replace">
                 <prop oor:name="URL" oor:type="xs:string">
-                    <value>.uno:InsertGraphic</value>
+                    <value>vnd.sun.star.script:schooltools.QuicktalkUtilities.InsertImage?language=Basic&amp;location=application</value>
                 </prop>
                 <node oor:name="UserDefinedImages">
                     <prop oor:name="ImageSmallURL">

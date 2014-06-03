@@ -511,4 +511,15 @@ Sub goRight
 	args1(1).Value = &quot;False&quot;
 	dispatcher.executeDispatch(document, &quot;.uno:GoRight&quot;, &quot;&quot;, 0, args1())
 End Sub
+
+sub insertImage
+	dim document   as object
+	dim dispatcher as object
+	document   = ThisComponent.CurrentController.Frame
+	dispatcher = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
+	dispatcher.executeDispatch(document, &quot;.uno:InsertGraphic&quot;, &quot;&quot;, 0, Array())
+	if thisComponent.supportsService(&quot;com.sun.star.text.TextDocument&quot;) or thisComponent.supportsService(&quot;com.sun.star.text.WebDocument&quot;) or thisComponent.supportsService(&quot;com.sun.star.text.GlobalDocument&quot;) Then
+		dispatcher.executeDispatch(document, &quot;.uno:SetAnchorToChar&quot;, &quot;&quot;, 0, Array())
+	endif
+end sub
 </script:module>

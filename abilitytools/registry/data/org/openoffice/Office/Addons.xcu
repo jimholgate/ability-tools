@@ -135,7 +135,7 @@
                         <value>com.sun.star.text.TextDocument,com.sun.star.sheet.SpreadsheetDocument,com.sun.star.text.WebDocument,com.sun.star.text.GlobalDocument,com.sun.star.drawing.DrawingDocument</value>
                     </prop>
                     <prop oor:name="URL" oor:type="xs:string">
-                        <value>.uno:InsertGraphic</value>
+                        <value>vnd.sun.star.script:schooltools.QuicktalkUtilities.InsertImage?language=Basic&amp;location=application</value>
                     </prop>
                     <prop oor:name="Title" oor:type="xs:string">
                         <value>Insert Graphic</value>
@@ -401,7 +401,7 @@
             </node>
             <node oor:name="schooltools.OfficeToolBar.images9" oor:op="replace">
                 <prop oor:name="URL" oor:type="xs:string">
-                    <value>.uno:InsertGraphic</value>
+                    <value>vnd.sun.star.script:schooltools.QuicktalkUtilities.InsertImage?language=Basic&amp;location=application</value>
                 </prop>
                 <node oor:name="UserDefinedImages">
                     <prop oor:name="ImageSmallURL">
