@@ -102,7 +102,7 @@ end function
 
 sub previewAsGradeOneBraille (optional sA)
 	if ismissing (sA) then
-		sA = getBranding(bI_ABOUT_TEXT, fsGetSetting(&quot;language&quot;))
+		sA = getBranding(bI_ABOUT_TEXT, fs_CL)
 	endif
 	showDialog (fsToGradeOneBraille (sA) )
 
@@ -510,8 +510,8 @@ function fsNotesMenuSettingURL
 	fsNotesMenuSettingURL=createUnoService(&quot;com.sun.star.util.PathSettings&quot;).userConfig &amp; &quot;/impresstools/notes-menu.ini&quot;
 end function
 
-function fsHasReadContinuousReadingHelpURL
-	fsHasReadContinuousReadingHelpURL=createUnoService(&quot;com.sun.star.util.PathSettings&quot;).userConfig &amp; &quot;/impresstools/has-read-help.ini&quot;
+function fsHasEnabledContinuousReadingWriterURL
+	fsHasEnabledContinuousReadingWriterURL=createUnoService(&quot;com.sun.star.util.PathSettings&quot;).userConfig &amp; &quot;/impresstools/has-read-help.ini&quot;
 end function
 
 function fsTemporaryJsonURL

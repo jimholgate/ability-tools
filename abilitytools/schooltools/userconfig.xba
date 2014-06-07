@@ -83,7 +83,7 @@ sub ConfigureImpressImport
 	oComboBox.removeItems( 0,n1)
 	i=0
 	for i = 0 to fiCountNewCommands
-		sA = fsNewCommands(i, fsGetSetting(&quot;language&quot;) ,I_BRANDED , 1)
+		sA = fsNewCommands(i, fs_CL ,I_BRANDED , 1)
 		
 		if len(sA) &lt;&gt; 0 then
 			oComboBox.addItem( sA, 0 )
@@ -167,7 +167,7 @@ sub ConfigureImpressTools
 	oComboBox.removeItems( 0,n1)
 	i=0
 	for i = 0 to fiCountCommands
-		sA = fsGetCommands(i, fsGetSetting(&quot;language&quot;), I_BRANDED , 2 )
+		sA = fsGetCommands(i, fs_CL, I_BRANDED , 2 )
 		if len(sA) &lt;&gt; 0 then
 			oComboBox.addItem( sA, 0 )
 		endif
@@ -185,6 +185,82 @@ sub ConfigureImpressTools
 		ss_config_writeFile(config(), sfile)
 		&apos;execute the program specified with the commands specified
 		ssActuate (config(),msgs(),errorCode, 2)
+	endif
+end sub 
+
+sub ConfigureWriteTools
+	dim i as integer
+	dim n1 as integer
+	dim sA as string
+	dim sFile as string
+	dim msgs() As Variant
+	dim oComboBox
+	dim errorCode as integer 
+	dim config(fiCountConfigOptions) As Variant
+		&apos; Open up the dialog
+	DialogLibraries.LoadLibrary(&quot;schooltools&quot;)
+	f_dlgImpressToolsSetup=CreateUnoDialog( DialogLibraries.schooltools.schooltools2 )
+	if fbHelpIsInstalled then
+		f_dlgImpressToolsSetup.model.HelpURL=fsMyID &amp; &quot;/send_mail.xhp&quot;
+	else 
+		f_dlgImpressToolsSetup.model.HelpURL=&quot;&quot;
+	endif
+	&apos;Load default settings, so any settings undefined by settings file are Not empty
+	config()=fvDefaultConfig(msgs(), errorCode)
+	&apos;Load the settings you used last time
+	sFile= fsConfigurationFileURI()
+	if fileExists (sFile) then
+		ss_config_parseFile (sFile, config(), errorCode)
+	endif									 
+	&apos;Now apply the settings To the dialog box
+	f_dlgImpressToolsSetup.GetControl(&quot;Destination1&quot;).Model.Text=config(fiExternalCommand)
+	f_dlgImpressToolsSetup.GetControl(&quot;Destination1&quot;).Visible=false
+	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox1&quot;).Model.Text=config(fiExternalArgument)
+	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox0&quot;).Visible=false
+	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox0&quot;).model.enabled=false
+	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox0&quot;).Model.Text=config(fiNewArgument)
+	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox1&quot;).Visible=false
+	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox1&quot;).model.enabled=false
+	f_dlgImpressToolsSetup.GetControl(&quot;TextField2&quot;).Model.Text=fsReplaceImpressToolsTokens(config(fiRandomKey))
+	f_dlgImpressToolsSetup.GetControl(&quot;TextField2&quot;).Visible=false
+	&apos;Update the labels with your language
+	
+	f_dlgImpressToolsSetup.Title = getBranding(bI_SPOKEN_BRANDING)
+	f_dlgImpressToolsSetup.GetControl(&quot;CommandButton1&quot;).Label = fs_OKAY(fs_cL)
+	f_dlgImpressToolsSetup.GetControl(&quot;CommandButton2&quot;).Label = fs_DIALOG_CANCEL(fs_cL)
+	f_dlgImpressToolsSetup.GetControl(&quot;ImageControl1&quot;).model.ImageURL=fsMyURL &amp; &quot;/images/&quot; &amp; getBranding(bI_TOOLS_PNG)
+	
+	select case fsGetOS()
+	case &quot;MAC&quot;,&quot;OSX&quot;
+		f_dlgImpressToolsSetup.GetControl(&quot;ImageControl1&quot;).model.helpText=getBranding(bI_SLOGAN)
+		f_dlgImpressToolsSetup.GetControl(&quot;CommandButton1&quot;).model.helpText = fs_OKAY(fs_cL)
+	case else 
+		f_dlgImpressToolsSetup.GetControl(&quot;ImageControl1&quot;).model.helpText=fs_F1_IS_HELP(fs_cL)
+		f_dlgImpressToolsSetup.GetControl(&quot;CommandButton1&quot;).model.helpText = fs_F1_IS_HELP(fs_cL)
+	end select
+	config(fiInternalArgument)
+	f_dlgImpressToolsSetup.GetControl(&quot;Label1&quot;).Text= fs_OPTIONS(fs_cL)
+	f_dlgImpressToolsSetup.GetControl(&quot;Label2&quot;).Visible = false
+	f_dlgImpressToolsSetup.GetControl(&quot;Label3&quot;).Visible = false
+	oComboBox=f_dlgImpressToolsSetup.getControl(&quot;ComboBox2&quot;)
+	&apos; REM first remove all old items from the list
+	n1=oComboBox.getItemCount()
+	oComboBox.removeItems( 0,n1)
+	i=0
+	for i = 0 to fiCountCommands(4)
+		sA = fsGetCommands(i, fs_CL, I_BRANDED , 4 )
+		if len(sA) &lt;&gt; 0 then
+			oComboBox.addItem( sA, 0 )
+		endif
+	next
+	f_dlgImpressToolsSetup.GetControl(&quot;ComboBox2&quot;).Model.Text = fsGetCommands(i-1, fs_CL, I_BRANDED , 4 )
+	if f_dlgImpressToolsSetup.Execute() &lt;&gt; 0 then
+		config()=fvCurrentDialogConfig()
+		f_dlgImpressToolsSetup.Dispose()
+		&apos; Don&apos;t save these settings... 	
+		ss_config_writeFile(config(), sfile)
+		&apos;execute the program specified with the commands specified
+		ssActuate (config(),msgs(),errorCode, 4)
 	endif
 end sub 
 
@@ -249,7 +325,7 @@ sub ConfigureImpressExport
 	oComboBox.removeItems( 0,n1)
 	i=0
 	for i = 0 to fiCountExportCommands
-		sA = fsExportCommands(i, fsGetSetting(&quot;language&quot;) ,I_BRANDED , 3)
+		sA = fsExportCommands(i, fs_CL ,I_BRANDED , 3)
 		if len(sA) &lt;&gt; 0 then
 			oComboBox.addItem( sA, 0 )
 		endif
@@ -295,9 +371,9 @@ sub updateNewPresentationLanguage
 		if instr (sA, &quot;-&quot;) &lt;&gt; 0 then
 			sLang = left(sA, instr(sA,&quot;-&quot;) - 1)
 		else
-			sLang = fsGetSetting(&quot;language&quot;)
+			sLang = fs_CL
 		endif
-		if sLang = fsGetSetting(&quot;language&quot;) then
+		if sLang = fs_CL then
 			&apos; use the Unix LANG environment to determine the country
 			sCountry = mid(sA, instr(sA,&quot;-&quot;) + 1)
 		else
@@ -627,8 +703,10 @@ sub ssActuate(config() As Variant,msgs() As Variant,errorCode as integer, option
 	if ismissing (iButton) then
 		iButton = 2
 	endif
-	&apos;msgbox 
 	select case iButton
+	case 4 &apos; Writer
+		sA = config(fiInternalArgument)
+		sA = fsWriterPhraseToProgramPhrase (sA)
 	case 3 &apos; Export
 		sA = config(fiExternalArgument)
 		sA = fsExportPhraseToProgramPhrase (sA)
@@ -733,22 +811,28 @@ function TryHandlingLocally (byval sA as string, byval myKey as string) as boole
 	s123 = &quot;&quot;
 	TryHandlingLocally = true
 	if instr(sA,&quot;(PLAY_PRESENTATION_ALOUD_OFFLINE)&quot;) &lt;&gt; 0 then
-		&apos;msgBox &quot;Show audience a talking presentation with online links disabled.&quot;
-		readSlideShowNotes (ENABLE_SYSTEM_LANGUAGES)
+		&apos;msgBox &quot;Show audience a talking presentation with online links disabled.&quot; &apos;xxxxx
+		if ThisComponent.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) then
+			readSlideShowNotes (ENABLE_SYSTEM_LANGUAGES)
+		endif
 		if fileExists (fsSpeechSettingURL) then
 			kill fsSpeechSettingURL
 		endif
 		CreateFile(fsSpeechSettingURL,&quot;(PLAY_PRESENTATION_ALOUD_OFFLINE)&quot;,&quot;UTF-8&quot;)
 	elseif instr(sA,&quot;(PLAY_PRESENTATION_ALOUD)&quot;) &lt;&gt; 0 then
 		&apos;msgBox &quot;Show audience a talking presentation with online links enabled.&quot;
-		readSlideShowNotes (ENABLE_ONLINE_RESOURCES)
+		if ThisComponent.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) then
+			readSlideShowNotes (ENABLE_ONLINE_RESOURCES)
+		endif
 		if fileExists (fsSpeechSettingURL) then
 			kill fsSpeechSettingURL
 		endif
 		CreateFile(fsSpeechSettingURL,&quot;(PLAY_PRESENTATION_ALOUD)&quot;,&quot;UTF-8&quot;)
 	elseif instr(sA,&quot;(PLAY_PRESENTATION_ALOUD_SYSTEM_VOICE)&quot;) &lt;&gt; 0 then
 		&apos;msgBox &quot;Show audience a talking presentation with the system default voice.&quot;
-		readSlideShowNotes (ENABLE_SYSTEM_SPEECH_ONLY)
+		if ThisComponent.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) then
+			readSlideShowNotes (ENABLE_SYSTEM_SPEECH_ONLY)
+		endif
 		if fileExists (fsSpeechSettingURL) then
 			kill fsSpeechSettingURL
 		endif
@@ -943,6 +1027,9 @@ function TryHandlingLocally (byval sA as string, byval myKey as string) as boole
 	elseif instr(sA,&quot;(EDIT_THIS_SLIDES_NOTES)&quot;) &lt;&gt; 0 then
 		&apos;msgBox &quot;Edit this slide&apos;s notes using a custom editor.&quot;
 		SchoolToolsEditNotesDialog
+	elseif instr(sA,&quot;(TOGGLE_CONTINUOUS_SPEECH)&quot;) &lt;&gt; 0 then
+		&apos;msgBox &quot;Switch writer to allow or stop key logging for continuous speech.&quot;
+		toggleContinuousSpeechWriter
 	else 
 		TryHandlingLocally = false
 	endif

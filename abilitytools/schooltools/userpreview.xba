@@ -74,7 +74,7 @@ sub ReadImpressVeryVerbose (optional iMultiLingual as boolean)
 	&apos; on iBooks for iOS with VoiceOver or on Google Books for Android with TalkBack.
 	&apos; It plays all the text as audio, showing the text in a sequence of dialogues
 	&apos; as it reads. The screen updates as you click through the slides. 
-	&apos; Use &quot;Read notes aloud with the system voice (Recommended!)&quot; or the
+	&apos; Use &quot;Read aloud with the system voice (Recommended!)&quot; or the
 	&apos; Orange text balloon icon on the toolbar to present a slideshow
 	&apos; where your computer reads the notes as you advance the slides.
 	&apos; The order that the extension reads text fields corresponds to the 

@@ -24,12 +24,16 @@ end sub
 
 sub ToolBar2Pressed
 	&apos;Work on stuff
-	SetupImpressTools(2)
+	if ThisComponent.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) then
+		SetupMyAbilityTools(2)
+	else
+		SetupMyAbilityTools(4)
+	endif
 end sub
 
 sub ToolBar3Pressed
 	&apos;Export and Publish stuff
-	SetupImpressTools(3)
+	SetupMyAbilityTools(3)
 end sub
 
 sub ToolBar11Pressed
@@ -148,7 +152,7 @@ function I_BRANDED
 	I_BRANDED = 1 &apos; Ability Tools full
 end function
 
-sub SetupImpressTools (optional iToolType)
+sub SetupMyAbilityTools (optional iToolType)
 	&apos; Use this with Tools - Add-ons menu item 
 	&apos; This simply calls the ConfigureImpressTools dialog. We need to insist
 	&apos; on saving the presentation as an odp file before doing anything else 
@@ -170,11 +174,16 @@ sub SetupImpressTools (optional iToolType)
 			ConfigureImpressTools()
 		case else 
 			ShowDialog(fs_NO_ACTION(fs_cL))
+		end select
+	elseif thisComponent.supportsService(&quot;com.sun.star.text.TextDocument&quot;) or thisComponent.supportsService(&quot;com.sun.star.text.WebDocument&quot;) or thisComponent.supportsService(&quot;com.sun.star.text.GlobalDocument&quot;) Then
+		select case iToolType
+		case 4
+			ConfigureWriteTools()
+		case else 
+			ShowDialog(fs_NO_ACTION(fs_cL))
 		end select 
 	else 
-		if showdialog (fs_SAVE_BEFORE_PROCEEDING(fs_cL), true) then
-			saveDocumentAs
-		endif
+		ShowDialog(fs_NO_ACTION(fs_cL))
 	endif
 end sub 
 
@@ -395,7 +404,7 @@ end function
 function fbHelpIsInstalled as boolean
 	dim sA as string
 	sA=fsPathSettings(&quot;Help&quot;) &amp; &quot;/&quot;
-	if fileExists( sA &amp; fsGetSetting(&quot;language&quot;)) then
+	if fileExists( sA &amp; fs_CL) then
 		fbHelpIsInstalled=true
 	elseif fileExists(sA &amp; &quot;en&quot;) then
 		fbHelpIsInstalled=true

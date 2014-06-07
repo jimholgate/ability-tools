@@ -76,7 +76,7 @@
                     </node>
                     <node oor:name="m4" oor:op="replace">
                         <prop oor:name="Context" oor:type="xs:string">
-                            <value>com.sun.star.presentation.PresentationDocument</value>
+                            <value>com.sun.star.presentation.PresentationDocument,com.sun.star.text.TextDocument,com.sun.star.text.WebDocument</value>
                         </prop>
                         <prop oor:name="URL" oor:type="xs:string">
                             <value>vnd.sun.star.script:schooltools.schooltools.ToolBar2Pressed?language=Basic&amp;location=application</value>
@@ -160,7 +160,7 @@
                         </prop>
                         <prop oor:name="Title" oor:type="xs:string">
                             <value>Read last word</value>
-                            <value xml:lang="en">Read last word</value>
+                            <value xml:lang="en">Read Last Word</value>
                             <value xml:lang="fr">Lire le dernier mot</value>
                         </prop>
                         <prop oor:name="Target" oor:type="xs:string">

@@ -2660,7 +2660,7 @@ function fbIsAQuestion(byval optional sA as string, optional sLanguage as string
 		sA = &quot;xxxx&quot;
 	endif
 	if ismissing(sLanguage) then 
-		sLanguage=fsGetSetting(&quot;language&quot;)
+		sLanguage=fs_CL
 	endif
 	&apos;Note to translator: Please translate from the English strings.
 	&apos;This function checks for a question word.

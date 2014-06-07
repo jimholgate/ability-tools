@@ -13,7 +13,7 @@ function fbWindowsHasVoiceInThisLanguage (Optional byval sLang)
 	dim n,n1 as integer
 	dim s1, s2 as string
 	if ismissing(sLang) then
-		sLang = fsGetSetting(&quot;language&quot;)
+		sLang = fs_CL
 	endif
 	sLang = lcase (sLang)
 	fbWindowsHasVoiceInThisLanguage = false
@@ -100,14 +100,14 @@ end function
 function AddLanguageCodes(sA, Optional byval sLang)
 	dim s1,s2,s3,QT as string
 	if ismissing(sLang) then 
-		sLang = fsGetSetting(&quot;language&quot;)
+		sLang = fs_CL
 	endif
 	s1=lcase(sLang)
 	s2=&quot;%%%SPEECH-XML-OK%%%&quot;
 	QT=Chr(34)
 	&apos; if the selected language is the same as the UI language, then we don&apos;t specify the language.
 	&apos; We assume that the default voice is correct for language and locale
-	if sLang = fsGetSetting(&quot;language&quot;) &amp; &quot;-&quot; &amp; fsGetSetting(&quot;country&quot;) then
+	if sLang = fs_CL &amp; &quot;-&quot; &amp; fsGetSetting(&quot;country&quot;) then
 		AddLanguageCodes = sA
 	else
 		if canUseSpeechXML = false then
@@ -414,7 +414,7 @@ end function
 function SimpleWindowsSpeech(sA) as Long
 	&apos; asianComplexWindowsSpeech invokes SAPI5 directly.
 	&apos; We ask the function not to add any speech markup.
-	SimpleWindowsSpeech = asianComplexWindowsSpeech(sA, fsGetSetting(&quot;language&quot;), false)
+	SimpleWindowsSpeech = asianComplexWindowsSpeech(sA, fs_CL, false)
 end function
 
 function asianComplexWindowsSpeech(sA, Optional sLang, Optional bAddCode)
@@ -427,7 +427,7 @@ function asianComplexWindowsSpeech(sA, Optional sLang, Optional bAddCode)
 	&apos; David Lucardi  wrote an extension for OpenOffice.org writer
 	&apos; for Windows that invokes SAPI5 directly.
 	if ismissing(sLang) then 
-		sLang=fsGetSetting(&quot;language&quot;)
+		sLang=fs_CL
 	endif
 	if ismissing(bAddCode) then
 		bAddCode = true
@@ -1021,7 +1021,7 @@ function fbOKWithEspeak (sA)
 end function
 
 sub simpleLinuxSpeech(sA )
-	synthesizeLinuxSpeech (sA, fsGetSetting(&quot;language&quot;))
+	synthesizeLinuxSpeech (sA, fs_CL)
 end sub 
 
 function fsTemporaryOSXVoiceScript
@@ -1397,7 +1397,7 @@ sub synthesizeOSXSpeech (sA, sLangLocale)
 	endif
 	sA = fsReplaceText(sA, chr$(13), &quot;[[slnc 200]] &quot;)
 	sA = fsReplaceText(sA, chr$(10), &quot;[[slnc 200]] &quot;)
-	if sLangLocale = fsGetSetting(&quot;language&quot;) &amp; &quot;-&quot; &amp; fsGetSetting(&quot;country&quot;) then
+	if sLangLocale = fs_CL &amp; &quot;-&quot; &amp; fsGetSetting(&quot;country&quot;) then
 		&apos; if the selected language and locale is the same as the UI language 
 		&apos; and locale, then we don&apos;t specify the language. We assume that the 
 		&apos; default language is correct for language and locale. The extension respects 
@@ -1452,7 +1452,7 @@ function synthesizeWindowsSpeech(sB, Optional sLang )
 	&apos; be sure to wait until speech is finished completely before initiating
 	&apos; the next speech command, or else  the extension will skip some speech.
 	if ismissing(sLang) then 
-		sLang=fsGetSetting(&quot;language&quot;)
+		sLang=fs_CL
 	endif
 	select case left(sLang, 2)
 	case &quot;en&quot;,&quot;af&quot;,&quot;sq&quot;,&quot;br&quot;,&quot;ca&quot;,&quot;da&quot;,&quot;et&quot;,&quot;fo&quot;,&quot;fi&quot;,&quot;fr&quot;,&quot;gl&quot;,&quot;de&quot;,&quot;is&quot;,&quot;ga&quot;,&quot;it&quot;,&quot;ku&quot;,&quot;la&quot;,&quot;lb&quot;,&quot;ms&quot;,&quot;nb&quot;,&quot;nl&quot;,&quot;no&quot;,&quot;nn&quot;,&quot;oc&quot;,&quot;pt&quot;,&quot;gd&quot;,&quot;es&quot;,&quot;sw&quot;,&quot;sv&quot;,&quot;tl&quot;,&quot;wa&quot;
@@ -1471,7 +1471,7 @@ function synthesizeWindowsSpeech(sB, Optional sLang )
 		dim ElapsedTime as Long
 		ElapsedTime = 0
 		if ismissing(sLang) then 
-			sLang=fsGetSetting(&quot;language&quot;)
+			sLang=fs_CL
 		endif
 		if fileExists (fsTemporarySpeechTextURL) then
 			kill fsTemporarySpeechTextURL
@@ -2483,7 +2483,7 @@ function fsDocLanguage
 	fsDocLanguage = ThisComponent.CharLocale.Language
 	exit function
 	fsDocLanguageErr: &apos; No document open! Use interface language.
-	fsDocLanguage = fsGetSetting(&quot;language&quot;)
+	fsDocLanguage = fs_CL
 end function
 
 function fsDocCountry

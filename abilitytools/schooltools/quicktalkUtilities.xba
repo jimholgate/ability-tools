@@ -32,18 +32,17 @@ Sub ReadLastWordAloudinWriter
 		&apos; with speech in real time. Instead, we will go to the end of the 
 		&apos; document and read the last word.
 	case else
-		if fileExists(fsHasReadContinuousReadingHelpURL) = false then	
-			CreateFile(fsHasReadContinuousReadingHelpURL,fsNow(),&quot;UTF-8&quot;)
-			ShowDialog(fs_ABOUT_READ_LAST_WORD (fs_cL))
+		if fileExists(fsHasEnabledContinuousReadingWriterURL) then	
+			&apos; Enable continous reading using the project tools button on the writer toolbar.
+			on error resume next
+			UnRegisterMyKeyMouseHandler
+			gotoEnd
+			oDocView = ThisComponent.getCurrentController
+			oKeyHandler = createUnoListener(&quot;MyApp_&quot;, &quot;com.sun.star.awt.XKeyHandler&quot;)
+			oDocView.addKeyHandler(oKeyHandler)
+			oMouseClickHandler = createUnoListener(&quot;MyApp_&quot;, &quot;com.sun.star.awt.XMouseClickHandler&quot;)
+			oDocView.addMouseClickHandler(oMouseClickHandler)
 		endif
-		on error resume next
-		UnRegisterMyKeyMouseHandler
-		gotoEnd
-		oDocView = ThisComponent.getCurrentController
-		oKeyHandler = createUnoListener(&quot;MyApp_&quot;, &quot;com.sun.star.awt.XKeyHandler&quot;)
-		oDocView.addKeyHandler(oKeyHandler)
-		oMouseClickHandler = createUnoListener(&quot;MyApp_&quot;, &quot;com.sun.star.awt.XMouseClickHandler&quot;)
-		oDocView.addMouseClickHandler(oMouseClickHandler)
 	end select
 End Sub
 
@@ -125,6 +124,18 @@ sub typerightpluschar(optional sA)
 	oText.insertString(oText.getEnd(),sA, False)
 	gotoEnd
 end sub
+
+function toggleContinuousSpeechWriter
+	if fileExists(fsHasEnabledContinuousReadingWriterURL) then
+		kill fsHasEnabledContinuousReadingWriterURL
+		on error resume next
+		UnRegisterMyKeyMouseHandler
+	else
+		CreateFile(fsHasEnabledContinuousReadingWriterURL,fsNow(),&quot;UTF-8&quot;)
+		ShowDialog(fs_ABOUT_READ_LAST_WORD (fs_cL))
+		ReadLastWordAloudinWriter
+	endif
+end function
 
 sub exportSelectionAsODP
 	dim sA, sB, sC as string

@@ -4,7 +4,7 @@
 option explicit
 
 function fs_cL
-    fs_cL= fsGetSetting(&quot;language&quot;)
+    fs_cL = fsGetSetting(&quot;language&quot;)
 end function
 
 function fs_USEINTERFACELANGUAGE (cL)
@@ -248,12 +248,21 @@ function fs_EXPECTED_XHTML (cL)
 end function
 
 function fs_SAVE_BEFORE_PROCEEDING (cL)
-	select case cL
-	case &quot;fr&quot;
-		fs_SAVE_BEFORE_PROCEEDING = &quot;Il faut enregister le document au format &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp; &quot; ODF présentation (.odp).&quot;
-	case else
-		fs_SAVE_BEFORE_PROCEEDING = &quot;Please save this as a &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp; &quot; ODF presentation (.odp) file.&quot;
-	end select
+	if ThisComponent.supportsService(&quot;com.sun.star.presentation.PresentationDocument&quot;) then
+		select case cL
+		case &quot;fr&quot;
+			fs_SAVE_BEFORE_PROCEEDING = &quot;Il faut enregister le document au format &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp; &quot; ODF présentation (.odp).&quot;
+		case else
+			fs_SAVE_BEFORE_PROCEEDING = &quot;Please save this as a &quot; &amp; fsGetSetting(&quot;ooname&quot;) &amp; &quot; ODF presentation (.odp) file.&quot;
+		end select
+	else
+		select case cL
+		case &quot;fr&quot;
+			fs_SAVE_BEFORE_PROCEEDING = &quot;Enregistrer ce fichier avant de continuer.&quot;
+		case else
+			fs_SAVE_BEFORE_PROCEEDING = &quot;Please save this file before continuing.&quot;
+		end select
+	endif
 end function
 
 function fs_LINK (cL)
@@ -1703,9 +1712,9 @@ function fs_ABOUT_READ_LAST_WORD (cL)
 	case else
 		select case cL
 		case &quot;fr&quot;
-			sA = &quot;Pour désactiver la synthèse vocale, appuyez brièvement sur une touche de direction ou la touche « ESC ». Vous pouvez également cliquer dans la fenêtre de document avec la souris.&quot;
+			sA = &quot;Pour désactiver la synthèse vocale, appuyez brièvement sur une touche de direction ou la touche « ESC ». Vous pouvez également cliquer dans la fenêtre de document avec la souris. Pour démarrer la parole continue, cliquez sur le bouton « Lire le dernier mot ».&quot;
 		case else
-			sA = &quot;To turn speech off, tap a direction key or the “ESC” key. You can also click anywhere in the document window with the mouse.&quot;
+			sA = &quot;To turn continuous speech off, tap a direction key or the “ESC” key. You can also click anywhere in the document window with the mouse. To start continuous speech, click the “Read Last Word” button.&quot;
 		end select
 	end select
 	fs_ABOUT_READ_LAST_WORD = sA
@@ -1722,7 +1731,7 @@ function getBrailleL10N(i as integer, optional sLanguage ) as string
 	dim sA, CR as string
 	CR = chr$(13)
 	if ismissing(sLanguage) then 
-		sLanguage= fsGetSetting(&quot;language&quot;)
+		sLanguage= fs_CL
 	endif
 	dim sBrailleL10N(25) as string
 	select case left(sLanguage,2)
@@ -1788,7 +1797,7 @@ function fsTrimArticle (byval sA, optional sLanguage ) as string
 	&apos; for titles in en and fr, move the initial article to the end
 	&apos; for sorting purposes
 	if ismissing(sLanguage) then 
-		sLanguage= fsGetSetting(&quot;language&quot;)
+		sLanguage= fs_CL
 	endif
 	if len ( sA ) &lt;&gt; 0 then
 		sA = lcase ( fsSuperTrim (sA) )
