@@ -135,11 +135,41 @@ end sub
 sub createNewImpressDoc
 	dim oAlbum
 	&apos;Create new Impress document
-	oAlbum = StarDesktop.loadComponentFromUrl (&quot;private:factory/simpress&quot;,&quot;_blank&quot;,0,dimarray())
-	
+	oAlbum = StarDesktop.loadComponentFromUrl (&quot;private:factory/simpress&quot;,&quot;_blank&quot;,0,dimarray())	
 end sub
 
-sub createNewWriterDoc (optional sMyFile, optional sMyText)
+sub createNewWriterDoc (optional sMyFile, optional byval sMyText)
+	if NOT GlobalScope.BasicLibraries.isLibraryLoaded(&quot;Tools&quot;) then 
+		GlobalScope.BasicLibraries.loadLibrary(&quot;Tools&quot;)
+	endif
+	dim oDocument, oText, oCursor
+	Dim MaxIndex, n as Integer
+	Dim SepList() as String
+	dim sSep as string
+	if isMissing (sMyText) then
+		sMyText = &quot;&quot;
+	endif
+	if isMissing (sMyFile) then
+		sMyFile = &quot;&quot;
+	endif
+	oDocument = StarDesktop.loadComponentFromUrl (&quot;private:factory/swriter&quot;,&quot;_blank&quot;,0,dimarray())
+	oText = oDocument.Text
+	oCursor = oText.createTextCursor()
+	sSep = chr$(10)
+	if len (sMyText) &lt;&gt; 0 then
+		SepList() = ArrayoutofString(sMyText,sSep, MaxIndex)
+		MaxIndex = ubound(SepList())
+		for n = 0 to MaxIndex
+			oText.insertString(oCursor, SepList(n), FALSE)
+			insertParagraph
+		next
+	endif	
+	if len(sMyFile) &lt;&gt; 0 then
+		oDocument.storeAsURL(sMyFile, array())
+	endif
+end sub
+
+sub createNewWriterDocDebug (optional sMyFile, optional sMyText)
 	dim oDocument, oText, oCursor
 	if isMissing (sMyText) then
 		sMyText = &quot;&quot;

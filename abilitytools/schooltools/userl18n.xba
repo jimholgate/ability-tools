@@ -1712,7 +1712,7 @@ function fs_ABOUT_READ_LAST_WORD (cL)
 	case else
 		select case cL
 		case &quot;fr&quot;
-			sA = &quot;Pour désactiver la synthèse vocale, appuyez brièvement sur une touche de direction ou la touche « ESC ». Vous pouvez également cliquer dans la fenêtre de document avec la souris. Pour démarrer la parole continue, cliquez sur le bouton « Lire le dernier mot ».&quot;
+			sA = &quot;Pour désactiver la synthèse vocale, appuyez sur une touche de direction ou la touche « ESC », ou cliquer dans la fenêtre de document avec la souris. Pour démarrer la parole continue, cliquez sur le bouton « Lire le dernier mot ».&quot;
 		case else
 			sA = &quot;To turn continuous speech off, tap a direction key or the “ESC” key. You can also click anywhere in the document window with the mouse. To start continuous speech, click the “Read Last Word” button.&quot;
 		end select

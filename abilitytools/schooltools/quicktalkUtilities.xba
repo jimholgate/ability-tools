@@ -87,7 +87,8 @@ Function MyApp_KeyPressed(oEvt) As Boolean
 	       if bEndOfSentence = false and len(fsgetCursorWord) = len(rtrim(fsgetCursorWord)) then
 	       		doTextReader(true)
 	       endif
-	       typerightpluschar (chr$(10))
+	       gotoend
+	       insertParagraph
 	       bEndOfSentence = true
 	    case 1282 &apos; tab
 	    	MyApp_KeyPressed = true
@@ -137,7 +138,7 @@ function toggleContinuousSpeechWriter
 	endif
 end function
 
-sub exportSelectionAsODP
+sub exportSelectionFromWriter
 	dim sA, sB, sC as string
 	dim n as integer
 	dim oAlbum
@@ -202,7 +203,7 @@ sub exportSelectionAsODP
 end sub
 
 sub textMagnifierButton
-	exportSelectionAsODP
+	exportSelectionFromWriter
 end sub
 
 function stripControlChrs(byval sB)	
@@ -532,5 +533,13 @@ sub insertImage
 	if thisComponent.supportsService(&quot;com.sun.star.text.TextDocument&quot;) or thisComponent.supportsService(&quot;com.sun.star.text.WebDocument&quot;) or thisComponent.supportsService(&quot;com.sun.star.text.GlobalDocument&quot;) Then
 		dispatcher.executeDispatch(document, &quot;.uno:SetAnchorToChar&quot;, &quot;&quot;, 0, Array())
 	endif
+end sub
+
+sub insertParagraph
+	dim document   as object
+	dim dispatcher as object
+	document   = ThisComponent.CurrentController.Frame
+	dispatcher = createUnoService(&quot;com.sun.star.frame.DispatchHelper&quot;)
+	dispatcher.executeDispatch(document, &quot;.uno:InsertPara&quot;, &quot;&quot;, 0, Array())
 end sub
 </script:module>
