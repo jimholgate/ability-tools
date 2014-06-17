@@ -145,7 +145,9 @@ sub createNewWriterDoc (optional sMyFile, optional byval sMyText)
 	dim oDocument, oText, oCursor
 	Dim MaxIndex, n as Integer
 	Dim SepList() as String
-	dim sSep as string
+	dim sSep, sA, sCR as string
+	dim bCR as Boolean
+	
 	if isMissing (sMyText) then
 		sMyText = &quot;&quot;
 	endif
@@ -156,11 +158,22 @@ sub createNewWriterDoc (optional sMyFile, optional byval sMyText)
 	oText = oDocument.Text
 	oCursor = oText.createTextCursor()
 	sSep = chr$(10)
+	sCR = chr$(13)
 	if len (sMyText) &lt;&gt; 0 then
+		if instr(sMyText, sCR) = 0 then
+			bCR = false
+		else
+			bCR = true
+		endif
 		SepList() = ArrayoutofString(sMyText,sSep, MaxIndex)
-		MaxIndex = ubound(SepList())
-		for n = 0 to MaxIndex
-			oText.insertString(oCursor, SepList(n), FALSE)
+		for n = lbound(SepList()) to ubound(SepList())
+			if bCR then
+				&apos;Remove extra carriage returns when source is a Windows document
+				sA = fsReplaceText(SepList(n), sCR, &quot;&quot;)
+			else
+				sA = SepList(n)
+			endif
+			oText.insertString(oCursor, sA, FALSE)
 			insertParagraph
 		next
 	endif	
