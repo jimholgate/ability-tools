@@ -1436,7 +1436,11 @@ sub synthesizeOSXSpeech (sA, sLangLocale)
 		sB=sB &amp; &quot;if myVoice is &quot;&quot;Agnes&quot;&quot; or myVoice is &quot;&quot;Albert&quot;&quot; or myVoice is &quot;&quot;&quot;&quot; then&quot;  &amp; CR
 		sB=sB &amp; &quot;set myVoice to &quot;&quot;Alex&quot; &amp; sQ &amp; CR
 		sB=sB &amp; &quot;end if&quot;  &amp; CR
+		sB=sB &amp; &quot;try&quot; &amp; CR
 		sB=sB &amp; &quot;say &quot; &amp; sQ &amp; sA &amp; sQ &amp; &quot; using myVoice&quot; &amp; CR
+		sB=sB &amp; &quot;on error&quot; &amp; CR
+		sB=sB &amp; &quot;say &quot; &amp; sQ &amp; sA &amp; sQ &amp; CR
+		sB=sB &amp; &quot;end try&quot; &amp; CR
 		sFile=fsTemporaryOSXVoiceScript
 		CreateFile(sFile,sB,&quot;utf-8&quot;)
 		errorCode=Shell (&quot;osascript&quot;, 0, sQ &amp; sFile &amp; sQ, bWait)
