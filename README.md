@@ -20,7 +20,7 @@ Ability Tools extension for LibreOffice and Apache OpenOffice can read presentat
 
 ## Source Code ##
 
-  * [Ability Tools / Google Project Hosting](http://code.google.com/p/ability-tools/source/browse/)
+  * [Ability Tools / GitHub Project Hosting](https://github.com/jimholgate/ability-tools/tree/master)
 
 
 ---
